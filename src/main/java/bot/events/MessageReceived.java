@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Locale;
 
 public class MessageReceived extends ListenerAdapter {
@@ -20,15 +21,31 @@ public class MessageReceived extends ListenerAdapter {
         String message = event.getMessage().getContentRaw();
         User author = event.getAuthor();
 
+        // Has entered a number greater than 50?
+        registerAgeFilter(event);
+
         // Disconnect command
-        if (message.equals("DISCONNECT") && !author.isBot()) disconnectCommand(event);
+        if (message.equals(".DISCONNECT") && !author.isBot()) disconnectCommand(event);
 
         // Register command
         if (message.toLowerCase(Locale.ROOT).startsWith("r!")) registerCommand(event);
 
         // Check if message has prefix (r!)
-        if (message.equalsIgnoreCase("r.ping")) pingComand(event);
+        if (message.equalsIgnoreCase(".ping")) pingComand(event);
+    }
 
+    private void registerAgeFilter(MessageReceivedEvent e) {
+
+        Message content = e.getMessage();
+        List<String> message = List.of(content.getContentRaw().split(" "));
+
+        for (String i : message) {
+            try {
+                int number = Integer.parseInt(i);
+
+                if (number > 50 || number < 1) content.delete().queue();
+            } catch (NumberFormatException ignored) {}
+        }
     }
 
     private void registerCommand(MessageReceivedEvent e) {
