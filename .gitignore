@@ -23,8 +23,8 @@
 hs_err_pid*
 replay_pid*
 
-# DiscordBot Config (token and stuff)
-data/
+# bot.Main Config (token and stuff)
+src/main/java/bot/data/
 
 # Idea files
 .idea
