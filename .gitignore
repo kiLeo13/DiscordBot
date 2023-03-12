@@ -23,5 +23,8 @@
 hs_err_pid*
 replay_pid*
 
-# Bot Config (token and stuff)
+# DiscordBot Config (token and stuff)
 data/
+
+# Idea files
+.idea
