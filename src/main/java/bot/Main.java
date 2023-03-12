@@ -14,7 +14,8 @@ public class Main {
 
         try {
             api = JDABuilder.createDefault(BotConfig.getToken(),
-                            GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT)
+                            GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT,
+                            GatewayIntent.GUILD_VOICE_STATES)
                     .setEventManager(new AnnotatedEventManager())
                     .build()
                     .awaitReady();
