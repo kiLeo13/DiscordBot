@@ -19,4 +19,4 @@ Yeah, this is my first discord bot, learning how to use libraries and mostly how
 ###### Note that if you want to add a swearing to the list you can simply DM me and ask for it too.
 
 TODO: `Countdown`
-- I intend to make a countdown command in case you are a super weird person and wants a countdown from X to 0.
+- I intend to make a countdown command in case you are weird person and wants a countdown from X to 0.
