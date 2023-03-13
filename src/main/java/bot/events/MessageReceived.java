@@ -2,6 +2,7 @@ package bot.events;
 
 import bot.Main;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -21,31 +22,14 @@ public class MessageReceived extends ListenerAdapter {
         String message = event.getMessage().getContentRaw();
         User author = event.getAuthor();
 
-        // Has entered a number greater than 50?
-        registerAgeFilter(event);
-
         // Disconnect command
         if (message.equals(".DISCONNECT") && !author.isBot()) disconnectCommand(event);
 
-        // Register command
-        if (message.toLowerCase(Locale.ROOT).startsWith("r!")) registerCommand(event);
-
         // Check if message has prefix (r!)
         if (message.equalsIgnoreCase(".ping")) pingComand(event);
-    }
 
-    private void registerAgeFilter(MessageReceivedEvent e) {
-
-        Message content = e.getMessage();
-        List<String> message = List.of(content.getContentRaw().split(" "));
-
-        for (String i : message) {
-            try {
-                int number = Integer.parseInt(i);
-
-                if (number > 50 || number < 1) content.delete().queue();
-            } catch (NumberFormatException ignored) {}
-        }
+        // Swearing command
+        if (message.equalsIgnoreCase(".puta")) swearCommand(event);
     }
 
     private void registerCommand(MessageReceivedEvent e) {
@@ -114,5 +98,18 @@ public class MessageReceived extends ListenerAdapter {
         if (author.isBot()) return;
 
         channel.sendMessage("Oioioioioioi\nGateway ping: `" + api.getGatewayPing() + "ms`").queue();
+    }
+
+    private void swearCommand(MessageReceivedEvent e) {
+
+        Member member = e.getMember();
+        List<String> swearingList = Main.getFileObject().get("swearings");
+
+        if (member == null) return;
+        if (!member.hasPermission(Permission.MESSAGE_MANAGE)) return;
+
+        int random = (int) Math.floor(Math.random() * swearingList.size());
+
+        e.getMessage().reply(swearingList.get(random)).queue();
     }
 }
