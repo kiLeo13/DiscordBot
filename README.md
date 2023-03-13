@@ -7,7 +7,7 @@ Yeah, this is my first discord bot, learning how to use libraries and mostly how
 >
 > This bot isn't intended to be a public bot or whatever you may think, this is a bot for a specific server and I do not recommend you using it on your server.
 >
-> If you still want to use it on your server for some weird and dumb reason, DM me on Discord and I will send you the invitations link :3
+> If you still want to use it on your server for some weird and dumb reason, DM me on Discord and I will send you the invitation link :3
 
 ## Features
 

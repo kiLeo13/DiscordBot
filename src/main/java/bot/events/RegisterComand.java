@@ -14,6 +14,13 @@ import java.util.List;
 import java.util.Locale;
 
 public class RegisterComand extends ListenerAdapter {
+    private Role requiredRole;
+
+    // Final Register
+    private Role notRegistered;
+    private Role registered;
+    private Role verified;
+
     // Gender
     private Role male;
     private Role female;
@@ -41,17 +48,16 @@ public class RegisterComand extends ListenerAdapter {
 
         // Register command
         if (message.toLowerCase(Locale.ROOT).startsWith("r!") && !isBot) {
-            if (!rolesExist(event.getGuild())) {
-                content.delete().queue();
-
-                channel.sendMessage("One or more register roles were not found, we are sorry about that.")
-                        .delay(Duration.ofMillis(5000))
-                        .flatMap(Message::delete).queue();
-
+            if (rolesExist(event.getGuild())) {
+                registerCommand(event);
                 return;
             }
 
-            registerCommand(event);
+            content.delete().queue();
+
+            channel.sendMessage("One or more required roles for this action were not found, we are sorry about that.")
+                    .delay(Duration.ofMillis(5000))
+                    .flatMap(Message::delete).queue();
         }
     }
 
@@ -86,27 +92,11 @@ public class RegisterComand extends ListenerAdapter {
         Guild guild = e.getGuild();
         Member member = e.getMember();
 
-        // Roles
-        Role requiredRole = guild.getRoleById(Roles.ROLE_REQUIRED.get());
-
-        if (requiredRole == null) {
-            System.out.println(
-                    author.getName() + " tried to register someone but the required role was not found."
-            );
-
-            content.delete().queue();
-
-            channel.sendMessage("<@" + author.getId() + "> The required role for this action was not found, we are sorry about that.")
-                    .delay(Duration.ofMillis(5000))
-                    .flatMap(Message::delete).queue();
-            return;
-        }
-
         // If author does not have permission, ignore it
         if (member == null) return;
 
         // Also ignore if member does not the permission at all
-        if (member.hasPermission(Permission.MANAGE_ROLES) || !member.getRoles().contains(requiredRole)) return;
+        if (!member.hasPermission(Permission.MANAGE_ROLES) && !member.getRoles().contains(requiredRole)) return;
 
         if (args.length < 2) {
             content.delete().queue();
@@ -136,19 +126,83 @@ public class RegisterComand extends ListenerAdapter {
             return;
         }
 
-        target.getRoles().add(male);
+        // Is member already registered?
+        if (target.getRoles().contains(registered)) {
+            channel.sendMessage("<@" + author.getId() + "> this member is already registered.")
+                    .delay(Duration.ofMillis(5000))
+                    .flatMap(Message::delete)
+                    .queue();
 
+            content.delete().queue();
 
+            System.out.println("Moderator " + author.getName() + "#" + author.getDiscriminator() + " tentou registrar " + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + " mas ele já estava registrado.");
+            return;
+        }
 
+        String[] registerArgs = args[0].substring(2).split("");
 
+        try {
+            checkRegisterInput(registerArgs);
+        } catch (IllegalArgumentException exception) {
+            content.delete().queue();
 
+            channel.sendMessage("<@" + author.getId() + "> invalid register format.\nSee: `" + args[0] + "`.")
+                    .delay(Duration.ofMillis(5000))
+                    .flatMap(Message::delete)
+                    .queue();
 
+            System.out.println("Moderator " + author.getName() + "#" + author.getDiscriminator() + " used an invalid register format.\nSee: " + args[0]);
+            return;
+        }
 
+        char genderInput = registerArgs[0].charAt(0);
+        String ageInput = registerArgs[1] + registerArgs[2] + registerArgs[3];
+        char plataformInput = registerArgs[4].charAt(0);
 
+        // Gender
+        switch (genderInput) {
+            case 'f' -> guild.addRoleToMember(target, female).queue();
+            case 'm' -> guild.addRoleToMember(target, male).queue();
+            case 'n' -> guild.addRoleToMember(target, nonBinary).queue();
+        }
+
+        // Age
+        switch (ageInput) {
+            case "-13" -> guild.addRoleToMember(target, under13).queue();
+            case "-18" -> guild.addRoleToMember(target, underage).queue();
+            case "+18" -> guild.addRoleToMember(target, adult).queue();
+        }
+
+        // Plataform
+        switch (plataformInput) {
+            case 'b' -> {
+                guild.addRoleToMember(target, mobile).queue();
+                guild.addRoleToMember(target, pc).queue();
+            }
+            case 'm' -> guild.addRoleToMember(target, mobile).queue();
+            case 'p' -> guild.addRoleToMember(target, pc).queue();
+        }
+
+        guild.addRoleToMember(target, registered).queue();
+        guild.removeRoleFromMember(target, notRegistered).queue();
+        guild.removeRoleFromMember(target, verified).queue();
+
+        System.out.println(author.getName() +
+                "#" + author.getDiscriminator() +
+                " registrou o membro " + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "!\nId do registrado: " + target.getId() + "\n\nCargos:" +
+                "\nGênero: " + getFullGender(genderInput) +
+                "\nIdade: " + getFullAge(ageInput) +
+                "\nPlataforma: " + getFullPlataform(plataformInput));
     }
 
     private boolean rolesExist(Guild guild) {
         try {
+            requiredRole = guild.getRoleById(Roles.ROLE_REQUIRED.get());
+
+            notRegistered = guild.getRoleById(Roles.ROLE_NOT_REGISTERED.get());
+            registered = guild.getRoleById(Roles.ROLE_REGISTERED.get());
+            verified = guild.getRoleById(Roles.ROLE_VERIFIED.get());
+
             male = guild.getRoleById(Roles.ROLE_MALE.get());
             female = guild.getRoleById(Roles.ROLE_FEMALE.get());
             nonBinary = guild.getRoleById(Roles.ROLE_NON_BINARY.get());
@@ -164,5 +218,78 @@ public class RegisterComand extends ListenerAdapter {
         }
 
         return true;
+    }
+
+    private void checkRegisterInput(String[] input) throws IllegalArgumentException {
+        List<String> gender = List.of("f", "m", "n");
+        List<String> age = List.of("-13", "-18", "+18");
+        List<String> plataform = List.of("b", "m", "p");
+
+        if (input.length != 5) throw new IllegalArgumentException("Too few arguments");
+
+        if (!gender.contains(input[0])) throw new IllegalArgumentException("Could not find gender '" + input[0] + "'");
+        if (!age.contains(input[1] + input[2] + input[3])) throw new IllegalArgumentException("Could not find age '" + input[0] + input[1] + input[2] + "'");
+        if (!plataform.contains(input[4])) throw new IllegalArgumentException("could not find plataform '" + input[4] + "'");
+    }
+
+    private String getFullGender(char gender) {
+        switch (gender) {
+            case 'f' -> {
+                return "Feminino";
+
+            }
+
+            case 'm' -> {
+                return "Masculino";
+            }
+
+            case 'n' -> {
+                return "Não Binário";
+            }
+
+            default -> {
+                return "Unknown";
+            }
+        }
+    }
+
+    private String getFullAge(String age) {
+        switch (age) {
+            case "-13" -> {
+                return "Menor de idade + (😻)";
+            }
+
+            case "-18" -> {
+                return "Menor de Idade";
+            }
+
+            case "+19" -> {
+                return "Maior de Idade";
+            }
+
+            default -> {
+                return "Unknown";
+            }
+        }
+    }
+
+    private String getFullPlataform(char plataform) {
+        switch (plataform) {
+            case 'b' -> {
+                return "Ambos (PC e Mobile)";
+            }
+
+            case 'm' -> {
+                return "Mobile";
+            }
+
+            case 'p' -> {
+                return "Computador";
+            }
+
+            default -> {
+                return "Unknown";
+            }
+        }
     }
 }
