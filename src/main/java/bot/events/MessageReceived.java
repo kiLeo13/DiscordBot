@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Locale;
 
 public class MessageReceived extends ListenerAdapter {
 
