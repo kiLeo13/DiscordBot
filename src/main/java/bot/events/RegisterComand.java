@@ -107,14 +107,13 @@ public class RegisterComand extends ListenerAdapter {
 
         String targetRegex = args[1].replaceAll("[^0-9]+", "");
         Member target;
-        User targetUser;
 
         // If target is not found or something very weird happens
         try {
             target = guild.getMemberById(targetRegex);
-            targetUser = target.getUser();
-        } catch (IllegalArgumentException | NullPointerException exception) {
 
+            if (target == null) throw new IllegalArgumentException("Target cannot be null");
+        } catch (IllegalArgumentException exception) {
             channel.sendMessage("<@" + author.getId() + "> Member `" + args[1] + "` was not found.")
                     .delay(Duration.ofMillis(5000))
                     .flatMap(Message::delete).queue();
@@ -136,7 +135,19 @@ public class RegisterComand extends ListenerAdapter {
 
             content.delete().queue();
 
-            System.out.println("Staff " + author.getName() + "#" + author.getDiscriminator() + " tentou registrar " + targetUser.getName() + "#" + targetUser.getDiscriminator() + " mas ele já estava registrado.");
+            System.out.println("Staff " + author.getName() +
+                    "#" + author.getDiscriminator() +
+                    " tentou registrar " + target.getUser().getName() +
+                    "#" + target.getUser().getDiscriminator() +
+                    " mas ele já estava registrado. Ignorando...");
+            return;
+        }
+
+        if (target.getUser().isBot()) {
+            content.delete().queue();
+            System.out.println("Staff " + author.getName() +
+                    "#" + author.getDiscriminator() +
+                    " tentou registrar um bot: " + target.getEffectiveName() + "#" + target.getUser().getDiscriminator());
             return;
         }
 

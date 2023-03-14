@@ -18,9 +18,9 @@ public enum Roles {
     ROLE_COMPUTER("1084937558535962774"),
     ROLE_MOBILE("1084937569474707578");
 
-    final String role;
+    final String roleId;
 
-    Roles(String role) { this.role = role; }
+    Roles(String roleId) { this.roleId = roleId; }
 
-    public String get() { return this.role; }
+    public String get() { return this.roleId; }
 }

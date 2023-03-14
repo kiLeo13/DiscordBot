@@ -1,6 +1,7 @@
 package bot;
 
 import bot.data.BotConfig;
+import bot.events.Countdown;
 import bot.events.MessageReceived;
 import bot.events.RegisterComand;
 import net.dv8tion.jda.api.JDA;
@@ -55,6 +56,7 @@ public class Main {
     private static void registerEvents(JDA api) {
         api.addEventListener(new MessageReceived());
         api.addEventListener(new RegisterComand());
+        api.addEventListener(new Countdown());
     }
 
     public static Map<String, List<String>> getFileObject() { return object; }
