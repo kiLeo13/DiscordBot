@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -88,6 +89,7 @@ public class RegisterComand extends ListenerAdapter {
         Message content = e.getMessage();
         String message = e.getMessage().getContentRaw();
         String[] args = message.split(" ");
+        String[] registerArgs = args[0].substring(2).split("");
         MessageChannelUnion channel = e.getChannel();
         Guild guild = e.getGuild();
         Member member = e.getMember();
@@ -105,24 +107,23 @@ public class RegisterComand extends ListenerAdapter {
 
         String targetRegex = args[1].replaceAll("[^0-9]+", "");
         Member target;
+        User targetUser;
 
+        // If target is not found or something very weird happens
         try {
             target = guild.getMemberById(targetRegex);
-        } catch (IllegalArgumentException exception) {
-            target = null;
-        }
+            targetUser = target.getUser();
+        } catch (IllegalArgumentException | NullPointerException exception) {
 
-        // If target is not found
-        if (target == null) {
             channel.sendMessage("<@" + author.getId() + "> Member `" + args[1] + "` was not found.")
                     .delay(Duration.ofMillis(5000))
                     .flatMap(Message::delete).queue();
 
             content.delete().queue();
 
-            System.out.println("Moderator " + author.getName() +
+            System.out.println("Staff " + author.getName() +
                     "#" + author.getDiscriminator() +
-                    " tried to register a not found user (" + args[1] + ").");
+                    " tentou registrar um membro não encontrado (" + args[1] + ").");
             return;
         }
 
@@ -135,11 +136,9 @@ public class RegisterComand extends ListenerAdapter {
 
             content.delete().queue();
 
-            System.out.println("Moderator " + author.getName() + "#" + author.getDiscriminator() + " tentou registrar " + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + " mas ele já estava registrado.");
+            System.out.println("Staff " + author.getName() + "#" + author.getDiscriminator() + " tentou registrar " + targetUser.getName() + "#" + targetUser.getDiscriminator() + " mas ele já estava registrado.");
             return;
         }
-
-        String[] registerArgs = args[0].substring(2).split("");
 
         try {
             checkRegisterInput(registerArgs);
@@ -151,12 +150,12 @@ public class RegisterComand extends ListenerAdapter {
                     .flatMap(Message::delete)
                     .queue();
 
-            System.out.println("Moderator " + author.getName() + "#" + author.getDiscriminator() + " used an invalid register format.\nSee: " + args[0]);
+            System.out.println("Staff " + author.getName() + "#" + author.getDiscriminator() + " utilizou um formato de registro inválido.\nVeja: " + args[0]);
             return;
         }
 
         char genderInput = registerArgs[0].charAt(0);
-        String ageInput = registerArgs[1] + registerArgs[2] + registerArgs[3];
+        String ageInput = Arrays.toString(registerArgs).replaceAll("[^\\d+\\-]", "");
         char plataformInput = registerArgs[4].charAt(0);
 
         // Gender
@@ -183,9 +182,11 @@ public class RegisterComand extends ListenerAdapter {
             case 'p' -> guild.addRoleToMember(target, pc).queue();
         }
 
+        content.delete().queue();
         guild.addRoleToMember(target, registered).queue();
         guild.removeRoleFromMember(target, notRegistered).queue();
         guild.removeRoleFromMember(target, verified).queue();
+        channel.sendMessage("<@" + author.getId() + "> member `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` has been sucessfully registered.").queue();
 
         System.out.println(author.getName() +
                 "#" + author.getDiscriminator() +
@@ -236,7 +237,6 @@ public class RegisterComand extends ListenerAdapter {
         switch (gender) {
             case 'f' -> {
                 return "Feminino";
-
             }
 
             case 'm' -> {

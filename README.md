@@ -1,5 +1,5 @@
-# DiscordBot
-My first discord bot :3
+# <p align="center">✨ DiscordBot ✨
+#### <p align="center">My first discord bot :3
 
 Yeah, this is my first discord bot, learning how to use libraries and mostly how to use JDA. I tried to make a discord bot using JS a long time ago and it didn't go very well, so I'm here now trying to make it in Java xD
 
