@@ -31,6 +31,9 @@ public class Countdown extends ListenerAdapter {
         if (!channel.getId().equals(Channels.REQUIRED_COUNTDOWN_CHANNEL.get())
                 && !Channels.REQUIRED_COUNTDOWN_CHANNEL.get().toLowerCase(Locale.ROOT).equalsIgnoreCase("none")) return;
 
+        // If option set to 'disabled' the bot will not even care
+        if (Channels.REQUIRED_COUNTDOWN_CHANNEL.get().equalsIgnoreCase("disabled")) return;
+
         if (args.length < 2) return;
         int limit = 0;
         String reason;

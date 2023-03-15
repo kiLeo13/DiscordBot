@@ -2,7 +2,7 @@ package bot.util;
 
 public enum Channels {
     REQUIRED_REGISTER_CHANNEL("1084341941984034816"),
-    REQUIRED_COUNTDOWN_CHANNEL("1084341941984034816");
+    REQUIRED_COUNTDOWN_CHANNEL("disabled");
 
     final String channelid;
 

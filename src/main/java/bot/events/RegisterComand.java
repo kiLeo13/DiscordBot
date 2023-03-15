@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -44,13 +45,33 @@ public class RegisterComand extends ListenerAdapter {
         Message content = event.getMessage();
         String message = event.getMessage().getContentRaw();
         User user = event.getAuthor();
+        Member member = event.getMember();
         boolean isBot = user.isBot();
         MessageChannelUnion channel = event.getChannel();
+        Guild guild = event.getGuild();
 
+        // Special
+        String messageLink = "https://discord.com/channels/" + guild.getId() + "/" + channel.getId() + "/" + content.getId();
+        String data = getFormattedData();
+
+        if (member == null) return;
         if (!isBot) registerAgeFilter(event);
 
         // Register command
         if (message.toLowerCase(Locale.ROOT).startsWith("r!") && !isBot) {
+
+            // Also ignore if member does not the permission at all
+            if (!member.hasPermission(Permission.MANAGE_ROLES) && !member.getRoles().contains(requiredRole)) {
+                System.out.println("Um membro sem permissão tentou usar o registro.\n" +
+                        "\nMembro: @" + user.getName() + "#" + user.getDiscriminator() +
+                        "\nID: " + user.getId() +
+                        "\nChat: #" + channel.getName() +
+                        "\nComando: " + message +
+                        "\nLink da Mensagem: " + messageLink +
+                        "\nData: " + data);
+                return;
+            }
+
             if (!channel.getId().equals(Channels.REQUIRED_REGISTER_CHANNEL.get())) return;
 
             if (rolesExist(event.getGuild())) {
@@ -101,8 +122,6 @@ public class RegisterComand extends ListenerAdapter {
         // If member is not find, ignore it
         if (member == null) return;
 
-        // Also ignore if member does not the permission at all
-        if (!member.hasPermission(Permission.MANAGE_ROLES) && !member.getRoles().contains(requiredRole)) return;
 
         if (args.length < 2) {
             content.delete().queue();
@@ -241,6 +260,13 @@ public class RegisterComand extends ListenerAdapter {
 
             pc = guild.getRoleById(Roles.ROLE_COMPUTER.get());
             mobile = guild.getRoleById(Roles.ROLE_MOBILE.get());
+
+            // Is the role found
+            Roles[] roles = Roles.values();
+
+            for (Roles i : roles)
+                if (guild.getRoleById(i.get()) == null) throw new IllegalArgumentException("Role '" + i + "' cannot be null");
+
         } catch (IllegalArgumentException | NullPointerException error) {
             return false;
         }
@@ -318,5 +344,27 @@ public class RegisterComand extends ListenerAdapter {
                 return "Unknown";
             }
         }
+    }
+
+    private String getFormattedData() {
+
+        String year = formatNumber(LocalDateTime.now().getYear());
+        String month = formatNumber(LocalDateTime.now().getMonth().getValue());
+        String day = formatNumber(LocalDateTime.now().getDayOfMonth());
+        String hour = formatNumber(LocalDateTime.now().getHour());
+        String minute = formatNumber(LocalDateTime.now().getMinute());
+        String second = formatNumber(LocalDateTime.now().getSecond());
+
+        /*
+         * Example: January 04th, 2023 at 5:34:21 PM
+         * 01/04/2023 às 17h 34m 21s
+         */
+        return day + "/" + month + "/" + year + " às " + hour + "h " + minute + "m " + second + "s";
+    }
+
+    private String formatNumber(int num) {
+        return num < 10
+                ? "0" + num
+                : String.valueOf(num);
     }
 }
