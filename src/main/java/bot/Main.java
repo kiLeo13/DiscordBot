@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -31,7 +30,6 @@ public class Main {
                             GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MEMBERS,
                             GatewayIntent.GUILD_PRESENCES)
                     .setEventManager(new AnnotatedEventManager())
-                    .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .build()
                     .awaitReady();
 

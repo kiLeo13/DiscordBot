@@ -1,5 +1,6 @@
 package bot.events;
 
+import bot.util.Channels;
 import bot.util.Roles;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -13,6 +14,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class RegisterComand extends ListenerAdapter {
     private Role requiredRole;
@@ -49,6 +51,8 @@ public class RegisterComand extends ListenerAdapter {
 
         // Register command
         if (message.toLowerCase(Locale.ROOT).startsWith("r!") && !isBot) {
+            if (!channel.getId().equals(Channels.REQUIRED_REGISTER_CHANNEL.get())) return;
+
             if (rolesExist(event.getGuild())) {
                 registerCommand(event);
                 return;
@@ -94,7 +98,7 @@ public class RegisterComand extends ListenerAdapter {
         Guild guild = e.getGuild();
         Member member = e.getMember();
 
-        // If author does not have permission, ignore it
+        // If member is not find, ignore it
         if (member == null) return;
 
         // Also ignore if member does not the permission at all
@@ -110,7 +114,7 @@ public class RegisterComand extends ListenerAdapter {
 
         // If target is not found or something very weird happens
         try {
-            target = guild.getMemberById(targetRegex);
+            target = guild.retrieveMemberById(targetRegex).complete();
 
             if (target == null) throw new IllegalArgumentException("Target cannot be null");
         } catch (IllegalArgumentException exception) {
@@ -194,10 +198,22 @@ public class RegisterComand extends ListenerAdapter {
         }
 
         content.delete().queue();
+
+        // Give registered role
         guild.addRoleToMember(target, registered).queue();
+
+        // Take not registered role
         guild.removeRoleFromMember(target, notRegistered).queue();
+
+        // Take verified role
         guild.removeRoleFromMember(target, verified).queue();
-        channel.sendMessage("<@" + author.getId() + "> member `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` has been sucessfully registered.").queue();
+
+        channel.sendMessage("<@" + author.getId() + "> member `" + target.getEffectiveName() +
+                "#" + target.getUser().getDiscriminator() +
+                "` has been sucessfully registered.")
+                .delay(10000, TimeUnit.MILLISECONDS)
+                .flatMap(Message::delete)
+                .queue();
 
         System.out.println(author.getName() +
                 "#" + author.getDiscriminator() +

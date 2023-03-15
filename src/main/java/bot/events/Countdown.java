@@ -31,8 +31,6 @@ public class Countdown extends ListenerAdapter {
         if (!channel.getId().equals(Channels.REQUIRED_COUNTDOWN_CHANNEL.get())
                 && !Channels.REQUIRED_COUNTDOWN_CHANNEL.get().toLowerCase(Locale.ROOT).equalsIgnoreCase("none")) return;
 
-        System.out.println("Chegou aqui");
-
         if (args.length < 2) return;
         int limit = 0;
         String reason;
@@ -40,14 +38,17 @@ public class Countdown extends ListenerAdapter {
         try {
             limit = Integer.parseInt(args[1]);
 
-            StringBuilder builder = new StringBuilder();
+            if (args[2] == null) throw new NullPointerException("Argument is null");
 
-            for (int i = 2; i < args.length-1; i++)
+            StringBuilder builder = new StringBuilder();
+            builder.append("`");
+
+            for (int i = 2; i < args.length; i++)
                 builder.append(args[i]).append(" ");
 
             reason = builder
                     .toString()
-                    .stripTrailing();
+                    .stripTrailing() + "`";
         } catch (NumberFormatException e) {
             message.reply("The number format provided `" + args[1] + "` is not valid.")
                     .delay(10000, TimeUnit.MILLISECONDS)
@@ -62,7 +63,9 @@ public class Countdown extends ListenerAdapter {
 
             return;
         }
-        catch (NullPointerException | StringIndexOutOfBoundsException e) { reason = "none"; }
+        catch (NullPointerException
+               | StringIndexOutOfBoundsException
+               | ArrayIndexOutOfBoundsException e) { reason = "none"; }
 
         if (limit < 3 || limit > 60) {
             callSecondsBoundaries(event);
@@ -84,7 +87,7 @@ public class Countdown extends ListenerAdapter {
         private final User author;
 
         private Timer(MessageReceivedEvent event, int limit, String countReason) {
-            event.getChannel().sendMessage("Countdown will start soon, please wait.")
+            event.getChannel().sendMessage("Countdown will start soon, please wait...")
                     .delay(5000, TimeUnit.MILLISECONDS)
                     .flatMap(Message::delete)
                     .queue();
@@ -104,10 +107,10 @@ public class Countdown extends ListenerAdapter {
         @Override
         public void run() {
             while (count >= 0) {
-                if (!hasReason) botSentMessage.editMessage(count + "s")
+                if (!hasReason) botSentMessage.editMessage(getFormattedCount(count))
                         .queue();
 
-                else botSentMessage.editMessage(countReason + " será em " + count + " segundos.")
+                else botSentMessage.editMessage(countReason + " será em " + getFormattedCount(count))
                         .queue();
 
                 count--;
@@ -125,12 +128,16 @@ public class Countdown extends ListenerAdapter {
 
         Message message = e.getMessage();
 
-        message.reply("For spamming purposes you can only enter a number between 3 to 60")
+        message.reply("For spamming/rate-limit purposes you can only enter a number between 3 to 60")
                 .delay(10000, TimeUnit.MILLISECONDS)
                 .flatMap(Message::delete)
                 .queue();
 
         message.delete()
                 .queueAfter(11000, TimeUnit.MILLISECONDS);
+    }
+
+    private static String getFormattedCount(int count) {
+        return " `" + count + "s`";
     }
 }
