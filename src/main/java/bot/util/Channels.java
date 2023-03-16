@@ -1,12 +1,20 @@
 package bot.util;
 
+import java.util.List;
+
 public enum Channels {
-    REQUIRED_REGISTER_CHANNEL("1084341941984034816"),
-    REQUIRED_COUNTDOWN_CHANNEL("disabled");
+    REGISTER_FILTER_CHANNELS(List.of(1085377131019763802L)),
+    REGISTER_CHANNELS(List.of(1085377131019763802L)),
+    COUNTDOWN_CHANNELS(List.of(1085377131019763802L)),
+    SWEARING_CHANNELS(List.of(1085377131019763802L)),
+    STICKERS_CHANNELS(List.of(1085377131019763802L)),
+    DISCONNECT_CHANNELS(List.of(1085377131019763802L));
 
-    final String channelid;
+    final List<Long> list;
 
-    Channels(String channelid) { this.channelid = channelid; }
+    Channels(List<Long> list) {
+        this.list = list;
+    }
 
-    public String get() { return this.channelid; }
+    public List<Long> get() { return this.list; }
 }

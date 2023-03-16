@@ -9,13 +9,24 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import static bot.util.Feature.replyBombMessage;
+import static bot.util.Feature.sendBombMessage;
+
 public class Countdown extends ListenerAdapter {
+
+
 
     @SubscribeEvent
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+
+        List<Long> allowedCountdownChannels = Channels.COUNTDOWN_CHANNELS.get();
+
+        if (allowedCountdownChannels.isEmpty()) return;
+        if (event.getAuthor().isBot()) return;
 
         Message message = event.getMessage();
         String content = message.getContentRaw();
@@ -23,16 +34,10 @@ public class Countdown extends ListenerAdapter {
         String[] args = content.split(" ");
         User author = event.getAuthor();
 
-        if (author.isBot()) return;
+        if (!content.toLowerCase(Locale.ROOT).startsWith(".countdown")
+                && !content.toLowerCase(Locale.ROOT).startsWith(".cd")) return;
 
-        if (!content.toLowerCase(Locale.ROOT).startsWith(".cd")
-                && !content.toLowerCase(Locale.ROOT).startsWith(".countdown")) return;
-
-        if (!channel.getId().equals(Channels.REQUIRED_COUNTDOWN_CHANNEL.get())
-                && !Channels.REQUIRED_COUNTDOWN_CHANNEL.get().toLowerCase(Locale.ROOT).equalsIgnoreCase("none")) return;
-
-        // If option set to 'disabled' the bot will not even care
-        if (Channels.REQUIRED_COUNTDOWN_CHANNEL.get().equalsIgnoreCase("disabled")) return;
+        if (!allowedCountdownChannels.contains(channel.getIdLong())) return;
 
         if (args.length < 2) return;
         int limit = 0;
@@ -90,10 +95,9 @@ public class Countdown extends ListenerAdapter {
         private final User author;
 
         private Timer(MessageReceivedEvent event, int limit, String countReason) {
-            event.getChannel().sendMessage("Countdown will start soon, please wait...")
-                    .delay(5000, TimeUnit.MILLISECONDS)
-                    .flatMap(Message::delete)
-                    .queue();
+            sendBombMessage(event.getChannel(),
+                    "Countdown will start soon, please wait...",
+                    5000);
 
             try { Thread.sleep(5000); }
             catch (InterruptedException e) { e.printStackTrace(); }
@@ -131,10 +135,9 @@ public class Countdown extends ListenerAdapter {
 
         Message message = e.getMessage();
 
-        message.reply("For spamming/rate-limit purposes you can only enter a number between 3 to 60")
-                .delay(10000, TimeUnit.MILLISECONDS)
-                .flatMap(Message::delete)
-                .queue();
+        replyBombMessage(message,
+                "For spamming/rate-limit purposes you can only enter a number between 3 to 60",
+                10000);
 
         message.delete()
                 .queueAfter(11000, TimeUnit.MILLISECONDS);

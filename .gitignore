@@ -28,3 +28,6 @@ src/main/java/bot/data/
 
 # Idea files
 .idea
+
+# Target directory
+target

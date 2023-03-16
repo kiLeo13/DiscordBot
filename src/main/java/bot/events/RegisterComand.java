@@ -6,16 +6,17 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
+
+import static bot.util.Feature.sendBombMessage;
 
 public class RegisterComand extends ListenerAdapter {
     private Role requiredRole;
@@ -72,8 +73,9 @@ public class RegisterComand extends ListenerAdapter {
                 return;
             }
 
-            if (!channel.getId().equals(Channels.REQUIRED_REGISTER_CHANNEL.get())) return;
+            if (!Channels.REGISTER_CHANNELS.get().contains(channel.getIdLong())) return;
 
+            // Start register process if everything is fine
             if (rolesExist(event.getGuild())) {
                 registerCommand(event);
                 return;
@@ -81,18 +83,23 @@ public class RegisterComand extends ListenerAdapter {
 
             content.delete().queue();
 
-            channel.sendMessage("One or more required roles for this action were not found, we are sorry about that.")
-                    .delay(Duration.ofMillis(5000))
-                    .flatMap(Message::delete).queue();
+            sendBombMessage(channel,
+                    "One or more required roles for this action were not found, we are sorry about that.",
+                    5000);
         }
     }
 
     private void registerAgeFilter(MessageReceivedEvent e) {
 
+        List<Long> filterChannels = Channels.REGISTER_FILTER_CHANNELS.get();
+        if (filterChannels.isEmpty()) return;
+
         Message content = e.getMessage();
         Member member = e.getMember();
         List<String> message = List.of(content.getContentRaw().split(" "));
+        MessageChannelUnion channel = e.getChannel();
 
+        if (!filterChannels.contains(channel.getIdLong())) return;
         if (member == null) return;
 
         Role requiredRole = e.getGuild().getRoleById(Roles.ROLE_REQUIRED.get());
@@ -110,18 +117,21 @@ public class RegisterComand extends ListenerAdapter {
 
     private void registerCommand(MessageReceivedEvent e) {
 
-        User author = e.getAuthor();
+        List<Long> allowedRegisterChannels = Channels.REGISTER_CHANNELS.get();
+        if (allowedRegisterChannels.isEmpty()) return;
+
         Message content = e.getMessage();
         String message = e.getMessage().getContentRaw();
         String[] args = message.split(" ");
         String[] registerArgs = args[0].substring(2).split("");
         MessageChannelUnion channel = e.getChannel();
-        Guild guild = e.getGuild();
+
+        User author = e.getAuthor();
         Member member = e.getMember();
+        Guild guild = e.getGuild();
 
         // If member is not find, ignore it
         if (member == null) return;
-
 
         if (args.length < 2) {
             content.delete().queue();
@@ -136,10 +146,8 @@ public class RegisterComand extends ListenerAdapter {
             target = guild.retrieveMemberById(targetRegex).complete();
 
             if (target == null) throw new IllegalArgumentException("Target cannot be null");
-        } catch (IllegalArgumentException exception) {
-            channel.sendMessage("<@" + author.getId() + "> Member `" + args[1] + "` was not found.")
-                    .delay(Duration.ofMillis(5000))
-                    .flatMap(Message::delete).queue();
+        } catch (ErrorResponseException | IllegalArgumentException exception) {
+            sendBombMessage(channel, "<@" + author.getId() + "> Member `" + args[1] + "` was not found.", 5000);
 
             content.delete().queue();
 
@@ -149,12 +157,17 @@ public class RegisterComand extends ListenerAdapter {
             return;
         }
 
+        // Are they trying to register themselves?
+        if (target.getIdLong() == member.getIdLong()) {
+            content.delete().queue();
+            sendBombMessage(channel, "<@" + author.getId() + "> you cannot register yourself.", 5000);
+            System.out.println("Staff " + author.getName() + "#" + author.getDiscriminator() + " tentou se auto registrar.");
+            return;
+        }
+
         // Is member already registered?
         if (target.getRoles().contains(registered)) {
-            channel.sendMessage("<@" + author.getId() + "> this member is already registered.")
-                    .delay(Duration.ofMillis(5000))
-                    .flatMap(Message::delete)
-                    .queue();
+            sendBombMessage(channel, "<@" + author.getId() + "> this member is already registered.", 5000);
 
             content.delete().queue();
 
@@ -179,18 +192,15 @@ public class RegisterComand extends ListenerAdapter {
         } catch (IllegalArgumentException exception) {
             content.delete().queue();
 
-            channel.sendMessage("<@" + author.getId() + "> invalid register format.\nSee: `" + args[0] + "`.")
-                    .delay(Duration.ofMillis(5000))
-                    .flatMap(Message::delete)
-                    .queue();
+            sendBombMessage(channel, "<@" + author.getId() + "> invalid register format.\nSee: `" + args[0] + "`.", 5000);
 
             System.out.println("Staff " + author.getName() + "#" + author.getDiscriminator() + " utilizou um formato de registro inválido.\nVeja: " + args[0]);
             return;
         }
 
-        char genderInput = registerArgs[0].charAt(0);
+        char genderInput = registerArgs[0].toLowerCase().charAt(0);
         String ageInput = Arrays.toString(registerArgs).replaceAll("[^\\d+\\-]", "");
-        char plataformInput = registerArgs[4].charAt(0);
+        char plataformInput = registerArgs[4].toLowerCase().charAt(0);
 
         // Gender
         switch (genderInput) {
@@ -201,17 +211,16 @@ public class RegisterComand extends ListenerAdapter {
 
         // Age
         switch (ageInput) {
-            case "-13" -> guild.addRoleToMember(target, under13).queue();
+            case "-13" -> {
+                guild.addRoleToMember(target, under13).queue();
+                guild.addRoleToMember(target, underage).queue();
+            }
             case "-18" -> guild.addRoleToMember(target, underage).queue();
             case "+18" -> guild.addRoleToMember(target, adult).queue();
         }
 
         // Plataform
         switch (plataformInput) {
-            case 'b' -> {
-                guild.addRoleToMember(target, mobile).queue();
-                guild.addRoleToMember(target, pc).queue();
-            }
             case 'm' -> guild.addRoleToMember(target, mobile).queue();
             case 'p' -> guild.addRoleToMember(target, pc).queue();
         }
@@ -227,12 +236,11 @@ public class RegisterComand extends ListenerAdapter {
         // Take verified role
         guild.removeRoleFromMember(target, verified).queue();
 
-        channel.sendMessage("<@" + author.getId() + "> member `" + target.getEffectiveName() +
+        sendBombMessage(channel,
+                "<@" + author.getId() + "> member `" + target.getEffectiveName() +
                 "#" + target.getUser().getDiscriminator() +
-                "` has been sucessfully registered.")
-                .delay(10000, TimeUnit.MILLISECONDS)
-                .flatMap(Message::delete)
-                .queue();
+                "` has been sucessfully registered.",
+                10000);
 
         System.out.println(author.getName() +
                 "#" + author.getDiscriminator() +
@@ -277,7 +285,7 @@ public class RegisterComand extends ListenerAdapter {
     private void checkRegisterInput(String[] input) throws IllegalArgumentException {
         List<String> gender = List.of("f", "m", "n");
         List<String> age = List.of("-13", "-18", "+18");
-        List<String> plataform = List.of("b", "m", "p");
+        List<String> plataform = List.of("m", "p");
 
         if (input.length != 5) throw new IllegalArgumentException("Too few arguments");
 
@@ -328,10 +336,6 @@ public class RegisterComand extends ListenerAdapter {
 
     private String getFullPlataform(char plataform) {
         switch (plataform) {
-            case 'b' -> {
-                return "Ambos (PC e Mobile)";
-            }
-
             case 'm' -> {
                 return "Mobile";
             }

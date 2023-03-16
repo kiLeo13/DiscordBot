@@ -1,7 +1,8 @@
 package bot.events;
 
 import bot.Main;
-import net.dv8tion.jda.api.JDA;
+import bot.commands.Ping;
+import bot.util.Channels;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.Channel;
@@ -18,46 +19,32 @@ public class MessageReceived extends ListenerAdapter {
     @SubscribeEvent
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
 
+        if (event.getAuthor().isBot()) return;
+
         String message = event.getMessage().getContentRaw();
+        MessageChannelUnion channel = event.getChannel();
         User author = event.getAuthor();
 
         // Disconnect command
-        if (message.equals(".DISCONNECT") && !author.isBot()) disconnectCommand(event);
+        if (message.toLowerCase().startsWith(".disconnect")) disconnectCommand(event);
 
-        // Check if message has prefix (r!)
-        if (message.equalsIgnoreCase(".ping")) pingComand(event);
+        if (message.toLowerCase().startsWith(".ping")) Ping.run(channel, author);
 
         // Swearing command
-        if (message.equalsIgnoreCase(".puta")) swearCommand(event);
-    }
-
-    private void registerCommand(MessageReceivedEvent e) {
-
-        Member member = e.getMember();
-
-        if (member == null) return;
-
-        Role role = member.getJDA().getRoleById("1009140499325648991");
-        MessageChannelUnion channel = e.getChannel();
-
-        if (role == null) {
-            channel.sendMessage("Required role was not found.").queue();
-            return;
-        }
-
-        if (member.getRoles().contains(role)) {
-            channel.sendMessage("É, <@" + member.getId() + "> me parece que vc tem o cargo <@&" + role.getId() + "> :medo:").queue();
-        }
+        if (message.toLowerCase().startsWith(".puta")) swearCommand(event);
     }
 
     private void disconnectCommand(MessageReceivedEvent e) {
+
+        List<Long> allowedDisconnectChannels = Channels.DISCONNECT_CHANNELS.get();
+        if (allowedDisconnectChannels.isEmpty()) return;
 
         MessageChannelUnion channel = e.getChannel();
         Member member = e.getMember();
         String messageId = e.getMessageId();
 
-        if (!channel.getId().equals("1084341941984034816")) return;
         if (member == null) return;
+        if (!allowedDisconnectChannels.contains(channel.getIdLong())) return;
 
         GuildVoiceState voiceState = member.getVoiceState();
         Guild guild = member.getGuild();
@@ -88,27 +75,30 @@ public class MessageReceived extends ListenerAdapter {
         channel.deleteMessageById(messageId).queue();
     }
 
-    private void pingComand(MessageReceivedEvent e) {
-
-        User author = e.getAuthor();
-        MessageChannelUnion channel = e.getChannel();
-        JDA api = Main.getApi();
-
-        if (author.isBot()) return;
-
-        channel.sendMessage("Oioioioioioi\nGateway ping: `" + api.getGatewayPing() + "ms`").queue();
-    }
-
     private void swearCommand(MessageReceivedEvent e) {
 
+        List<Long> allowedSwearingChannels = Channels.SWEARING_CHANNELS.get();
+        if (allowedSwearingChannels.isEmpty()) return;
+
+        Member mentionedMember = null;
+        String[] args = e.getMessage().getContentRaw().split(" ");
+        MessageChannelUnion channel = e.getChannel();
         Member member = e.getMember();
-        List<String> swearingList = Main.getFileObject().get("swearings");
+        List<String> swearingList = Main.getSwearings().get("swearings");
+        Message message = e.getMessage();
+
+        if (!allowedSwearingChannels.contains(channel.getIdLong())) return;
+        if (args.length >= 2) mentionedMember =  e.getMessage().getMentions().getMembers().get(0);
 
         if (member == null) return;
         if (!member.hasPermission(Permission.MESSAGE_MANAGE)) return;
 
         int random = (int) Math.floor(Math.random() * swearingList.size());
 
-        e.getMessage().reply(swearingList.get(random)).queue();
+        if (mentionedMember == null) e.getMessage().reply(swearingList.get(random)).queue();
+        else {
+            channel.sendMessage("<@" + mentionedMember.getId() + "> " + swearingList.get(random)).queue();
+            message.delete().queue();
+        }
     }
 }
