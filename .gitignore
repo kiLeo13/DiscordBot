@@ -27,7 +27,7 @@ replay_pid*
 src/main/java/bot/data/
 
 # Idea files
-.idea
+.idea/
 
 # Target directory
-target
+target/

@@ -21,17 +21,19 @@ public class MessageReceived extends ListenerAdapter {
 
         if (event.getAuthor().isBot()) return;
 
-        String message = event.getMessage().getContentRaw();
+        Message message = event.getMessage();
+        String content = message.getContentRaw();
         MessageChannelUnion channel = event.getChannel();
         User author = event.getAuthor();
 
         // Disconnect command
-        if (message.toLowerCase().startsWith(".disconnect")) disconnectCommand(event);
+        if (content.toLowerCase().startsWith(".disconnect")) disconnectCommand(event);
 
-        if (message.toLowerCase().startsWith(".ping")) Ping.run(channel, author);
+        // Ping command
+        if (content.toLowerCase().startsWith(".ping")) Ping.run(message);
 
         // Swearing command
-        if (message.toLowerCase().startsWith(".puta")) swearCommand(event);
+        if (content.toLowerCase().startsWith(".puta")) swearCommand(event);
     }
 
     private void disconnectCommand(MessageReceivedEvent e) {
