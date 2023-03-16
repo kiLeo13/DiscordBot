@@ -22,8 +22,8 @@ public class Stickers extends ListenerAdapter {
         long lapada = 1076684318115643483L;
         long tapa = 873931795010289664L;
 
-        stickerMap.put(lapada, new File("src/main/resources/content/tapa.png")); // Lapada -> Tapa
-        stickerMap.put(tapa, new File("src/main/resources/content/lapada.png")); // Tapa -> Lapada
+        stickerMap.put(lapada, new File("src/main/resources/content/images/tapa.png")); // Lapada -> Tapa
+        stickerMap.put(tapa, new File("src/main/resources/content/images/lapada.png")); // Tapa -> Lapada
 
         Message message = event.getMessage();
         User author = event.getAuthor();

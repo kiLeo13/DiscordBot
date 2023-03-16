@@ -2,28 +2,28 @@ package bot;
 
 import bot.data.BotConfig;
 import bot.events.Countdown;
-import bot.events.Stickers;
 import bot.events.MessageReceived;
 import bot.events.RegisterComand;
+import bot.events.Stickers;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-public class Main {
+public final class Main {
     private static JDA api;
-    private static Map<String, List<String>> swearings;
+    private static Map<String, List<String>> sentences;
 
     public static void main(String[] args) {
         try { createYamlFiles(); }
-        catch (FileNotFoundException e) {
+        catch (IOException e) {
             System.out.println("Could not load YAML files.");
         }
 
@@ -57,13 +57,18 @@ public class Main {
         api.addEventListener(new Stickers());
     }
 
-    public static Map<String, List<String>> getSwearings() { return swearings; }
+    public static Map<String, List<String>> getSwearings() throws FileNotFoundException {
+        if (sentences == null) throw new FileNotFoundException();
 
-    private static void createYamlFiles() throws FileNotFoundException {
-        File swearingFile = new File("C:/Users/Leonardo/Downloads/Stuff/src/main/java/bot/config/swearings.yml");
-        Yaml swearingYaml = new Yaml();
+        return sentences;
+    }
 
-        // Load our swearing file
-        swearings = swearingYaml.load(new FileInputStream(swearingFile));
+    private static void createYamlFiles() throws IOException {
+        InputStream resource = Main.class.getResourceAsStream("/content/swearings.yml");
+
+        if (resource == null) throw new IOException("File 'swearings.yml' was not found");
+
+        sentences = new Yaml().load(resource);
+
     }
 }

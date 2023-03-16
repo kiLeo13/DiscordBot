@@ -14,10 +14,16 @@ public final class Ping {
         JDA api = Main.getApi();
         User author = message.getAuthor();
         MessageChannelUnion channel = message.getChannel();
+        long apiPing = api.getRestPing().complete();
+        long gatewayPing = api.getGatewayPing();
 
         if (!Channels.COMMAND_PING_CHANNELS.get().contains(channel.getIdLong())) return;
         if (author.isBot()) return;
 
-        channel.sendMessage("Gateway ping: `" + api.getGatewayPing() + "ms`").queue();
+        message.delete().queue();
+
+        channel.sendMessage("📡**｜**<@" + author.getIdLong() + "> **Oie!**\n" +
+                "⏱**｜Gateway Ping**: `" + gatewayPing + "ms`\n" +
+                "⚙**｜API Ping**: `" + apiPing + "ms`").queue();
     }
 }

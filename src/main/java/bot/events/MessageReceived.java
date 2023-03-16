@@ -12,7 +12,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.FileNotFoundException;
 import java.util.List;
+
+import static bot.util.Feature.sendBombMessage;
 
 public class MessageReceived extends ListenerAdapter {
 
@@ -24,7 +27,6 @@ public class MessageReceived extends ListenerAdapter {
         Message message = event.getMessage();
         String content = message.getContentRaw();
         MessageChannelUnion channel = event.getChannel();
-        User author = event.getAuthor();
 
         // Disconnect command
         if (content.toLowerCase().startsWith(".disconnect")) disconnectCommand(event);
@@ -33,7 +35,15 @@ public class MessageReceived extends ListenerAdapter {
         if (content.toLowerCase().startsWith(".ping")) Ping.run(message);
 
         // Swearing command
-        if (content.toLowerCase().startsWith(".puta")) swearCommand(event);
+        if (content.toLowerCase().startsWith(".puta")) {
+            try { swearCommand(event); }
+            catch (FileNotFoundException e) {
+                sendBombMessage(channel,
+                        "File `swearings.yml` was not found.",
+                        10000);
+                System.out.println("Arquivo 'swearings.yml' não foi encontrado, ignorando comando...");
+            }
+        }
     }
 
     private void disconnectCommand(MessageReceivedEvent e) {
@@ -77,7 +87,7 @@ public class MessageReceived extends ListenerAdapter {
         channel.deleteMessageById(messageId).queue();
     }
 
-    private void swearCommand(MessageReceivedEvent e) {
+    private void swearCommand(MessageReceivedEvent e) throws FileNotFoundException {
 
         List<Long> allowedSwearingChannels = Channels.SWEARING_CHANNELS.get();
         if (allowedSwearingChannels.isEmpty()) return;
@@ -87,6 +97,7 @@ public class MessageReceived extends ListenerAdapter {
         MessageChannelUnion channel = e.getChannel();
         Member member = e.getMember();
         List<String> swearingList = Main.getSwearings().get("swearings");
+
         Message message = e.getMessage();
 
         if (!allowedSwearingChannels.contains(channel.getIdLong())) return;
