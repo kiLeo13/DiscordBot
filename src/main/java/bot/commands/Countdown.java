@@ -1,38 +1,30 @@
-package bot.events;
+package bot.commands;
 
-import bot.util.Channels;
+import bot.util.Requirements;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import static bot.util.Feature.replyBombMessage;
-import static bot.util.Feature.sendBombMessage;
+import static bot.util.Extra.*;
 
-public class Countdown extends ListenerAdapter {
+public class Countdown {
+    private Countdown() {}
 
+    public static void run(Message message) {
 
-
-    @SubscribeEvent
-    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-
-        List<Long> allowedCountdownChannels = Channels.COUNTDOWN_CHANNELS.get();
+        List<Long> allowedCountdownChannels = Requirements.COMMAND_COUNTDOWN_CHANNELS.get();
 
         if (allowedCountdownChannels.isEmpty()) return;
-        if (event.getAuthor().isBot()) return;
+        if (message.getAuthor().isBot()) return;
 
-        Message message = event.getMessage();
         String content = message.getContentRaw();
-        MessageChannelUnion channel = event.getChannel();
+        MessageChannelUnion channel = message.getChannel();
         String[] args = content.split(" ");
-        User author = event.getAuthor();
+        User author = message.getAuthor();
 
         if (!content.toLowerCase(Locale.ROOT).startsWith(".countdown")
                 && !content.toLowerCase(Locale.ROOT).startsWith(".cd")) return;
@@ -76,12 +68,12 @@ public class Countdown extends ListenerAdapter {
                | ArrayIndexOutOfBoundsException e) { reason = "none"; }
 
         if (limit < 3 || limit > 60) {
-            callSecondsBoundaries(event);
+            callSecondsBoundaries(message);
             return;
         }
 
         message.delete().queue();
-        Timer timer = new Timer(event, limit, reason);
+        Timer timer = new Timer(message, limit, reason);
         Thread thread = new Thread(timer);
         thread.start();
     }
@@ -94,9 +86,9 @@ public class Countdown extends ListenerAdapter {
         private final MessageChannelUnion channel;
         private final User author;
 
-        private Timer(MessageReceivedEvent event, int limit, String countReason) {
-            sendBombMessage(event.getChannel(),
-                    "Countdown will start soon, please wait...",
+        private Timer(Message message, int limit, String countReason) {
+            sendExpireMessage(message.getChannel(),
+                    "Iniciando contagem...",
                     5000);
 
             try { Thread.sleep(5000); }
@@ -105,8 +97,8 @@ public class Countdown extends ListenerAdapter {
             this.count = limit;
             this.countReason = countReason;
             this.hasReason = !countReason.equalsIgnoreCase("none");
-            this.channel = event.getChannel();
-            this.author = event.getAuthor();
+            this.channel = message.getChannel();
+            this.author = message.getAuthor();
 
             this.botSentMessage = channel.sendMessage("Starting countdown...").complete();
         }
@@ -126,24 +118,20 @@ public class Countdown extends ListenerAdapter {
             }
 
             botSentMessage.delete().queue();
-            channel.sendMessage("<@" + author.getId() + "> countdown has ended.")
+            channel.sendMessage("<@" + author.getId() + "> o contador para " + countReason + " se encerrou.")
                     .queue();
         }
     }
 
-    private void callSecondsBoundaries(MessageReceivedEvent e) {
-
-        Message message = e.getMessage();
-
-        replyBombMessage(message,
+    private static void callSecondsBoundaries(Message message) {
+        sendExpireReply(message,
                 "For spamming/rate-limit purposes you can only enter a number between 3 to 60",
                 10000);
 
-        message.delete()
-                .queueAfter(11000, TimeUnit.MILLISECONDS);
+        deleteAfter(message, 11000);
     }
 
     private static String getFormattedCount(int count) {
-        return " `" + count + "s`";
+        return "`" + count + "s`";
     }
 }

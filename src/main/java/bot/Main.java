@@ -1,25 +1,20 @@
 package bot;
 
 import bot.data.BotConfig;
-import bot.events.Countdown;
-import bot.events.MessageReceived;
-import bot.events.RegisterComand;
-import bot.events.Stickers;
+import bot.events.CommandHandler;
+import bot.events.MessageReceivedGeneral;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
+
+import static bot.data.BotConfig.checkRegisterAvailability;
+import static bot.data.BotFiles.createYamlFiles;
 
 public final class Main {
     private static JDA api;
-    private static Map<String, List<String>> sentences;
 
     public static void main(String[] args) {
         try { createYamlFiles(); }
@@ -43,6 +38,7 @@ public final class Main {
             return;
         }
 
+        checkRegisterAvailability(api);
         registerEvents(api);
     }
 
@@ -51,24 +47,7 @@ public final class Main {
     }
 
     private static void registerEvents(JDA api) {
-        api.addEventListener(new MessageReceived());
-        api.addEventListener(new RegisterComand());
-        api.addEventListener(new Countdown());
-        api.addEventListener(new Stickers());
-    }
-
-    public static Map<String, List<String>> getSwearings() throws FileNotFoundException {
-        if (sentences == null) throw new FileNotFoundException();
-
-        return sentences;
-    }
-
-    private static void createYamlFiles() throws IOException {
-        InputStream resource = Main.class.getResourceAsStream("/content/swearings.yml");
-
-        if (resource == null) throw new IOException("File 'swearings.yml' was not found");
-
-        sentences = new Yaml().load(resource);
-
+        api.addEventListener(new CommandHandler());
+        api.addEventListener(new MessageReceivedGeneral());
     }
 }

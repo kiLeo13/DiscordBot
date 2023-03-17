@@ -1,7 +1,7 @@
 package bot.commands;
 
 import bot.Main;
-import bot.util.Channels;
+import bot.util.Requirements;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -17,7 +17,7 @@ public final class Ping {
         long apiPing = api.getRestPing().complete();
         long gatewayPing = api.getGatewayPing();
 
-        if (!Channels.COMMAND_PING_CHANNELS.get().contains(channel.getIdLong())) return;
+        if (!Requirements.COMMAND_PING_CHANNELS.get().contains(channel.getIdLong())) return;
         if (author.isBot()) return;
 
         message.delete().queue();

@@ -1,140 +1,105 @@
-package bot.events;
+package bot.commands;
 
-import bot.util.Channels;
+import bot.util.Requirements;
 import bot.util.Roles;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
-import static bot.util.Feature.sendBombMessage;
+import static bot.data.BotConfig.isRegisterEnabled;
+import static bot.util.Extra.sendExpireMessage;
 
-public class RegisterComand extends ListenerAdapter {
-    private Role requiredRole;
+public class Registration {
+    private static Role requiredRole;
 
     // Final Register
-    private Role notRegistered;
-    private Role registered;
-    private Role verified;
+    private static Role notRegistered;
+    private static Role registered;
+    private static Role verified;
 
     // Gender
-    private Role male;
-    private Role female;
-    private Role nonBinary;
+    private static Role male;
+    private static Role female;
+    private static Role nonBinary;
 
     // Age
-    private Role adult;
-    private Role underage;
-    private Role under13;
+    private static Role adult;
+    private static Role underage;
+    private static Role under13;
 
     // Plataform
-    private Role pc;
-    private Role mobile;
+    private static Role pc;
+    private static Role mobile;
+    private Registration() {}
 
-    @SubscribeEvent
-    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+    public static void perform(Message message) {
 
-        Message content = event.getMessage();
-        String message = event.getMessage().getContentRaw();
-        User user = event.getAuthor();
-        Member member = event.getMember();
-        boolean isBot = user.isBot();
-        MessageChannelUnion channel = event.getChannel();
-        Guild guild = event.getGuild();
+        User author = message.getAuthor();
+        Member member = message.getMember();
+        boolean isBot = author.isBot();
+        MessageChannelUnion channel = message.getChannel();
+        Guild guild = message.getGuild();
+
+        if (isBot) return;
+        if (!isRegisterEnabled(guild)) return;
 
         // Special
-        String messageLink = "https://discord.com/channels/" + guild.getId() + "/" + channel.getId() + "/" + content.getId();
+        String messageLink = "https://discord.com/channels/" + guild.getId() + "/" + channel.getId() + "/" + message.getId();
         String data = getFormattedData();
 
         if (member == null) return;
-        if (!isBot) registerAgeFilter(event);
 
-        // Register command
-        if (message.toLowerCase(Locale.ROOT).startsWith("r!") && !isBot) {
-
-            // Also ignore if member does not the permission at all
-            if (!member.hasPermission(Permission.MANAGE_ROLES) && !member.getRoles().contains(requiredRole)) {
-                System.out.println("Um membro sem permissão tentou usar o registro.\n" +
-                        "\nMembro: @" + user.getName() + "#" + user.getDiscriminator() +
-                        "\nID: " + user.getId() +
-                        "\nChat: #" + channel.getName() +
-                        "\nComando: " + message +
-                        "\nLink da Mensagem: " + messageLink +
-                        "\nData: " + data);
-                return;
-            }
-
-            if (!Channels.REGISTER_CHANNELS.get().contains(channel.getIdLong())) return;
-
-            // Start register process if everything is fine
-            if (rolesExist(event.getGuild())) {
-                registerCommand(event);
-                return;
-            }
-
-            content.delete().queue();
-
-            sendBombMessage(channel,
-                    "One or more required roles for this action were not found, we are sorry about that.",
-                    5000);
+        // Ignore if member does not the permission
+        if (!member.hasPermission(Permission.MANAGE_ROLES) && !member.getRoles().contains(requiredRole)) {
+            System.out.println("Um membro sem permissão tentou usar o registro.\n" +
+                    "\nMembro: @" + author.getName() + "#" + author.getDiscriminator() +
+                    "\nID: " + author.getId() +
+                    "\nChat: #" + channel.getName() +
+                    "\nComando: " + message +
+                    "\nLink da Mensagem: " + messageLink +
+                    "\nData: " + data);
+            return;
         }
+
+        if (!Requirements.REGISTER_CHANNELS.get().contains(channel.getIdLong())) return;
+
+        // Start register process if everything is fine
+        if (rolesExist(guild)) {
+            run(message);
+            return;
+        }
+
+        message.delete().queue();
+
+        sendExpireMessage(channel,
+                "One or more required roles for this action were not found, we are sorry about that.",
+                5000);
     }
 
-    private void registerAgeFilter(MessageReceivedEvent e) {
+    private static void run(Message message) {
 
-        List<Long> filterChannels = Channels.REGISTER_FILTER_CHANNELS.get();
-        if (filterChannels.isEmpty()) return;
-
-        Message content = e.getMessage();
-        Member member = e.getMember();
-        List<String> message = List.of(content.getContentRaw().split(" "));
-        MessageChannelUnion channel = e.getChannel();
-
-        if (!filterChannels.contains(channel.getIdLong())) return;
-        if (member == null) return;
-
-        Role requiredRole = e.getGuild().getRoleById(Roles.ROLE_REQUIRED.get());
-
-        if (member.hasPermission(Permission.MANAGE_SERVER) || member.getRoles().contains(requiredRole)) return;
-
-        for (String i : message) {
-            try {
-                int number = Integer.parseInt(i);
-
-                if (number > 50 || number < 1) content.delete().queue();
-            } catch (NumberFormatException ignored) {}
-        }
-    }
-
-    private void registerCommand(MessageReceivedEvent e) {
-
-        List<Long> allowedRegisterChannels = Channels.REGISTER_CHANNELS.get();
+        List<Long> allowedRegisterChannels = Requirements.REGISTER_CHANNELS.get();
         if (allowedRegisterChannels.isEmpty()) return;
 
-        Message content = e.getMessage();
-        String message = e.getMessage().getContentRaw();
-        String[] args = message.split(" ");
+        String content = message.getContentRaw();
+        String[] args = content.split(" ");
         String[] registerArgs = args[0].substring(2).split("");
-        MessageChannelUnion channel = e.getChannel();
+        MessageChannelUnion channel = message.getChannel();
 
-        User author = e.getAuthor();
-        Member member = e.getMember();
-        Guild guild = e.getGuild();
+        User author = message.getAuthor();
+        Member member = message.getMember();
+        Guild guild = message.getGuild();
 
         // If member is not find, ignore it
         if (member == null) return;
 
         if (args.length < 2) {
-            content.delete().queue();
+            message.delete().queue();
             return;
         }
 
@@ -147,9 +112,9 @@ public class RegisterComand extends ListenerAdapter {
 
             if (target == null) throw new IllegalArgumentException("Target cannot be null");
         } catch (ErrorResponseException | IllegalArgumentException exception) {
-            sendBombMessage(channel, "<@" + author.getId() + "> Member `" + args[1] + "` was not found.", 5000);
+            sendExpireMessage(channel, "<@" + author.getId() + "> Member `" + args[1] + "` was not found.", 5000);
 
-            content.delete().queue();
+            message.delete().queue();
 
             System.out.println("Staff " + author.getName() +
                     "#" + author.getDiscriminator() +
@@ -159,17 +124,17 @@ public class RegisterComand extends ListenerAdapter {
 
         // Are they trying to register themselves?
         if (target.getIdLong() == member.getIdLong()) {
-            content.delete().queue();
-            sendBombMessage(channel, "<@" + author.getId() + "> you cannot register yourself.", 5000);
+            message.delete().queue();
+            sendExpireMessage(channel, "<@" + author.getId() + "> you cannot register yourself.", 5000);
             System.out.println("Staff " + author.getName() + "#" + author.getDiscriminator() + " tentou se auto registrar.");
             return;
         }
 
         // Is member already registered?
         if (target.getRoles().contains(registered)) {
-            sendBombMessage(channel, "<@" + author.getId() + "> this member is already registered.", 5000);
+            sendExpireMessage(channel, "<@" + author.getId() + "> this member is already registered.", 5000);
 
-            content.delete().queue();
+            message.delete().queue();
 
             System.out.println("Staff " + author.getName() +
                     "#" + author.getDiscriminator() +
@@ -180,7 +145,7 @@ public class RegisterComand extends ListenerAdapter {
         }
 
         if (target.getUser().isBot()) {
-            content.delete().queue();
+            message.delete().queue();
             System.out.println("Staff " + author.getName() +
                     "#" + author.getDiscriminator() +
                     " tentou registrar um bot: " + target.getEffectiveName() + "#" + target.getUser().getDiscriminator());
@@ -190,9 +155,9 @@ public class RegisterComand extends ListenerAdapter {
         try {
             checkRegisterInput(registerArgs);
         } catch (IllegalArgumentException exception) {
-            content.delete().queue();
+            message.delete().queue();
 
-            sendBombMessage(channel, "<@" + author.getId() + "> invalid register format.\nSee: `" + args[0] + "`.", 5000);
+            sendExpireMessage(channel, "<@" + author.getId() + "> invalid register format.\nSee: `" + args[0] + "`.", 5000);
 
             System.out.println("Staff " + author.getName() + "#" + author.getDiscriminator() + " utilizou um formato de registro inválido.\nVeja: " + args[0]);
             return;
@@ -225,7 +190,7 @@ public class RegisterComand extends ListenerAdapter {
             case 'p' -> guild.addRoleToMember(target, pc).queue();
         }
 
-        content.delete().queue();
+        message.delete().queue();
 
         // Give registered role
         guild.addRoleToMember(target, registered).queue();
@@ -236,10 +201,10 @@ public class RegisterComand extends ListenerAdapter {
         // Take verified role
         guild.removeRoleFromMember(target, verified).queue();
 
-        sendBombMessage(channel,
+        sendExpireMessage(channel,
                 "<@" + author.getId() + "> member `" + target.getEffectiveName() +
-                "#" + target.getUser().getDiscriminator() +
-                "` has been sucessfully registered.",
+                        "#" + target.getUser().getDiscriminator() +
+                        "` has been sucessfully registered.",
                 10000);
 
         System.out.println(author.getName() +
@@ -250,7 +215,7 @@ public class RegisterComand extends ListenerAdapter {
                 "\nPlataforma: " + getFullPlataform(plataformInput));
     }
 
-    private boolean rolesExist(Guild guild) {
+    private static boolean rolesExist(Guild guild) {
         try {
             requiredRole = guild.getRoleById(Roles.ROLE_REQUIRED.get());
 
@@ -269,20 +234,18 @@ public class RegisterComand extends ListenerAdapter {
             pc = guild.getRoleById(Roles.ROLE_COMPUTER.get());
             mobile = guild.getRoleById(Roles.ROLE_MOBILE.get());
 
-            // Is the role found
+            // Were all roles found?
             Roles[] roles = Roles.values();
 
             for (Roles i : roles)
                 if (guild.getRoleById(i.get()) == null) throw new IllegalArgumentException("Role '" + i + "' cannot be null");
 
-        } catch (IllegalArgumentException | NullPointerException error) {
-            return false;
-        }
+        } catch (IllegalArgumentException | NullPointerException ignore) { return false; }
 
         return true;
     }
 
-    private void checkRegisterInput(String[] input) throws IllegalArgumentException {
+    private static void checkRegisterInput(String[] input) throws IllegalArgumentException {
         List<String> gender = List.of("f", "m", "n");
         List<String> age = List.of("-13", "-18", "+18");
         List<String> plataform = List.of("m", "p");
@@ -294,7 +257,7 @@ public class RegisterComand extends ListenerAdapter {
         if (!plataform.contains(input[4])) throw new IllegalArgumentException("could not find plataform '" + input[4] + "'");
     }
 
-    private String getFullGender(char gender) {
+    private static String getFullGender(char gender) {
         switch (gender) {
             case 'f' -> {
                 return "Feminino";
@@ -314,7 +277,7 @@ public class RegisterComand extends ListenerAdapter {
         }
     }
 
-    private String getFullAge(String age) {
+    private static String getFullAge(String age) {
         switch (age) {
             case "-13" -> {
                 return "Menor de idade + (😻)";
@@ -334,7 +297,7 @@ public class RegisterComand extends ListenerAdapter {
         }
     }
 
-    private String getFullPlataform(char plataform) {
+    private static String getFullPlataform(char plataform) {
         switch (plataform) {
             case 'm' -> {
                 return "Mobile";
@@ -350,7 +313,7 @@ public class RegisterComand extends ListenerAdapter {
         }
     }
 
-    private String getFormattedData() {
+    private static String getFormattedData() {
 
         String year = formatNumber(LocalDateTime.now().getYear());
         String month = formatNumber(LocalDateTime.now().getMonth().getValue());
@@ -366,7 +329,7 @@ public class RegisterComand extends ListenerAdapter {
         return day + "/" + month + "/" + year + " às " + hour + "h " + minute + "m " + second + "s";
     }
 
-    private String formatNumber(int num) {
+    private static String formatNumber(int num) {
         return num < 10
                 ? "0" + num
                 : String.valueOf(num);
