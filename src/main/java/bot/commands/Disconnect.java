@@ -1,6 +1,6 @@
 package bot.commands;
 
-import bot.util.Requirements;
+import bot.util.Channels;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -16,7 +16,7 @@ public class Disconnect {
     private Disconnect() {}
 
     public static void run(Message message) {
-        List<Long> allowedDisconnectChannels = Requirements.COMMAND_DISCONNECT_CHANNELS.get();
+        List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_CHANNELS;
         if (allowedDisconnectChannels.isEmpty()) return;
 
         MessageChannelUnion channel = message.getChannel();

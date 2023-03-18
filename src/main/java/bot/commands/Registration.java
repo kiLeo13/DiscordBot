@@ -1,17 +1,17 @@
 package bot.commands;
 
-import bot.util.Requirements;
-import bot.util.Roles;
+import bot.util.Channels;
+import bot.util.RegistrationRoles;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
-import static bot.data.BotConfig.isRegisterEnabled;
 import static bot.util.Extra.sendExpireMessage;
 
 public class Registration {
@@ -37,40 +37,42 @@ public class Registration {
     private static Role mobile;
     private Registration() {}
 
-    public static void perform(Message message) {
+    public static void run(Message message) {
 
+        String content = message.getContentRaw();
         User author = message.getAuthor();
         Member member = message.getMember();
         boolean isBot = author.isBot();
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
+        boolean rolesExist = rolesExist(guild);
 
         if (isBot) return;
-        if (!isRegisterEnabled(guild)) return;
 
         // Special
         String messageLink = "https://discord.com/channels/" + guild.getId() + "/" + channel.getId() + "/" + message.getId();
         String data = getFormattedData();
 
         if (member == null) return;
+        if (!Channels.REGISTER_CHANNELS.contains(channel.getIdLong())) return;
 
         // Ignore if member does not the permission
         if (!member.hasPermission(Permission.MANAGE_ROLES) && !member.getRoles().contains(requiredRole)) {
             System.out.println("Um membro sem permissão tentou usar o registro.\n" +
-                    "\nMembro: @" + author.getName() + "#" + author.getDiscriminator() +
+                    "\nMembro: " + author.getName() + "#" + author.getDiscriminator() +
                     "\nID: " + author.getId() +
                     "\nChat: #" + channel.getName() +
-                    "\nComando: " + message +
+                    "\nComando: " + content +
                     "\nLink da Mensagem: " + messageLink +
                     "\nData: " + data);
             return;
         }
 
-        if (!Requirements.REGISTER_CHANNELS.get().contains(channel.getIdLong())) return;
+        if (!isRegistrationAvailable(message)) return;
 
         // Start register process if everything is fine
-        if (rolesExist(guild)) {
-            run(message);
+        if (rolesExist) {
+            perform(message);
             return;
         }
 
@@ -81,9 +83,9 @@ public class Registration {
                 5000);
     }
 
-    private static void run(Message message) {
+    private static void perform(Message message) {
 
-        List<Long> allowedRegisterChannels = Requirements.REGISTER_CHANNELS.get();
+        List<Long> allowedRegisterChannels = Channels.REGISTER_CHANNELS;
         if (allowedRegisterChannels.isEmpty()) return;
 
         String content = message.getContentRaw();
@@ -217,27 +219,27 @@ public class Registration {
 
     private static boolean rolesExist(Guild guild) {
         try {
-            requiredRole = guild.getRoleById(Roles.ROLE_REQUIRED.get());
+            requiredRole = guild.getRoleById(RegistrationRoles.ROLE_REQUIRED.get());
 
-            notRegistered = guild.getRoleById(Roles.ROLE_NOT_REGISTERED.get());
-            registered = guild.getRoleById(Roles.ROLE_REGISTERED.get());
-            verified = guild.getRoleById(Roles.ROLE_VERIFIED.get());
+            notRegistered = guild.getRoleById(RegistrationRoles.ROLE_NOT_REGISTERED.get());
+            registered = guild.getRoleById(RegistrationRoles.ROLE_REGISTERED.get());
+            verified = guild.getRoleById(RegistrationRoles.ROLE_VERIFIED.get());
 
-            male = guild.getRoleById(Roles.ROLE_MALE.get());
-            female = guild.getRoleById(Roles.ROLE_FEMALE.get());
-            nonBinary = guild.getRoleById(Roles.ROLE_NON_BINARY.get());
+            male = guild.getRoleById(RegistrationRoles.ROLE_MALE.get());
+            female = guild.getRoleById(RegistrationRoles.ROLE_FEMALE.get());
+            nonBinary = guild.getRoleById(RegistrationRoles.ROLE_NON_BINARY.get());
 
-            adult = guild.getRoleById(Roles.ROLE_ADULT.get());
-            underage = guild.getRoleById(Roles.ROLE_UNDERAGE.get());
-            under13 = guild.getRoleById(Roles.ROLE_UNDER13.get());
+            adult = guild.getRoleById(RegistrationRoles.ROLE_ADULT.get());
+            underage = guild.getRoleById(RegistrationRoles.ROLE_UNDERAGE.get());
+            under13 = guild.getRoleById(RegistrationRoles.ROLE_UNDER13.get());
 
-            pc = guild.getRoleById(Roles.ROLE_COMPUTER.get());
-            mobile = guild.getRoleById(Roles.ROLE_MOBILE.get());
+            pc = guild.getRoleById(RegistrationRoles.ROLE_COMPUTER.get());
+            mobile = guild.getRoleById(RegistrationRoles.ROLE_MOBILE.get());
 
             // Were all roles found?
-            Roles[] roles = Roles.values();
+            RegistrationRoles[] roles = RegistrationRoles.values();
 
-            for (Roles i : roles)
+            for (RegistrationRoles i : roles)
                 if (guild.getRoleById(i.get()) == null) throw new IllegalArgumentException("Role '" + i + "' cannot be null");
 
         } catch (IllegalArgumentException | NullPointerException ignore) { return false; }
@@ -315,23 +317,35 @@ public class Registration {
 
     private static String getFormattedData() {
 
-        String year = formatNumber(LocalDateTime.now().getYear());
-        String month = formatNumber(LocalDateTime.now().getMonth().getValue());
-        String day = formatNumber(LocalDateTime.now().getDayOfMonth());
-        String hour = formatNumber(LocalDateTime.now().getHour());
-        String minute = formatNumber(LocalDateTime.now().getMinute());
-        String second = formatNumber(LocalDateTime.now().getSecond());
+        LocalDateTime time = LocalDateTime.now();
 
-        /*
-         * Example: January 04th, 2023 at 5:34:21 PM
-         * 01/04/2023 às 17h 34m 21s
-         */
-        return day + "/" + month + "/" + year + " às " + hour + "h " + minute + "m " + second + "s";
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        return time.format(dateFormatter) + " às " + time.format(timeFormatter);
     }
 
-    private static String formatNumber(int num) {
-        return num < 10
-                ? "0" + num
-                : String.valueOf(num);
+    private static boolean isRegistrationAvailable(Message message) {
+        RegistrationRoles[] roles = RegistrationRoles.values();
+        Guild guild = message.getGuild();
+        MessageChannelUnion channel = message.getChannel();
+
+        for (RegistrationRoles r : roles) {
+            Role targetRole = guild.getRoleById(r.get());
+            Role selfHighest = guild.getSelfMember().getRoles().get(0);
+
+            if (targetRole == null) {
+                System.out.println("Não foi possível completar registro, cargo " + r.name() + " não foi encontrado.");
+                sendExpireMessage(channel, "Could not find role `" + r.name() + "`, we're sorry about that.", 10000);
+                return false;
+            }
+
+            if (targetRole.getPosition() > selfHighest.getPosition()) {
+                System.out.println("Um ou mais cargos de registro estão acima do meu, por favor, reajuste a hierarquia do servidor.");
+                sendExpireMessage(channel, "One or more roles are above my highest role, please readjust the server hierarchy.", 10000);
+                return false;
+            }
+        }
+        return true;
     }
 }

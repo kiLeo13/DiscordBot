@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.io.IOException;
 
-import static bot.data.BotConfig.checkRegisterAvailability;
 import static bot.data.BotFiles.createYamlFiles;
 
 public final class Main {
@@ -38,7 +37,6 @@ public final class Main {
             return;
         }
 
-        checkRegisterAvailability(api);
         registerEvents(api);
     }
 

@@ -1,7 +1,7 @@
 package bot.events.handlers;
 
 import bot.util.Images;
-import bot.util.Requirements;
+import bot.util.Channels;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -19,15 +19,15 @@ public class Stickers {
         long lapada = 1076684318115643483L;
         long tapa = 873931795010289664L;
 
-        stickerMap.put(lapada, Images.TAPA.get()); // Lapada -> Tapa
-        stickerMap.put(tapa, Images.LAPADA.get()); // Tapa -> Lapada
+        stickerMap.put(lapada, Images.TAPA); // Lapada -> Tapa
+        stickerMap.put(tapa, Images.LAPADA); // Tapa -> Lapada
 
         User author = message.getAuthor();
         MessageChannelUnion channel = message.getChannel();
         boolean hasSticker = !message.getStickers().isEmpty();
         long stickerId;
 
-        if (!Requirements.HANDLER_STICKERS_CHANNELS.get().contains(channel.getIdLong())) return;
+        if (!Channels.HANDLER_STICKERS_CHANNELS.contains(channel.getIdLong())) return;
 
         if (!hasSticker) return;
         else stickerId = message.getStickers().get(0).getIdLong();

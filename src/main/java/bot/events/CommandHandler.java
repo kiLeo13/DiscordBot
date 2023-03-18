@@ -17,19 +17,28 @@ public class CommandHandler extends ListenerAdapter {
         Message message = event.getMessage();
         String contentLowerCase = message.getContentRaw().toLowerCase();
 
-        // Countdown command
-        if (contentLowerCase.startsWith(".cd") || contentLowerCase.startsWith(".countdown")) Countdown.run(message);
+        switch (contentLowerCase) {
+            // case ".crole" -> ColorRoleSchedule.run(message);
 
-        // Disconnect command
-        if (contentLowerCase.startsWith(".disconnect")) Disconnect.run(message);
+            case ".cd", ".countdown" -> Countdown.run(message);
 
-        // Ping command
-        if (contentLowerCase.startsWith(".ping")) Ping.run(message);
+            case ".disconnect" -> Disconnect.run(message);
 
-        // Register command
-        if (contentLowerCase.startsWith("r!")) Registration.perform(message);
+            case ".ping" -> Ping.run(message);
 
-        // Swearing command
-        if (contentLowerCase.startsWith(".puta")) Puta.run(message);
+            case "r!roles" -> {
+                RegisterInputRoles.run(message);
+                return;
+            }
+
+            case "r!help" -> {
+                RegisterHelp.run(message);
+                return;
+            }
+
+            case ".puta" -> Puta.run(message);
+        }
+
+        if (contentLowerCase.startsWith("r!")) Registration.run(message);
     }
 }

@@ -1,7 +1,7 @@
 package bot.commands;
 
 import bot.data.BotFiles;
-import bot.util.Requirements;
+import bot.util.Channels;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -17,7 +17,7 @@ public class Puta {
 
     public static void run(Message message) {
 
-        List<Long> allowedSwearingChannels = Requirements.HANDLER_SWEARING_CHANNELS.get();
+        List<Long> allowedSwearingChannels = Channels.HANDLER_SWEARING_CHANNELS;
         if (allowedSwearingChannels.isEmpty()) return;
 
         Member mentionedMember = null;

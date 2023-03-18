@@ -1,6 +1,6 @@
 package bot.commands;
 
-import bot.util.Requirements;
+import bot.util.Channels;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -16,7 +16,7 @@ public class Countdown {
 
     public static void run(Message message) {
 
-        List<Long> allowedCountdownChannels = Requirements.COMMAND_COUNTDOWN_CHANNELS.get();
+        List<Long> allowedCountdownChannels = Channels.COMMAND_COUNTDOWN_CHANNELS;
 
         if (allowedCountdownChannels.isEmpty()) return;
         if (message.getAuthor().isBot()) return;

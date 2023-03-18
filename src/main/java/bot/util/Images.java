@@ -5,14 +5,11 @@ import bot.Main;
 import java.io.File;
 import java.net.URL;
 
-public enum Images {
-    LAPADA(getImage("lapada.png")),
-    TAPA(getImage("tapa.png"));
+public class Images {
+    private Images() {}
 
-    private final File file;
-    Images(File file) { this.file = file; }
-
-    public File get() { return file; }
+    public static final File LAPADA = getImage("lapada.png");
+    public static final File TAPA = getImage("tapa.png");
 
     private static File getImage(String fileName) {
         URL file = Main.class.getResource("/content/images/" + fileName);
