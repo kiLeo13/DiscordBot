@@ -342,7 +342,7 @@ public class Registration {
 
             if (targetRole.getPosition() > selfHighest.getPosition()) {
                 System.out.println("Um ou mais cargos de registro estão acima do meu, por favor, reajuste a hierarquia do servidor.");
-                sendExpireMessage(channel, "One or more roles are above my highest role, please readjust the server hierarchy.", 10000);
+                sendExpireMessage(channel, "One or more roles have a higher position than my highest role. Please adjust the server hierarchy accordingly.", 10000);
                 return false;
             }
         }

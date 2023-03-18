@@ -3,9 +3,14 @@ package bot;
 import bot.data.BotConfig;
 import bot.events.CommandHandler;
 import bot.events.MessageReceivedGeneral;
+import bot.events.SlashCommand;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.io.IOException;
@@ -31,6 +36,7 @@ public final class Main {
                     .build()
                     .awaitReady();
 
+            updateCommands(api);
         } catch (InterruptedException e) {
             e.printStackTrace();
             System.out.println("Failed to login, exiting...");
@@ -47,5 +53,14 @@ public final class Main {
     private static void registerEvents(JDA api) {
         api.addEventListener(new CommandHandler());
         api.addEventListener(new MessageReceivedGeneral());
+        api.addEventListener(new SlashCommand());
+    }
+
+    private static void updateCommands(JDA jda) {
+        jda.updateCommands().addCommands(
+                Commands.slash("disconnect", "Disconnects the player from the current voice-channel."),
+                Commands.slash("ping", "Sends you the ping.")
+                        .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
+        ).queue();
     }
 }

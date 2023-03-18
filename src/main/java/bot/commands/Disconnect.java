@@ -5,12 +5,10 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.util.List;
-
-import static bot.util.Extra.sendExpireMessage;
 
 public class Disconnect {
     private Disconnect() {}
@@ -21,38 +19,45 @@ public class Disconnect {
 
         MessageChannelUnion channel = message.getChannel();
         Member member = message.getMember();
-        String messageId = message.getId();
+        Guild guild = message.getGuild();
 
-        if (member == null) return;
         if (!allowedDisconnectChannels.contains(channel.getIdLong())) return;
+        if (member == null) return;
 
-        GuildVoiceState voiceState = member.getVoiceState();
-        Guild guild = member.getGuild();
+        GuildVoiceState voiceStatus = member.getVoiceState();
 
-        Channel voiceChannel;
-        String voiceChannelName;
-
-        try {
-            if (voiceState == null) throw new NullPointerException("Voicestate cannot be null in this command");
-            voiceChannel = voiceState.getChannel();
-
-            if (voiceChannel == null) throw new NullPointerException("Voicechannel cannot be null in this comand");
-            voiceChannelName = voiceChannel.getName();
-        } catch (NullPointerException error) {
-            message.delete().queue();
-            sendExpireMessage(channel, "<@" + member.getId() + "> channel not found, are you sure you are connected to one?", 5000);
+        if (voiceStatus == null) {
+            channel.sendMessage("Canal não encontrado, conecte-se em um para poder usar este comando.").queue();
             return;
         }
 
-        channel.sendMessage("<@" + member.getId() + "> okay, disconnected :)").queue();
         guild.kickVoiceMember(member).queue();
-        System.out.println(
-                "Desconectamos " +
-                        member.getEffectiveName() +
-                        "#"+
-                        member.getUser().getDiscriminator() +
-                        "\nDo canal: #" + voiceChannelName);
+        channel.sendMessage("<@" + member.getId() + "> ok, desconectado :)").queue();
+        message.delete().queue();
+    }
 
-        channel.deleteMessageById(messageId).queue();
+    public static void run(SlashCommandInteractionEvent e) {
+
+        List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_CHANNELS;
+        if (!allowedDisconnectChannels.contains(e.getChannel().getIdLong())) return;
+
+        Guild guild = e.getGuild();
+        Member member = e.getMember();
+
+        if (guild == null || member == null) return;
+
+        GuildVoiceState state = member.getVoiceState();
+
+        if (state == null ) {
+            e.reply("Canal não encontrado, conecte-se em um para poder usar este comando.")
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
+
+        guild.kickVoiceMember(member).queue();
+        e.reply("Ok, desconectado :)")
+                .setEphemeral(true)
+                .queue();
     }
 }

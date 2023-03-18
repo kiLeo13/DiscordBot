@@ -44,11 +44,16 @@ public class Puta {
         if (!member.hasPermission(Permission.MESSAGE_MANAGE)) return;
 
         int random = (int) Math.floor(Math.random() * swearingList.size());
+        String swearSentence = swearingList.get(random);
 
-        if (mentionedMember == null) message.reply(swearingList.get(random)).queue();
+        if (mentionedMember == null) message.reply(swearSentence).queue();
         else {
-            channel.sendMessage("<@" + mentionedMember.getId() + "> " + swearingList.get(random)).queue();
+            channel.sendMessage(mention(mentionedMember) + swearSentence).queue();
             message.delete().queue();
         }
+    }
+
+    private static String mention(Member member) {
+        return "<@" + member.getIdLong() + ">";
     }
 }

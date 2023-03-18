@@ -8,8 +8,9 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-public final class Ping {
+public class Ping {
     private Ping() {}
 
     public static void run(Message message) {
@@ -28,8 +29,20 @@ public final class Ping {
 
         message.delete().queue();
 
-        channel.sendMessage("📡**｜**<@" + author.getIdLong() + "> **Oie!**\n" +
+        channel.sendMessage("📡**｜**<@" + author.getIdLong() + "> **Oie!**\n\n" +
                 "⏱**｜Gateway Ping**: `" + gatewayPing + "ms`\n" +
                 "⚙**｜API Ping**: `" + apiPing + "ms`").queue();
+    }
+
+    public static void run(SlashCommandInteractionEvent e) {
+
+        JDA api = Main.getApi();
+        long apiPing = api.getRestPing().complete();
+        long gatewayPing = api.getGatewayPing();
+
+        e.reply("> **Pong!**\n\n" +
+                        "⏱**｜Gateway Ping**: `" + gatewayPing + "ms`\n" +
+                        "📡**｜API Ping**: `" + apiPing + "ms`")
+                .queue();
     }
 }

@@ -53,9 +53,8 @@ public class RegisterInputRoles {
         for (RegistrationRoles r : roles) {
             Role targetRole = guild.getRoleById(r.get());
 
-            if (targetRole == null) continue;
-
-            embedBuilder.addField("> `" + r.name() + "`", "<@&" + targetRole.getIdLong() + ">", false);
+            if (targetRole == null) embedBuilder.addField("> `" + r.name() + "`", "`⚠ Not Found`", false);
+            else embedBuilder.addField("> `" + r.name() + "`", "<@&" + targetRole.getIdLong() + ">", false);
         }
     }
 }
