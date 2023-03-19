@@ -20,7 +20,6 @@ public class CommandHandler extends ListenerAdapter {
         switch (contentLowerCase) {
             // case ".crole" -> ColorRoleSchedule.run(message);
 
-            case ".cd", ".countdown" -> Countdown.run(message);
 
             case ".disconnect" -> Disconnect.run(message);
 
@@ -31,13 +30,17 @@ public class CommandHandler extends ListenerAdapter {
                 return;
             }
 
-            case "r!help" -> {
+            /* case "r!help" -> {
                 RegisterHelp.run(message);
                 return;
             }
+             */
 
             case ".puta" -> Puta.run(message);
         }
+
+        if  (contentLowerCase.startsWith(".cd") || contentLowerCase.startsWith(".countdown"))
+            Countdown.run(message);
 
         if (contentLowerCase.startsWith("r!")) Registration.run(message);
     }

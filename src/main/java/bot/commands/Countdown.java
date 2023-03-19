@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import static bot.util.Extra.*;
@@ -18,18 +17,12 @@ public class Countdown {
 
         List<Long> allowedCountdownChannels = Channels.COMMAND_COUNTDOWN_CHANNELS;
 
-        if (allowedCountdownChannels.isEmpty()) return;
-        if (message.getAuthor().isBot()) return;
-
         String content = message.getContentRaw();
         MessageChannelUnion channel = message.getChannel();
         String[] args = content.split(" ");
-        User author = message.getAuthor();
 
-        if (!content.toLowerCase(Locale.ROOT).startsWith(".countdown")
-                && !content.toLowerCase(Locale.ROOT).startsWith(".cd")) return;
-
-        if (!allowedCountdownChannels.contains(channel.getIdLong())) return;
+        if (allowedCountdownChannels.isEmpty() || !allowedCountdownChannels.contains(channel.getIdLong())) return;
+        if (message.getAuthor().isBot()) return;
 
         if (args.length < 2) return;
         int limit = 0;
@@ -55,12 +48,7 @@ public class Countdown {
                     .flatMap(Message::delete)
                     .queue();
 
-            System.out.println("Membro " + author.getName() +
-                    "#" + author.getDiscriminator() +
-                    " utilizou um formato de numero inválido no .countdown (" + args[1] + ")");
-
             message.delete().queueAfter(11000, TimeUnit.MILLISECONDS);
-
             return;
         }
         catch (NullPointerException
@@ -87,13 +75,6 @@ public class Countdown {
         private final User author;
 
         private Timer(Message message, int limit, String countReason) {
-            sendExpireMessage(message.getChannel(),
-                    "Iniciando contagem...",
-                    5000);
-
-            try { Thread.sleep(5000); }
-            catch (InterruptedException e) { e.printStackTrace(); }
-
             this.count = limit;
             this.countReason = countReason;
             this.hasReason = !countReason.equalsIgnoreCase("none");
@@ -101,6 +82,9 @@ public class Countdown {
             this.author = message.getAuthor();
 
             this.botSentMessage = channel.sendMessage("Starting countdown...").complete();
+
+            try { Thread.sleep(3000); }
+            catch (InterruptedException e) { e.printStackTrace(); }
         }
 
         @Override
@@ -118,8 +102,8 @@ public class Countdown {
             }
 
             botSentMessage.delete().queue();
-            channel.sendMessage("<@" + author.getId() + "> o contador para " + countReason + " se encerrou.")
-                    .queue();
+            if (!hasReason) channel.sendMessage("<@" + author.getId() + "> o contador se encerrou.").queue();
+            else channel.sendMessage("<@" + author.getId() + "> o contador para " + countReason + " se encerrou.").queue();
         }
     }
 

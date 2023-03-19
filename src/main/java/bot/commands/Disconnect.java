@@ -1,8 +1,8 @@
 package bot.commands;
 
 import bot.util.Channels;
+import bot.util.Extra;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -24,14 +24,16 @@ public class Disconnect {
         if (!allowedDisconnectChannels.contains(channel.getIdLong())) return;
         if (member == null) return;
 
-        GuildVoiceState voiceStatus = member.getVoiceState();
-
-        if (voiceStatus == null) {
-            channel.sendMessage("Canal não encontrado, conecte-se em um para poder usar este comando.").queue();
+        try {
+            guild.kickVoiceMember(member).queue();
+        } catch (IllegalStateException exception) {
+            message.delete().queue();
+            Extra.sendExpireMessage(channel,
+                    "<@" + member.getIdLong() + "> Canal não encontrado, conecte-se em um para poder usar este comando.",
+                    10000);
             return;
         }
 
-        guild.kickVoiceMember(member).queue();
         channel.sendMessage("<@" + member.getId() + "> ok, desconectado :)").queue();
         message.delete().queue();
     }
@@ -46,16 +48,15 @@ public class Disconnect {
 
         if (guild == null || member == null) return;
 
-        GuildVoiceState state = member.getVoiceState();
-
-        if (state == null ) {
+        try {
+            guild.kickVoiceMember(member).queue();
+        } catch (IllegalStateException exception) {
             e.reply("Canal não encontrado, conecte-se em um para poder usar este comando.")
                     .setEphemeral(true)
                     .queue();
             return;
         }
 
-        guild.kickVoiceMember(member).queue();
         e.reply("Ok, desconectado :)")
                 .setEphemeral(true)
                 .queue();
