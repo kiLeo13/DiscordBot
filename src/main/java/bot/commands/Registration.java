@@ -2,11 +2,14 @@ package bot.commands;
 
 import bot.util.Channels;
 import bot.util.RegistrationRoles;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 
+import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -52,7 +55,7 @@ public class Registration {
 
         // Special
         String messageLink = "https://discord.com/channels/" + guild.getId() + "/" + channel.getId() + "/" + message.getId();
-        String data = getFormattedData();
+        String date = getFormattedDate();
 
         if (member == null) return;
         if (!Channels.REGISTER_CHANNELS.contains(channel.getIdLong())) return;
@@ -65,7 +68,7 @@ public class Registration {
                     "\nChat: #" + channel.getName() +
                     "\nComando: " + content +
                     "\nLink da Mensagem: " + messageLink +
-                    "\nData: " + data);
+                    "\nData: " + date);
             return;
         }
 
@@ -185,12 +188,13 @@ public class Registration {
 
         // Give and take the provided roles
         guild.modifyMemberRoles(target, toGiveRoles, toRemoveRoles).queue();
+        logRegister(target, toGiveRoles, toRemoveRoles, member);
 
         sendExpireMessage(channel,
-                "<@" + author.getId() + "> member `" + target.getEffectiveName() +
-                        "#" + target.getUser().getDiscriminator() +
-                        "` has been sucessfully registered.",
+                "<@" + author.getId() + "> you have successfully registered <@" + target.getIdLong() + ">.",
                 10000);
+
+        deleteLastMessageByUsers(target, channel);
 
         System.out.println(author.getName() +
                 "#" + author.getDiscriminator() +
@@ -198,6 +202,17 @@ public class Registration {
                 "\nGênero: " + getFullGender(genderInput) +
                 "\nIdade: " + getFullAge(ageInput) +
                 "\nPlataforma: " + getFullPlataform(plataformInput));
+    }
+
+    private static void deleteLastMessageByUsers(Member target, MessageChannelUnion channel) {
+        List<Message> history = channel.asTextChannel().getHistory().retrievePast(20).complete();
+
+        for (Message m : history) {
+            if (m.getAuthor().getIdLong() != target.getUser().getIdLong()) continue;
+
+            m.delete().queue();
+            break;
+        }
     }
 
     private static boolean rolesExist(Guild guild) {
@@ -272,7 +287,7 @@ public class Registration {
                 return "Menor de Idade";
             }
 
-            case "+19" -> {
+            case "+18" -> {
                 return "Maior de Idade";
             }
 
@@ -298,7 +313,7 @@ public class Registration {
         }
     }
 
-    private static String getFormattedData() {
+    private static String getFormattedDate() {
 
         LocalDateTime time = LocalDateTime.now();
 
@@ -332,5 +347,38 @@ public class Registration {
             }
         }
         return true;
+    }
+
+    private static void logRegister(Member target, List<Role> givenRoles, List<Role> removedRoles, Member registerMaker) {
+        EmbedBuilder builder = new EmbedBuilder();
+        String targetName = target.getUser().getName();
+        String targetDiscriminator = target.getUser().getDiscriminator();
+        String staffName = registerMaker.getUser().getName();
+        String staffDiscriminator = registerMaker.getUser().getDiscriminator();
+        TextChannel channel = target.getGuild().getTextChannelById(Channels.REGISTER_LOG_CHANNEL);
+
+        builder
+                .setColor(Color.GREEN)
+                .setThumbnail(target.getEffectiveAvatarUrl())
+                .setTitle("`" + targetName + "#" + targetDiscriminator + "` foi registrado!")
+                .setDescription("Registrado por `" + staffName + "#" + staffDiscriminator + "`\n ")
+                .addField("> **Cargos Dados**", getFormattedRolesToEmbed(givenRoles) + "", true)
+                .addField("> **Cargos Removidos**", getFormattedRolesToEmbed(removedRoles), true)
+                .setFooter("Oficina Myuu", "https://cdn.discordapp.com/attachments/631974560605929493/1086540588788228117/a_d51df27b11a16bbfaf5ce83acfeebfd8.png");
+
+        if (channel != null) channel.sendMessageEmbeds(builder.build()).queue();
+        else System.out.println("Não foi possível salvar o registro pois nenhum chat foi encontrado.");
+    }
+
+    private static String getFormattedRolesToEmbed(List<Role> roles) {
+        StringBuilder builder = new StringBuilder();
+
+        for (Role r : roles) {
+            builder.append("<@&")
+                    .append(r.getIdLong())
+                    .append(">\n");
+        }
+
+        return builder.toString().stripTrailing();
     }
 }

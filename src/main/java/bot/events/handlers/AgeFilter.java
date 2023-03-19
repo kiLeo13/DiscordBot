@@ -15,7 +15,7 @@ public class AgeFilter {
 
     public static void perform(Message message) {
 
-        List<Long> filterChannels = Channels.REGISTER_FILTER_CHANNELS;
+        List<Long> filterChannels = Channels.REGISTER_AGE_FILTER_CHANNELS;
 
         Member member = message.getMember();
         String[] args = message.getContentRaw().split(" ");

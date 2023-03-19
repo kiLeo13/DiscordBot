@@ -15,33 +15,33 @@ public class CommandHandler extends ListenerAdapter {
         if (event.getAuthor().isBot()) return;
 
         Message message = event.getMessage();
-        String contentLowerCase = message.getContentRaw().toLowerCase();
+        String contentLC = message.getContentRaw().toLowerCase();
 
-        switch (contentLowerCase) {
+        switch (contentLC) {
             // case ".crole" -> ColorRoleSchedule.run(message);
-
 
             case ".disconnect" -> Disconnect.run(message);
 
             case ".ping" -> Ping.run(message);
 
-            case "r!roles" -> {
-                RegisterInputRoles.run(message);
-                return;
-            }
+            case ".bigo" -> BigoAnnouncement.run(message);
+
+            case ".maconha", ".brisa" -> Maconha.run(message);
+
+            case "r!roles" -> RegisterInputRoles.run(message);
 
             /* case "r!help" -> {
                 RegisterHelp.run(message);
                 return;
             }
              */
-
-            case ".puta" -> Puta.run(message);
         }
 
-        if  (contentLowerCase.startsWith(".cd") || contentLowerCase.startsWith(".countdown"))
-            Countdown.run(message);
+        if (contentLC.startsWith(".moveall")) VoiceMoveAll.run(message);
+        if (contentLC.startsWith(".puta")) Puta.run(message);
+        if (contentLC.startsWith(".cd") || contentLC.startsWith(".countdown")) Countdown.run(message);
+        if (contentLC.startsWith("r!take")) RegistrationTake.run(message);
 
-        if (contentLowerCase.startsWith("r!")) Registration.run(message);
+        if (contentLC.startsWith("r!") && contentLC.split(" ").length >= 2) Registration.run(message);
     }
 }

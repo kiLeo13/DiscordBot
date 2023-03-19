@@ -1,5 +1,6 @@
 package bot;
 
+import bot.commands.music.MusicHandler;
 import bot.data.BotConfig;
 import bot.events.CommandHandler;
 import bot.events.MessageReceivedGeneral;
@@ -7,7 +8,6 @@ import bot.events.SlashCommand;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -54,6 +54,7 @@ public final class Main {
         api.addEventListener(new CommandHandler());
         api.addEventListener(new MessageReceivedGeneral());
         api.addEventListener(new SlashCommand());
+        api.addEventListener(new MusicHandler());
     }
 
     private static void updateCommands(JDA jda) {

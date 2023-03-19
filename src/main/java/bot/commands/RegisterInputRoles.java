@@ -25,7 +25,7 @@ public class RegisterInputRoles {
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
 
-        if (!Channels.COMMAND_REGISTER_ROLES_CHECK.contains(channel.getIdLong())) return;
+        if (!Channels.COMMAND_REGISTER_ROLES_CHECK_CHANNELS.contains(channel.getIdLong())) return;
 
         if (author.isBot()) return;
         if (member == null || !member.hasPermission(Permission.ADMINISTRATOR)) return;

@@ -36,9 +36,12 @@ public class Ping {
 
     public static void run(SlashCommandInteractionEvent e) {
 
+        MessageChannelUnion channel = e.getChannel();
         JDA api = Main.getApi();
         long apiPing = api.getRestPing().complete();
         long gatewayPing = api.getGatewayPing();
+
+        if (!Channels.COMMAND_PING_CHANNELS.contains(channel.getIdLong())) return;
 
         e.reply("> **Pong!**\n\n" +
                         "⏱**｜Gateway Ping**: `" + gatewayPing + "ms`\n" +
