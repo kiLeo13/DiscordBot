@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -92,6 +93,8 @@ public class Registration {
         String[] args = content.split(" ");
         String[] registerArgs = args[0].substring(2).split("");
         MessageChannelUnion channel = message.getChannel();
+        ArrayList<Role> toGiveRoles = new ArrayList<>();
+        List<Role> toRemoveRoles = List.of(verified, notRegistered);
 
         User author = message.getAuthor();
         Member member = message.getMember();
@@ -117,10 +120,6 @@ public class Registration {
             sendExpireMessage(channel, "<@" + author.getId() + "> Member `" + args[1] + "` was not found.", 5000);
 
             message.delete().queue();
-
-            System.out.println("Staff " + author.getName() +
-                    "#" + author.getDiscriminator() +
-                    " tentou registrar um membro não encontrado (" + args[1] + ").");
             return;
         }
 
@@ -137,20 +136,11 @@ public class Registration {
             sendExpireMessage(channel, "<@" + author.getId() + "> this member is already registered.", 5000);
 
             message.delete().queue();
-
-            System.out.println("Staff " + author.getName() +
-                    "#" + author.getDiscriminator() +
-                    " tentou registrar " + target.getUser().getName() +
-                    "#" + target.getUser().getDiscriminator() +
-                    " mas ele já estava registrado. Ignorando...");
             return;
         }
 
         if (target.getUser().isBot()) {
             message.delete().queue();
-            System.out.println("Staff " + author.getName() +
-                    "#" + author.getDiscriminator() +
-                    " tentou registrar um bot: " + target.getEffectiveName() + "#" + target.getUser().getDiscriminator());
             return;
         }
 
@@ -160,8 +150,6 @@ public class Registration {
             message.delete().queue();
 
             sendExpireMessage(channel, "<@" + author.getId() + "> invalid register format.\nSee: `" + args[0] + "`.", 5000);
-
-            System.out.println("Staff " + author.getName() + "#" + author.getDiscriminator() + " utilizou um formato de registro inválido.\nVeja: " + args[0]);
             return;
         }
 
@@ -171,37 +159,32 @@ public class Registration {
 
         // Gender
         switch (genderInput) {
-            case 'f' -> guild.addRoleToMember(target, female).queue();
-            case 'm' -> guild.addRoleToMember(target, male).queue();
-            case 'n' -> guild.addRoleToMember(target, nonBinary).queue();
+            case 'f' -> toGiveRoles.add(female);
+            case 'm' -> toGiveRoles.add(male);
+            case 'n' -> toGiveRoles.add(nonBinary);
         }
 
         // Age
         switch (ageInput) {
             case "-13" -> {
-                guild.addRoleToMember(target, under13).queue();
-                guild.addRoleToMember(target, underage).queue();
+                toGiveRoles.add(under13);
+                toGiveRoles.add(underage);
             }
-            case "-18" -> guild.addRoleToMember(target, underage).queue();
-            case "+18" -> guild.addRoleToMember(target, adult).queue();
+            case "-18" -> toGiveRoles.add(underage);
+            case "+18" -> toGiveRoles.add(adult);
         }
 
         // Plataform
         switch (plataformInput) {
-            case 'm' -> guild.addRoleToMember(target, mobile).queue();
-            case 'p' -> guild.addRoleToMember(target, pc).queue();
+            case 'm' -> toGiveRoles.add(mobile);
+            case 'p' -> toGiveRoles.add(pc);
         }
 
+        toGiveRoles.add(registered);
         message.delete().queue();
 
-        // Give registered role
-        guild.addRoleToMember(target, registered).queue();
-
-        // Take not registered role
-        guild.removeRoleFromMember(target, notRegistered).queue();
-
-        // Take verified role
-        guild.removeRoleFromMember(target, verified).queue();
+        // Give and take the provided roles
+        guild.modifyMemberRoles(target, toGiveRoles, toRemoveRoles).queue();
 
         sendExpireMessage(channel,
                 "<@" + author.getId() + "> member `" + target.getEffectiveName() +
@@ -329,6 +312,8 @@ public class Registration {
         RegistrationRoles[] roles = RegistrationRoles.values();
         Guild guild = message.getGuild();
         MessageChannelUnion channel = message.getChannel();
+
+        if (!guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES)) return false;
 
         for (RegistrationRoles r : roles) {
             Role targetRole = guild.getRoleById(r.get());
