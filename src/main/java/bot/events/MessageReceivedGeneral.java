@@ -1,7 +1,6 @@
 package bot.events;
 
 import bot.events.handlers.AgeFilter;
-import bot.events.handlers.Stickers;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -25,8 +24,5 @@ public class MessageReceivedGeneral extends ListenerAdapter {
 
         // Trigger age filter
         AgeFilter.perform(message);
-
-        // Trigger stickers feature
-        Stickers.run(message);
     }
 }

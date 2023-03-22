@@ -54,7 +54,6 @@ public class Registration {
         if (isBot) return;
 
         // Special
-        String messageLink = "https://discord.com/channels/" + guild.getId() + "/" + channel.getId() + "/" + message.getId();
         String date = getFormattedDate();
 
         if (member == null) return;
@@ -67,7 +66,6 @@ public class Registration {
                     "\nID: " + author.getId() +
                     "\nChat: #" + channel.getName() +
                     "\nComando: " + content +
-                    "\nLink da Mensagem: " + messageLink +
                     "\nData: " + date);
             return;
         }
@@ -196,9 +194,9 @@ public class Registration {
 
         deleteLastMessageByUsers(target, channel);
 
-        System.out.println(author.getName() +
+        System.out.println("\n" + author.getName() +
                 "#" + author.getDiscriminator() +
-                " registrou o membro " + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "!\nId do registrado: " + target.getId() + "\n\nCargos:" +
+                " registrou o membro " + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "\n\nCargos:" +
                 "\nGênero: " + getFullGender(genderInput) +
                 "\nIdade: " + getFullAge(ageInput) +
                 "\nPlataforma: " + getFullPlataform(plataformInput));
@@ -355,6 +353,7 @@ public class Registration {
         String targetDiscriminator = target.getUser().getDiscriminator();
         String staffName = registerMaker.getUser().getName();
         String staffDiscriminator = registerMaker.getUser().getDiscriminator();
+        Guild guild = target.getGuild();
         TextChannel channel = target.getGuild().getTextChannelById(Channels.REGISTER_LOG_CHANNEL);
 
         builder
@@ -364,7 +363,7 @@ public class Registration {
                 .setDescription("Registrado por `" + staffName + "#" + staffDiscriminator + "`\n ")
                 .addField("> **Cargos Dados**", getFormattedRolesToEmbed(givenRoles) + "", true)
                 .addField("> **Cargos Removidos**", getFormattedRolesToEmbed(removedRoles), true)
-                .setFooter("Oficina Myuu", "https://cdn.discordapp.com/attachments/631974560605929493/1086540588788228117/a_d51df27b11a16bbfaf5ce83acfeebfd8.png");
+                .setFooter("Oficina Myuu・ID: " + target.getIdLong(), guild.getIconUrl());
 
         if (channel != null) channel.sendMessageEmbeds(builder.build()).queue();
         else System.out.println("Não foi possível salvar o registro pois nenhum chat foi encontrado.");

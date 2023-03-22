@@ -37,11 +37,14 @@ public class CommandHandler extends ListenerAdapter {
              */
         }
 
+        if (contentLC.startsWith(".uptime")) Uptime.run(message);
+        if (contentLC.startsWith(".disconnectall")) DisconnectAll.run(message);
         if (contentLC.startsWith(".moveall")) VoiceMoveAll.run(message);
         if (contentLC.startsWith(".puta")) Puta.run(message);
         if (contentLC.startsWith(".cd") || contentLC.startsWith(".countdown")) Countdown.run(message);
-        if (contentLC.startsWith("r!take")) RegistrationTake.run(message);
 
+        // Register related
+        if (contentLC.startsWith("r!take")) RegistrationTake.run(message);
         if (contentLC.startsWith("r!") && contentLC.split(" ").length >= 2) Registration.run(message);
     }
 }

@@ -4,6 +4,8 @@ import bot.util.Channels;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -91,10 +93,10 @@ public class Countdown {
         public void run() {
             while (count >= 0) {
                 if (!hasReason) botSentMessage.editMessage(getFormattedCount(count))
-                        .queue();
+                        .queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE));
 
                 else botSentMessage.editMessage(countReason + " será em " + getFormattedCount(count))
-                        .queue();
+                        .queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE));
 
                 count--;
                 try { Thread.sleep(1000); }
@@ -102,8 +104,8 @@ public class Countdown {
             }
 
             botSentMessage.delete().queue();
-            if (!hasReason) channel.sendMessage("<@" + author.getId() + "> o contador se encerrou.").queue();
-            else channel.sendMessage("<@" + author.getId() + "> o contador para " + countReason + " se encerrou.").queue();
+            if (!hasReason) channel.sendMessage("<@" + author.getId() + "> o contador se encerrou.").queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE));
+            else channel.sendMessage("<@" + author.getId() + "> o contador para " + countReason + " se encerrou.").queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE));
         }
     }
 

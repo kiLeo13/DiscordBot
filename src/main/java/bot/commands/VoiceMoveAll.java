@@ -34,11 +34,7 @@ public class VoiceMoveAll {
 
             vChannels.add(guild.getVoiceChannelById(currentRegex));
             vChannels.add(guild.getVoiceChannelById(futureRegex));
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            Extra.sendExpireMessage(channel, "<@" + author.getIdLong() + "> canal de voz não encontrado.", 5000);
-            message.delete().queue();
-            return;
-        }
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) { vChannels.add(null); }
 
         for (VoiceChannel v : vChannels)
             if (v == null) {

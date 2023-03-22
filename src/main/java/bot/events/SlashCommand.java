@@ -1,6 +1,7 @@
 package bot.events;
 
 import bot.commands.Disconnect;
+import bot.commands.DisconnectAll;
 import bot.commands.Ping;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -17,6 +18,7 @@ public class SlashCommand extends ListenerAdapter {
         switch (name) {
             case "ping" -> Ping.run(event);
             case "disconnect" -> Disconnect.run(event);
+            case "disconnectall" -> DisconnectAll.run(event);
         }
     }
 }
