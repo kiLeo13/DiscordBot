@@ -2,6 +2,7 @@ package bot.commands;
 
 import bot.data.BotFiles;
 import bot.util.Channels;
+import bot.util.Extra;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -16,6 +17,23 @@ public class Puta {
     private Puta() {}
 
     public static void run(Message message) {
+
+        if (message.getGuild().getIdLong() != 1111L) {
+            List<String> blocked = List.of(
+                    "O comando foi desativado devido à uso incorreto.",
+                    "O comando foi desativado devido à comportamento abusivo.",
+                    "Puta sua mãe."
+            );
+
+            int random = (int) (Math.random() * blocked.size());
+
+            Extra.sendExpireMessage(message.getChannel(),
+                    "<@" + message.getAuthor().getIdLong() + "> " + blocked.get(random),
+                    10000);
+
+            message.delete().queue();
+            return;
+        }
 
         List<Long> allowedSwearingChannels = Channels.COMMAND_PUTA_CHANNELS;
 

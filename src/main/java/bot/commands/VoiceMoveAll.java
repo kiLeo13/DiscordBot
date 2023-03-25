@@ -68,7 +68,7 @@ public class VoiceMoveAll {
         }
 
         if (vChannels.get(0).getIdLong() == vChannels.get(1).getIdLong()) {
-            Extra.sendExpireMessage(channel, "<@" + author.getIdLong() + ">  você forneceu o mesmo canal de voz nos dois argumentos.", 5000);
+            Extra.sendExpireMessage(channel, "<@" + author.getIdLong() + "> você forneceu o mesmo canal de voz nos dois argumentos.", 5000);
             message.delete().queue();
             return;
         }

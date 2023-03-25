@@ -2,6 +2,7 @@ package bot.commands;
 
 import bot.util.Channels;
 import bot.util.Extra;
+import bot.util.Messages;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -29,7 +30,7 @@ public class Disconnect {
         } catch (IllegalStateException exception) {
             message.delete().queue();
             Extra.sendExpireMessage(channel,
-                    "<@" + member.getIdLong() + "> Canal não encontrado, conecte-se em um para poder usar este comando.",
+                    "<@" + member.getIdLong() + "> " + Messages.ERROR_CHANNEL_NOT_FOUND.toMessage(),
                     10000);
             return;
         }
@@ -51,7 +52,7 @@ public class Disconnect {
         try {
             guild.kickVoiceMember(member).queue();
         } catch (IllegalStateException exception) {
-            e.reply("Canal não encontrado, conecte-se em um para poder usar este comando.")
+            e.reply(Messages.ERROR_CHANNEL_NOT_FOUND.toMessage())
                     .setEphemeral(true)
                     .queue();
             return;

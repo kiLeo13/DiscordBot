@@ -1,5 +1,6 @@
 package bot;
 
+import bot.commands.misc.PayServer;
 import bot.data.BotConfig;
 import bot.events.CommandHandler;
 import bot.events.MessageReceivedGeneral;
@@ -53,6 +54,7 @@ public final class Main {
             return;
         }
 
+        runRunnables(api);
         profile(api);
         init = System.currentTimeMillis();
         registerEvents(api);
@@ -99,5 +101,11 @@ public final class Main {
 
     private static void profile(JDA api) {
         api.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Oficina"), false);
+    }
+
+    private static void runRunnables(JDA api) {
+        // Pay Server
+        PayServer server = new PayServer(api);
+        server.start();
     }
 }

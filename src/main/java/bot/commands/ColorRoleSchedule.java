@@ -75,6 +75,8 @@ public class ColorRoleSchedule {
 
         if (logChannel != null) logChannel.sendMessage(logMessage).queue();
         else System.out.println("Não foi possível encontrar o canal de registros para cargo de cor, ignorando...");
+
+
     }
 
     private static Member fetchTarget(String arg, Guild guild) {
@@ -89,23 +91,23 @@ public class ColorRoleSchedule {
 
         switch (arg) {
             case "fire", "fireelement" -> {
-                return guild.getRoleById(ColorRoles.FIRE_ELEMENT);
+                return guild.getRoleById(ColorRoles.FIRE_ELEMENT.toLong());
             }
 
             case "earth", "earthelement" -> {
-                return guild.getRoleById(ColorRoles.EARTH_ELEMENT);
+                return guild.getRoleById(ColorRoles.EARTH_ELEMENT.toLong());
             }
 
             case "water", "waterelement" -> {
-                return guild.getRoleById(ColorRoles.WATER_ELEMENT);
+                return guild.getRoleById(ColorRoles.WATER_ELEMENT.toLong());
             }
 
             case "light", "lightelement" -> {
-                return guild.getRoleById(ColorRoles.LIGHT_ELEMENT);
+                return guild.getRoleById(ColorRoles.LIGHT_ELEMENT.toLong());
             }
 
             case "air", "airelement" -> {
-                return guild.getRoleById(ColorRoles.AIR_ELEMENT);
+                return guild.getRoleById(ColorRoles.AIR_ELEMENT.toLong());
             }
 
             default -> {

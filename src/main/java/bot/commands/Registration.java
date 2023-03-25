@@ -1,6 +1,7 @@
 package bot.commands;
 
 import bot.util.Channels;
+import bot.util.Messages;
 import bot.util.RegistrationRoles;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -81,7 +82,7 @@ public class Registration {
         message.delete().queue();
 
         sendExpireMessage(channel,
-                "One or more required roles for this action were not found, we are sorry about that.",
+                Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.toMessage(),
                 5000);
     }
 
@@ -109,16 +110,16 @@ public class Registration {
             return;
         }
 
-        String targetRegex = args[1].replaceAll("[^0-9]+", "");
         Member target;
 
         // If target is not found or something very weird happens
         try {
+            String targetRegex = args[1].replaceAll("[^0-9]+", "");
             target = guild.retrieveMemberById(targetRegex).complete();
 
             if (target == null) throw new IllegalArgumentException("Target cannot be null");
         } catch (ErrorResponseException | IllegalArgumentException exception) {
-            sendExpireMessage(channel, "<@" + author.getId() + "> Member `" + args[1] + "` was not found.", 5000);
+            sendExpireMessage(channel, "<@" + author.getId() + "> Membro `" + args[1] + "` não encontrado.", 5000);
 
             message.delete().queue();
             return;
@@ -127,14 +128,14 @@ public class Registration {
         // Are they trying to register themselves?
         if (target.getIdLong() == member.getIdLong()) {
             message.delete().queue();
-            sendExpireMessage(channel, "<@" + author.getId() + "> you cannot register yourself.", 5000);
+            sendExpireMessage(channel, "<@" + author.getId() + "> você não pode se auto registrar.", 5000);
             System.out.println("Staff " + author.getName() + "#" + author.getDiscriminator() + " tentou se auto registrar.");
             return;
         }
 
         // Is member already registered?
         if (target.getRoles().contains(registered)) {
-            sendExpireMessage(channel, "<@" + author.getId() + "> this member is already registered.", 5000);
+            sendExpireMessage(channel, "<@" + author.getId() + "> este membro já está registrado.", 5000);
 
             message.delete().queue();
             return;
@@ -150,7 +151,7 @@ public class Registration {
         } catch (IllegalArgumentException exception) {
             message.delete().queue();
 
-            sendExpireMessage(channel, "<@" + author.getId() + "> invalid register format.\nSee: `" + args[0] + "`.", 5000);
+            sendExpireMessage(channel, "<@" + author.getId() + "> formato de registro inválido.\nVeja: `" + args[0] + "`.", 5000);
             return;
         }
 
@@ -189,7 +190,7 @@ public class Registration {
         logRegister(target, toGiveRoles, toRemoveRoles, member);
 
         sendExpireMessage(channel,
-                "<@" + author.getId() + "> you have successfully registered <@" + target.getIdLong() + ">.",
+                "<@" + author.getId() + "> você registrou com sucesso <@" + target.getIdLong() + ">.",
                 10000);
 
         deleteLastMessageByUsers(target, channel);
@@ -282,11 +283,11 @@ public class Registration {
             }
 
             case "-18" -> {
-                return "Menor de Idade";
+                return "Menor de idade";
             }
 
             case "+18" -> {
-                return "Maior de Idade";
+                return "Maior de idade";
             }
 
             default -> {
@@ -333,14 +334,14 @@ public class Registration {
             Role selfHighest = guild.getSelfMember().getRoles().get(0);
 
             if (targetRole == null) {
-                System.out.println("Não foi possível completar registro, cargo " + r.name() + " não foi encontrado.");
-                sendExpireMessage(channel, "Could not find role `" + r.name() + "`, we're sorry about that.", 10000);
+                sendExpireMessage(channel, "não foi possível encontrar o cargo `" + r.name() + "`! Pedimos desculpas.", 10000);
                 return false;
             }
 
             if (targetRole.getPosition() > selfHighest.getPosition()) {
-                System.out.println("Um ou mais cargos de registro estão acima do meu, por favor, reajuste a hierarquia do servidor.");
-                sendExpireMessage(channel, "One or more roles have a higher position than my highest role. Please adjust the server hierarchy accordingly.", 10000);
+                sendExpireMessage(channel,
+                        Messages.ERROR_HIERARCHY_HIGHER_ROLE.toMessage(),
+                        10000);
                 return false;
             }
         }

@@ -1,6 +1,7 @@
 package bot.commands;
 
 import bot.util.Extra;
+import bot.util.Messages;
 import bot.util.Roles;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -35,7 +36,7 @@ public class DisconnectAll {
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) { voiceChannel = null; }
 
         if (voiceChannel == null) {
-            Extra.sendExpireMessage(channel, "Canal não encontrado, por favor, especifique um canal de voz válido.", 10000);
+            Extra.sendExpireMessage(channel, Messages.ERROR_CHANNEL_NOT_FOUND.toMessage(), 10000);
             message.delete().queue();
             return;
         }
@@ -58,7 +59,7 @@ public class DisconnectAll {
         OptionMapping option = event.getOption("filter");
 
         if (event.getGuild().getIdLong() != 624008072544780309L) {
-            event.reply("Command is still in development stages...").queue();
+            event.reply("Comando em estágio de desenvolvimento...").queue();
             return;
         }
 
@@ -90,12 +91,12 @@ public class DisconnectAll {
 
         try {
             switch (filter) {
-                case "staff" -> disconnect(voiceChannel, Roles.ROLE_STAFF, guild);
+                case "staff" -> disconnect(voiceChannel, Roles.ROLE_STAFF.toId(), guild);
 
-                case "eventos" -> disconnect(voiceChannel, Roles.ROLES_EVENTOS, guild);
+                case "eventos" -> disconnect(voiceChannel, Roles.ROLES_EVENTOS.toIds(), guild);
             }
         } catch (IllegalArgumentException e) {
-            event.reply("Could not find a role for filter `" + filter + "`, please contact the server administration.").queue();
+            event.reply("Não foi possível encontrar um cargo para filtrar `" + filter + "`.").queue();
         }
     }
 

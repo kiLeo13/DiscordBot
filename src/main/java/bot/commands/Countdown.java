@@ -45,7 +45,7 @@ public class Countdown {
                     .toString()
                     .stripTrailing() + "`";
         } catch (NumberFormatException e) {
-            message.reply("The number format provided `" + args[1] + "` is not valid.")
+            message.reply("O formato de número `" + args[1] + "` não é válido.")
                     .delay(10000, TimeUnit.MILLISECONDS)
                     .flatMap(Message::delete)
                     .queue();
@@ -83,7 +83,7 @@ public class Countdown {
             this.channel = message.getChannel();
             this.author = message.getAuthor();
 
-            this.botSentMessage = channel.sendMessage("Starting countdown...").complete();
+            this.botSentMessage = channel.sendMessage("Iniciando contagem...").complete();
 
             try { Thread.sleep(3000); }
             catch (InterruptedException e) { e.printStackTrace(); }
@@ -111,7 +111,7 @@ public class Countdown {
 
     private static void callSecondsBoundaries(Message message) {
         sendExpireReply(message,
-                "For spamming/rate-limit purposes you can only enter a number between 3 to 60",
+                "Por motivos de evitar rate-limit (Discord API) você só pode utilizar um valor entre 3 - 60 segundos.",
                 10000);
 
         deleteAfter(message, 11000);

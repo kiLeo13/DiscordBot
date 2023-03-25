@@ -20,7 +20,7 @@ public class BigoAnnouncement {
                 Vão lá conferir a live do <streamer>!
                 
                 <link>
-                """, message);
+                """);
 
         if (author.isBot() || member == null) return;
         if (!member.hasPermission(Permission.MESSAGE_MANAGE) && member.getIdLong() != 974159685764649010L) return;
@@ -29,7 +29,7 @@ public class BigoAnnouncement {
         channel.sendMessage(announcement).queue();
     }
 
-    private static String getAnnouncement(String str, Message message) {
+    private static String getAnnouncement(String str) {
         HashMap<String, String> placeholders = new HashMap<>();
 
         placeholders.put("<streamer>", "Bigo");
