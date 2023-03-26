@@ -54,7 +54,7 @@ public class Puta {
             if (args.length >= 2) mentionedMember = message.getMentions().getMembers().get(0);
         } catch (FileNotFoundException e) {
             sendExpireMessage(channel,
-                    "File `swearings.yml` was not found.",
+                    "Arquivo `swearings.yml` não foi encontrado.",
                     10000);
             System.out.println("Arquivo 'swearings.yml' não foi encontrado, ignorando comando...");
             return;

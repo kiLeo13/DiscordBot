@@ -44,7 +44,7 @@ public class PayServer extends Thread {
                 hasInformed = false;
 
             try { Thread.sleep(3600000); }
-            catch (InterruptedException ignore) {}
+            catch (InterruptedException e) { break; }
         }
     }
 

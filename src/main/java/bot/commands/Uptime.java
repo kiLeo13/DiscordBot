@@ -25,7 +25,7 @@ public class Uptime {
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
         String response = formatted("""
-                ⏱**｜Uptime:** `<uptime>`
+                🕒**｜Uptime:** `<uptime>`
                 ⏰**｜Desde:** `<init-date> às <init-time> (<time-zone>)`
                 """);
 

@@ -37,6 +37,7 @@ public class CommandHandler extends ListenerAdapter {
              */
         }
 
+        if (contentLC.startsWith(".condor")) Condor.run(message);
         if (contentLC.startsWith(".among")) RoleAmongUs.run(message);
         if (contentLC.startsWith(".uptime")) Uptime.run(message);
         if (contentLC.startsWith(".disconnectall")) DisconnectAll.run(message);

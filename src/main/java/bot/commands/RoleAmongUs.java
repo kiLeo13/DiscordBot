@@ -55,9 +55,15 @@ public class RoleAmongUs {
             return;
         }
 
+        if (member.getRoles().contains(roleAmongUs)) {
+            channel.sendMessage("<@" + member.getIdLong() + "> o membro <@" + target.getIdLong() + "> já tem o cargo `Já Participou (Among Us)`.").queue();
+            message.delete().queue();
+            return;
+        }
+
         guild.addRoleToMember(target, roleAmongUs).queue();
         message.delete().queue();
-        channel.sendMessage("<@" + member.getIdLong() + "> o cargo `" + roleAmongUs.getName() + "` foi adicionado com sucesso à <@" + target.getIdLong() + ">!").queue();
+        channel.sendMessage("<@" + member.getIdLong() + "> o cargo `Já Participou (Among Us)` foi adicionado com sucesso à <@" + target.getIdLong() + ">!").queue();
     }
 
     private static boolean isMemberAllowed(Member member) {
