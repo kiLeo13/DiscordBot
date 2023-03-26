@@ -5,9 +5,9 @@ Yeah, this is my first Discord bot, learning how to use libraries and mostly how
 
 > **Note**
 >
-> This bot isn't intended to be a public bot or whatever you may think, this is a bot for a specific server and I do not recommend you using it on your own server.
+> This bot isn't intended to be a public bot or whatever you may think, this is a bot for a specific server.
 >
-> If you still want to use it on your server for some weird and dumb reason, DM me on Discord and I will send you the invitation link :3
+> If you still want to use it on your server for some weird and dumb reason you can just grab the code and use it.
 
 ## Features
 
@@ -20,3 +20,6 @@ Yeah, this is my first Discord bot, learning how to use libraries and mostly how
 
 `Countdown`
 - You can run a countdown in case you are a weird person and want a countdown from X to 0.
+
+`Misc`
+- Yeah, this bot has many more features that I won't list here, but you can check them out by simply looking at the code.
