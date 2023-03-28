@@ -18,7 +18,7 @@ public class AgeFilter {
         List<Long> filterChannels = Channels.REGISTER_AGE_FILTER_CHANNELS;
 
         Member member = message.getMember();
-        String[] args = message.getContentRaw().split(" ");
+        String[] args = message.getContentRaw().replaceAll("[^0-9 ]+", "").split(" ");
         MessageChannelUnion channel = message.getChannel();
 
         if (!filterChannels.contains(channel.getIdLong())) return;
@@ -32,7 +32,8 @@ public class AgeFilter {
             try {
                 int number = Integer.parseInt(i);
 
-                if (number > 50 || number < 1) message.delete().queue();
+                // Are you really 30 years old in a server for kids?
+                if (number > 30 || number < 1) message.delete().queue();
             } catch (NumberFormatException ignore) {}
         }
     }

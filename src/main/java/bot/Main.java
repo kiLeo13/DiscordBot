@@ -48,6 +48,7 @@ public final class Main {
                     .awaitReady();
 
             updateCommands(api);
+            init = System.currentTimeMillis();
         } catch (InterruptedException e) {
             e.printStackTrace();
             System.out.println("Failed to login, exiting...");
@@ -56,7 +57,6 @@ public final class Main {
 
         runRunnables(api);
         profile(api);
-        init = System.currentTimeMillis();
         registerEvents(api);
     }
 

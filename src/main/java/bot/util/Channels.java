@@ -5,7 +5,7 @@ import java.util.List;
 public class Channels {
     private Channels() {}
 
-    public static final List<Long> REGISTER_CHANNELS = List.of(757408993164394527L);
+    public static final long REGISTER_CHANNEL = 757408993164394527L;
     public static final List<Long> REGISTER_AGE_FILTER_CHANNELS = List.of(757408993164394527L);
     public static final long REGISTER_LOG_CHANNEL = 664972939908743209L;
 

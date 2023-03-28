@@ -41,7 +41,7 @@ public class RoleAmongUs {
             target = guild.retrieveMemberById(targetRegex).complete();
         } catch (ArrayIndexOutOfBoundsException e) {
             Extra.sendExpireMessage(channel,
-                    Messages.ERROR_CHANNEL_NOT_FOUND.toMessage(),
+                    Messages.ERROR_MEMBER_NOT_FOUND.toMessage(),
                     5000);
             message.delete().queue();
             return;
@@ -55,7 +55,7 @@ public class RoleAmongUs {
             return;
         }
 
-        if (member.getRoles().contains(roleAmongUs)) {
+        if (target.getRoles().contains(roleAmongUs)) {
             channel.sendMessage("<@" + member.getIdLong() + "> o membro <@" + target.getIdLong() + "> já tem o cargo `Já Participou (Among Us)`.").queue();
             message.delete().queue();
             return;
@@ -71,9 +71,8 @@ public class RoleAmongUs {
         Guild guild = member.getGuild();
         AtomicBoolean returned = new AtomicBoolean(false);
 
-        for (int i = 0; i < StaffField.GENERAL_AJUDANTES.toIds().size(); i++)
-            if (i != StaffField.GENERAL_AJUDANTES.toIds().size()-2)
-                possibleRoles.add(guild.getRoleById(StaffField.GENERAL_AJUDANTES.toIds().get(i)));
+        for (int i = 0; i < StaffRoles.GENERAL_AJUDANTES.toIds().size()-2; i++)
+            possibleRoles.add(guild.getRoleById(StaffRoles.GENERAL_AJUDANTES.toIds().get(i)));
 
         possibleRoles.forEach(r -> {
             if (member.getRoles().contains(r))

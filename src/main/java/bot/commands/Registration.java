@@ -8,11 +8,9 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.exceptions.HierarchyException;
 
 import java.awt.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,117 +42,86 @@ public class Registration {
 
     public static void run(Message message) {
 
-        String content = message.getContentRaw();
-        User author = message.getAuthor();
+        if (message.getGuild().getIdLong() != 624008072544780309L) return;
+
         Member member = message.getMember();
-        boolean isBot = author.isBot();
-        MessageChannelUnion channel = message.getChannel();
+        User author = message.getAuthor();
         Guild guild = message.getGuild();
+        MessageChannelUnion channel = message.getChannel();
+        String content = message.getContentRaw();
         boolean rolesExist = rolesExist(guild);
 
-        if (isBot) return;
+        if (author.isBot() || member == null) return;
 
-        // Special
-        String date = getFormattedDate();
+        if (channel.getIdLong() != Channels.REGISTER_CHANNEL && !member.hasPermission(Permission.ADMINISTRATOR)) return;
+        if (!member.getRoles().contains(requiredRole) && !member.hasPermission(Permission.MANAGE_ROLES)) return;
 
-        if (member == null) return;
-        if (!Channels.REGISTER_CHANNELS.contains(channel.getIdLong())) return;
 
-        // Ignore if member does not the permission
-        if (!member.hasPermission(Permission.MANAGE_ROLES) && !member.getRoles().contains(requiredRole)) {
-            System.out.println("Um membro sem permissão tentou usar o registro.\n" +
-                    "\nMembro: " + author.getName() + "#" + author.getDiscriminator() +
-                    "\nID: " + author.getId() +
-                    "\nChat: #" + channel.getName() +
-                    "\nComando: " + content +
-                    "\nData: " + date);
+        try { areRolesSetupProperly(message); }
+        catch (IllegalArgumentException | HierarchyException e) {
+            sendExpireMessage(channel, e.getMessage(), 10000);
+            message.delete().queue();
             return;
         }
 
-        if (!isRegistrationAvailable(message)) return;
+        if (!isInputValid(message)) {
+            sendExpireMessage(channel, "O padrão de registro usado `" + content + "` não é válido.", 5000);
+            message.delete().queue();
+            return;
+        }
 
-        // Start register process if everything is fine
         if (rolesExist) {
-            perform(message);
+            if (isInputExact(message)) performExact(message);
+            else performDynamic(message);
             return;
         }
 
+        sendExpireMessage(channel, Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.toMessage(), 5000);
         message.delete().queue();
-
-        sendExpireMessage(channel,
-                Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.toMessage(),
-                5000);
     }
 
-    private static void perform(Message message) {
-
-        List<Long> allowedRegisterChannels = Channels.REGISTER_CHANNELS;
-        if (allowedRegisterChannels.isEmpty()) return;
+    private static void performExact(Message message) {
 
         String content = message.getContentRaw();
+        User author = message.getAuthor();
+        MessageChannelUnion channel = message.getChannel();
         String[] args = content.split(" ");
         String[] registerArgs = args[0].substring(2).split("");
-        MessageChannelUnion channel = message.getChannel();
-        ArrayList<Role> toGiveRoles = new ArrayList<>();
-        List<Role> toRemoveRoles = List.of(verified, notRegistered);
-
-        User author = message.getAuthor();
-        Member member = message.getMember();
         Guild guild = message.getGuild();
 
-        // If member is not find, ignore it
-        if (member == null) return;
+        // Which roles should we give and take?
+        List<Role> toGiveRoles = new ArrayList<>();
+        List<Role> toTakeRoles = List.of(verified, notRegistered);
 
-        if (args.length < 2) {
+        Member target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
+
+        if (target == null) {
+            sendExpireMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.toMessage(), 5000);
             message.delete().queue();
             return;
         }
 
-        Member target;
-
-        // If target is not found or something very weird happens
-        try {
-            String targetRegex = args[1].replaceAll("[^0-9]+", "");
-            target = guild.retrieveMemberById(targetRegex).complete();
-
-            if (target == null) throw new IllegalArgumentException("Target cannot be null");
-        } catch (ErrorResponseException | IllegalArgumentException exception) {
-            sendExpireMessage(channel, "<@" + author.getId() + "> Membro `" + args[1] + "` não encontrado.", 5000);
-
-            message.delete().queue();
-            return;
-        }
-
-        // Are they trying to register themselves?
-        if (target.getIdLong() == member.getIdLong()) {
-            message.delete().queue();
-            sendExpireMessage(channel, "<@" + author.getId() + "> você não pode se auto registrar.", 5000);
-            System.out.println("Staff " + author.getName() + "#" + author.getDiscriminator() + " tentou se auto registrar.");
-            return;
-        }
-
-        // Is member already registered?
-        if (target.getRoles().contains(registered)) {
-            sendExpireMessage(channel, "<@" + author.getId() + "> este membro já está registrado.", 5000);
-
-            message.delete().queue();
-            return;
-        }
-
+        // Why would someone register a bot?
         if (target.getUser().isBot()) {
             message.delete().queue();
             return;
         }
 
-        try {
-            checkRegisterInput(registerArgs);
-        } catch (IllegalArgumentException exception) {
+        // Why would someone register themselves?
+        if (target.getIdLong() == author.getIdLong()) {
+            sendExpireMessage(channel, "<@" + author.getIdLong() + "> Você não pode registrar você mesmo.", 5000);
             message.delete().queue();
-
-            sendExpireMessage(channel, "<@" + author.getId() + "> formato de registro inválido.\nVeja: `" + args[0] + "`.", 5000);
             return;
         }
 
+        // Why would someone register someone that is already registered?
+        if (target.getRoles().contains(registered)) {
+            sendExpireMessage(channel, "<@" + author.getIdLong() + "> O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.", 5000);
+            message.delete().queue();
+            return;
+        }
+
+        // Finnally the register system
         char genderInput = registerArgs[0].toLowerCase().charAt(0);
         String ageInput = Arrays.toString(registerArgs).replaceAll("[^\\d+\\-]", "");
         char plataformInput = registerArgs[4].toLowerCase().charAt(0);
@@ -186,174 +153,198 @@ public class Registration {
         message.delete().queue();
 
         // Give and take the provided roles
-        guild.modifyMemberRoles(target, toGiveRoles, toRemoveRoles).queue();
-        logRegister(target, toGiveRoles, toRemoveRoles, member);
+        guild.modifyMemberRoles(target, toGiveRoles, toTakeRoles).queue();
+
+        logRegister(target, toGiveRoles, toTakeRoles, author);
+        logRegister(author, target.getUser(), String.valueOf(genderInput), ageInput, String.valueOf(plataformInput));
 
         sendExpireMessage(channel,
                 "<@" + author.getId() + "> você registrou com sucesso <@" + target.getIdLong() + ">.",
                 10000);
 
-        deleteLastMessageByUsers(target, channel);
-
-        System.out.println("\n" + author.getName() +
-                "#" + author.getDiscriminator() +
-                " registrou o membro " + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "\n\nCargos:" +
-                "\nGênero: " + getFullGender(genderInput) +
-                "\nIdade: " + getFullAge(ageInput) +
-                "\nPlataforma: " + getFullPlataform(plataformInput));
+        deleteLastMessageByUser(target, channel);
     }
 
-    private static void deleteLastMessageByUsers(Member target, MessageChannelUnion channel) {
-        List<Message> history = channel.asTextChannel().getHistory().retrievePast(20).complete();
+    private static void performDynamic(Message message) {
 
-        for (Message m : history) {
-            if (m.getAuthor().getIdLong() != target.getUser().getIdLong()) continue;
+        String content = message.getContentRaw();
+        User author = message.getAuthor();
+        MessageChannelUnion channel = message.getChannel();
+        String[] args = content.split(" ");
+        String[] registerArgs = args[0].substring(2).split("");
+        Guild guild = message.getGuild();
 
-            m.delete().queue();
-            break;
+        // Which roles should we give and take?
+        List<Role> toGiveRoles = new ArrayList<>();
+        List<Role> toTakeRoles = List.of(verified, notRegistered);
+
+        Member target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
+
+        if (target == null) {
+            sendExpireMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.toMessage(), 5000);
+            message.delete().queue();
+            return;
         }
+
+        // Why would someone register a bot?
+        if (target.getUser().isBot()) {
+            message.delete().queue();
+            return;
+        }
+
+        // Why would someone register themselves?
+        if (target.getIdLong() == author.getIdLong()) {
+            sendExpireMessage(channel, "<@" + author.getIdLong() + "> Você não pode registrar você mesmo.", 5000);
+            message.delete().queue();
+            return;
+        }
+
+        // Why would someone register someone that is already registered?
+        if (target.getRoles().contains(registered)) {
+            sendExpireMessage(channel, "<@" + author.getIdLong() + "> O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.", 5000);
+            message.delete().queue();
+            return;
+        }
+
+        // Finnally the register system
+        char genderInput = registerArgs[0].toLowerCase().charAt(0);
+        String ageFormatted = formatAge(registerArgs);
+        int ageInput = Integer.parseInt(Arrays.toString(registerArgs).replaceAll("[^\\d+\\-]", ""));
+        char plataformInput = registerArgs[registerArgs.length-1].toLowerCase().charAt(0);
+
+        // What? Are you -2 years old?
+        if (ageInput < 0) {
+            sendExpireMessage(channel, "<@" + author.getIdLong() + "> você não pode colocar uma idade negativa.", 5000);
+            message.delete().queue();
+            return;
+        }
+
+        // Gender
+        switch (genderInput) {
+            case 'f' -> toGiveRoles.add(female);
+            case 'm' -> toGiveRoles.add(male);
+            case 'n' -> toGiveRoles.add(nonBinary);
+        }
+
+        // Age
+        if (ageInput < 13) {
+            toGiveRoles.add(underage);
+            toGiveRoles.add(under13);
+        }
+        if (ageInput >= 13 && ageInput < 18) toGiveRoles.add(underage);
+        if (ageInput >= 18) toGiveRoles.add(adult);
+
+        // Plataform
+        switch (plataformInput) {
+            case 'm' -> toGiveRoles.add(mobile);
+            case 'p' -> toGiveRoles.add(pc);
+        }
+
+        toGiveRoles.add(registered);
+        message.delete().queue();
+
+        // Give and take the provided roles
+        guild.modifyMemberRoles(target, toGiveRoles, toTakeRoles).queue();
+
+        logRegister(target, toGiveRoles, toTakeRoles, author);
+        logRegister(author, target.getUser(), String.valueOf(genderInput), ageFormatted, String.valueOf(plataformInput));
+
+        sendExpireMessage(channel,
+                "<@" + author.getId() + "> você registrou com sucesso <@" + target.getIdLong() + ">.",
+                10000);
+
+        deleteLastMessageByUser(target, channel);
+    }
+
+    private static boolean isInputExact(Message message) {
+        String content = message.getContentRaw();
+        String[] args = content.split(" ");
+        String ageInput = args[0].substring(3, args[0].length()-1);
+        List<String> ages = List.of("-13", "-18", "+18");
+
+        return ages.contains(ageInput);
+    }
+
+    private static String formatAge(String[] registerArgs) {
+        int age = Integer.parseInt(Arrays.toString(registerArgs).replaceAll("[^\\d+\\-]", ""));
+        String returned = "Unknown";
+
+        if (age < 13) returned = "-13";
+        if (age >= 13 && age < 18) returned = "-18";
+        if (age >= 18) returned = "+18";
+
+        return returned;
+    }
+
+    private static boolean isInputValid(Message message) {
+        String content = message.getContentRaw();
+        String[] args = content.split(" ");
+
+        if (args[0].substring(2).length() <= 2) return false;
+
+        if (args.length < 2) return false;
+
+        String[] registrationArgs = args[0].substring(2).split("");
+        String ageInput = args[0].substring(3, args[0].length()-2);
+
+        try { Integer.parseInt(ageInput);}
+        catch (NumberFormatException e) { return false; }
+
+        List<String> begins = List.of("f", "m", "n");
+        List<String> ends = List.of("m", "p");
+
+        return begins.contains(registrationArgs[0]) && ends.contains(registrationArgs[registrationArgs.length - 1]);
     }
 
     private static boolean rolesExist(Guild guild) {
-        try {
-            requiredRole = guild.getRoleById(RegistrationRoles.ROLE_REQUIRED.get());
+        requiredRole = guild.getRoleById(RegistrationRoles.ROLE_REQUIRED.get());
 
-            notRegistered = guild.getRoleById(RegistrationRoles.ROLE_NOT_REGISTERED.get());
-            registered = guild.getRoleById(RegistrationRoles.ROLE_REGISTERED.get());
-            verified = guild.getRoleById(RegistrationRoles.ROLE_VERIFIED.get());
+        notRegistered = guild.getRoleById(RegistrationRoles.ROLE_NOT_REGISTERED.get());
+        registered = guild.getRoleById(RegistrationRoles.ROLE_REGISTERED.get());
+        verified = guild.getRoleById(RegistrationRoles.ROLE_VERIFIED.get());
 
-            male = guild.getRoleById(RegistrationRoles.ROLE_MALE.get());
-            female = guild.getRoleById(RegistrationRoles.ROLE_FEMALE.get());
-            nonBinary = guild.getRoleById(RegistrationRoles.ROLE_NON_BINARY.get());
+        male = guild.getRoleById(RegistrationRoles.ROLE_MALE.get());
+        female = guild.getRoleById(RegistrationRoles.ROLE_FEMALE.get());
+        nonBinary = guild.getRoleById(RegistrationRoles.ROLE_NON_BINARY.get());
 
-            adult = guild.getRoleById(RegistrationRoles.ROLE_ADULT.get());
-            underage = guild.getRoleById(RegistrationRoles.ROLE_UNDERAGE.get());
-            under13 = guild.getRoleById(RegistrationRoles.ROLE_UNDER13.get());
+        adult = guild.getRoleById(RegistrationRoles.ROLE_ADULT.get());
+        underage = guild.getRoleById(RegistrationRoles.ROLE_UNDERAGE.get());
+        under13 = guild.getRoleById(RegistrationRoles.ROLE_UNDER13.get());
 
-            pc = guild.getRoleById(RegistrationRoles.ROLE_COMPUTER.get());
-            mobile = guild.getRoleById(RegistrationRoles.ROLE_MOBILE.get());
+        pc = guild.getRoleById(RegistrationRoles.ROLE_COMPUTER.get());
+        mobile = guild.getRoleById(RegistrationRoles.ROLE_MOBILE.get());
 
-            // Were all roles found?
-            RegistrationRoles[] roles = RegistrationRoles.values();
+        // Were all roles found?
+        RegistrationRoles[] roles = RegistrationRoles.values();
 
-            for (RegistrationRoles i : roles)
-                if (guild.getRoleById(i.get()) == null) throw new IllegalArgumentException("Role '" + i + "' cannot be null");
-
-        } catch (IllegalArgumentException | NullPointerException ignore) { return false; }
+        for (RegistrationRoles i : roles)
+            if (guild.getRoleById(i.get()) == null) return false;
 
         return true;
     }
 
-    private static void checkRegisterInput(String[] input) throws IllegalArgumentException {
-        List<String> gender = List.of("f", "m", "n");
-        List<String> age = List.of("-13", "-18", "+18");
-        List<String> plataform = List.of("m", "p");
-
-        if (input.length != 5) throw new IllegalArgumentException("Too few arguments");
-
-        if (!gender.contains(input[0])) throw new IllegalArgumentException("Could not find gender '" + input[0] + "'");
-        if (!age.contains(input[1] + input[2] + input[3])) throw new IllegalArgumentException("Could not find age '" + input[0] + input[1] + input[2] + "'");
-        if (!plataform.contains(input[4])) throw new IllegalArgumentException("could not find plataform '" + input[4] + "'");
-    }
-
-    private static String getFullGender(char gender) {
-        switch (gender) {
-            case 'f' -> {
-                return "Feminino";
-            }
-
-            case 'm' -> {
-                return "Masculino";
-            }
-
-            case 'n' -> {
-                return "Não Binário";
-            }
-
-            default -> {
-                return "Unknown";
-            }
-        }
-    }
-
-    private static String getFullAge(String age) {
-        switch (age) {
-            case "-13" -> {
-                return "Menor de idade + (😻)";
-            }
-
-            case "-18" -> {
-                return "Menor de idade";
-            }
-
-            case "+18" -> {
-                return "Maior de idade";
-            }
-
-            default -> {
-                return "Unknown";
-            }
-        }
-    }
-
-    private static String getFullPlataform(char plataform) {
-        switch (plataform) {
-            case 'm' -> {
-                return "Mobile";
-            }
-
-            case 'p' -> {
-                return "Computador";
-            }
-
-            default -> {
-                return "Unknown";
-            }
-        }
-    }
-
-    private static String getFormattedDate() {
-
-        LocalDateTime time = LocalDateTime.now();
-
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-
-        return time.format(dateFormatter) + " às " + time.format(timeFormatter);
-    }
-
-    private static boolean isRegistrationAvailable(Message message) {
+    private static void areRolesSetupProperly(Message message) {
         RegistrationRoles[] roles = RegistrationRoles.values();
         Guild guild = message.getGuild();
-        MessageChannelUnion channel = message.getChannel();
-
-        if (!guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES)) return false;
 
         for (RegistrationRoles r : roles) {
             Role targetRole = guild.getRoleById(r.get());
             Role selfHighest = guild.getSelfMember().getRoles().get(0);
 
-            if (targetRole == null) {
-                sendExpireMessage(channel, "não foi possível encontrar o cargo `" + r.name() + "`! Pedimos desculpas.", 10000);
-                return false;
-            }
+            if (targetRole == null)
+                throw new IllegalArgumentException("Role " + r.name() + " cannot be null");
 
-            if (targetRole.getPosition() > selfHighest.getPosition()) {
-                sendExpireMessage(channel,
-                        Messages.ERROR_HIERARCHY_HIGHER_ROLE.toMessage(),
-                        10000);
-                return false;
-            }
+            if (targetRole.getPosition() > selfHighest.getPosition() || !guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES))
+                throw new HierarchyException(targetRole.getName() + " has a higher position than my highest role or I don't have Permission.MANAGE_ROLES enabled");
         }
-        return true;
     }
 
-    private static void logRegister(Member target, List<Role> givenRoles, List<Role> removedRoles, Member registerMaker) {
+    private static void logRegister(Member target, List<Role> givenRoles, List<Role> removedRoles, User registerMaker) {
         EmbedBuilder builder = new EmbedBuilder();
         String targetName = target.getUser().getName();
         String targetDiscriminator = target.getUser().getDiscriminator();
-        String staffName = registerMaker.getUser().getName();
-        String staffDiscriminator = registerMaker.getUser().getDiscriminator();
+        String staffName = registerMaker.getName();
+        String staffDiscriminator = registerMaker.getDiscriminator();
         Guild guild = target.getGuild();
         TextChannel channel = target.getGuild().getTextChannelById(Channels.REGISTER_LOG_CHANNEL);
 
@@ -361,13 +352,22 @@ public class Registration {
                 .setColor(Color.GREEN)
                 .setThumbnail(target.getEffectiveAvatarUrl())
                 .setTitle("`" + targetName + "#" + targetDiscriminator + "` foi registrado!")
-                .setDescription("Registrado por `" + staffName + "#" + staffDiscriminator + "`\n ")
-                .addField("> **Cargos Dados**", getFormattedRolesToEmbed(givenRoles) + "", true)
+                .setDescription("Registrado por `" + staffName + "#" + staffDiscriminator + "`")
+                .addField("> **Cargos Dados**", getFormattedRolesToEmbed(givenRoles), true)
                 .addField("> **Cargos Removidos**", getFormattedRolesToEmbed(removedRoles), true)
                 .setFooter("Oficina Myuu・ID: " + target.getIdLong(), guild.getIconUrl());
 
         if (channel != null) channel.sendMessageEmbeds(builder.build()).queue();
         else System.out.println("Não foi possível salvar o registro pois nenhum chat foi encontrado.");
+    }
+
+    private static void logRegister(User moderator, User target, String gender, String age, String plataform) {
+        System.out.println("\n" + moderator.getName() + "#" + moderator.getDiscriminator() +
+                " registrou o membro " + target.getName() + "#" + target.getDiscriminator() +
+                "\n\nCargos:" +
+                "\nGênero: " + getFullGender(gender) +
+                "\nIdade: " + getFullAge(age) +
+                "\nPlataforma: " + getFullPlataform(plataform));
     }
 
     private static String getFormattedRolesToEmbed(List<Role> roles) {
@@ -380,5 +380,56 @@ public class Registration {
         }
 
         return builder.toString().stripTrailing();
+    }
+
+    private static void deleteLastMessageByUser(Member target, MessageChannelUnion channel) {
+        List<Message> history = channel.asTextChannel().getHistory().retrievePast(20).complete();
+
+        for (Message m : history) {
+            if (m.getAuthor().getIdLong() != target.getUser().getIdLong()) continue;
+
+            m.delete().queue();
+            break;
+        }
+    }
+
+    private static String getFullPlataform(String plataform) {
+        String returned = "Unknown";
+
+        switch (plataform) {
+            case "m" -> returned = "Mobile";
+
+            case "p" -> returned = "Computador";
+        }
+
+         return returned;
+    }
+
+    private static String getFullAge(String age) {
+        String returned = "Unknown";
+
+        switch (age) {
+            case "-13" -> returned = "Menor de idade + (😻)";
+
+            case "-18" -> returned = "Menor de idade";
+
+            case "+18" -> returned = "Maior de idade";
+        }
+
+        return returned;
+    }
+
+    private static String getFullGender(String gender) {
+        String returned = "Unknown";
+
+        switch (gender) {
+            case "f" -> returned = "Feminino";
+
+            case "m" -> returned = "Masculino";
+
+            case "n" -> returned = "Não binário";
+        }
+
+        return returned;
     }
 }

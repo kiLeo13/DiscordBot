@@ -2,7 +2,7 @@ package bot.commands;
 
 import bot.util.Extra;
 import bot.util.Messages;
-import bot.util.Roles;
+import bot.util.StaffRoles;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
@@ -91,9 +91,9 @@ public class DisconnectAll {
 
         try {
             switch (filter) {
-                case "staff" -> disconnect(voiceChannel, Roles.ROLE_STAFF.toId(), guild);
+                case "staff" -> disconnect(voiceChannel, StaffRoles.ROLE_STAFF.toId(), guild);
 
-                case "eventos" -> disconnect(voiceChannel, Roles.ROLES_EVENTOS.toIds(), guild);
+                case "eventos" -> disconnect(voiceChannel, StaffRoles.ROLES_EVENTOS.toIds(), guild);
             }
         } catch (IllegalArgumentException e) {
             event.reply("Não foi possível encontrar um cargo para filtrar `" + filter + "`.").queue();

@@ -22,6 +22,8 @@ public class CommandHandler extends ListenerAdapter {
 
             case ".disconnect" -> Disconnect.run(message);
 
+            case ".lapada" -> Lapada.run(message);
+
             case ".ping" -> Ping.run(message);
 
             case ".bigo" -> BigoAnnouncement.run(message);
@@ -47,6 +49,8 @@ public class CommandHandler extends ListenerAdapter {
 
         // Register related
         if (contentLC.startsWith("r!take")) RegistrationTake.run(message);
-        if (contentLC.startsWith("r!") && contentLC.split(" ").length >= 2) Registration.run(message);
+        if (contentLC.startsWith("r!") && !contentLC.startsWith("r!take")) {
+            Registration.run(message);
+        }
     }
 }
