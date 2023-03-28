@@ -18,8 +18,5 @@ Yeah, this is my first Discord bot, learning how to use libraries and mostly how
 - If you run the command `.puta`, the bot will grab a random swearing stored in my YAML file and send it to you :)
 ###### Note that if you want to add a swearing to the list you can simply DM me and ask for it as well.
 
-`Countdown`
-- You can run a countdown in case you are a weird person and want a countdown from X to 0.
-
 `Misc`
 - Yeah, this bot has many more features that I won't list here, but you can check them out by simply looking at the code.

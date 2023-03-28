@@ -22,13 +22,9 @@ public class CommandHandler extends ListenerAdapter {
 
             case ".disconnect" -> Disconnect.run(message);
 
-            case ".lapada" -> Lapada.run(message);
-
             case ".ping" -> Ping.run(message);
 
             case ".bigo" -> BigoAnnouncement.run(message);
-
-            case ".maconha", ".brisa" -> Maconha.run(message);
 
             case "r!roles" -> RegisterInputRoles.run(message);
 
@@ -39,13 +35,11 @@ public class CommandHandler extends ListenerAdapter {
              */
         }
 
-        if (contentLC.startsWith(".condor")) Condor.run(message);
         if (contentLC.startsWith(".among")) RoleAmongUs.run(message);
         if (contentLC.startsWith(".uptime")) Uptime.run(message);
         if (contentLC.startsWith(".disconnectall")) DisconnectAll.run(message);
         if (contentLC.startsWith(".moveall")) VoiceMoveAll.run(message);
         if (contentLC.startsWith(".puta")) Puta.run(message);
-        if (contentLC.startsWith(".cd") || contentLC.startsWith(".countdown")) Countdown.run(message);
 
         // Register related
         if (contentLC.startsWith("r!take")) RegistrationTake.run(message);
