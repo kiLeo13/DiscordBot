@@ -12,6 +12,7 @@ public class CommandHandler extends ListenerAdapter {
     @SubscribeEvent
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
 
+        if (event.getGuild().getIdLong() != 582430782577049600L) return;
         if (event.getAuthor().isBot()) return;
 
         Message message = event.getMessage();
@@ -26,13 +27,10 @@ public class CommandHandler extends ListenerAdapter {
 
             case ".bigo" -> BigoAnnouncement.run(message);
 
-            case "r!roles" -> RegisterInputRoles.run(message);
+            case "r!roles" -> RegistrationRoles.run(message);
 
-            /* case "r!help" -> {
-                RegisterHelp.run(message);
-                return;
-            }
-             */
+            case "r!help" -> Registration.help(message);
+            case ".help" -> HelpManager.run(message);
         }
 
         if (contentLC.startsWith(".among")) RoleAmongUs.run(message);

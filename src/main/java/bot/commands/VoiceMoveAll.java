@@ -1,6 +1,7 @@
 package bot.commands;
 
 import bot.util.Extra;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -9,11 +10,30 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class VoiceMoveAll {
     private VoiceMoveAll() {}
+
+    protected static void help(Message message) {
+        EmbedBuilder builder = new EmbedBuilder();
+
+        MessageChannelUnion channel = message.getChannel();
+        Guild guild = message.getGuild();
+
+        builder
+                .setColor(Color.YELLOW)
+                .setTitle("Voice Move All", guild.getIconUrl())
+                .setDescription("Segue uma explicação mais detalhada sobre o comando fornecido.")
+                .addField("> 📝 Requisitos", "Atualmente para executar este comando, requer `Permission.MANAGE_SERVER` em um dos seus cargos.", true)
+                .addField("> ❓ O que é", "É um comando feito para mover todos os usuários de um canal de voz para outro sem exceções.", true)
+                .addField("> ❗ Disclaimer", "Tenha em mente que pode demorar um pouco para mover todos os membros devido ao rate-limit do Discord. Saiba mais: https://discord.com/developers/docs/topics/rate-limits", true)
+                .setFooter("Oficina Myuu", guild.getIconUrl());
+
+        channel.sendMessageEmbeds(builder.build()).queue();
+    }
 
     public static void run(Message message) {
 

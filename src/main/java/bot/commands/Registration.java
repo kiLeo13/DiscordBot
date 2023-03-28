@@ -40,10 +40,28 @@ public class Registration {
     private static Role mobile;
     private Registration() {}
 
+    public static void help(Message message) {
+        MessageChannelUnion channel = message.getChannel();
+        EmbedBuilder builder = new EmbedBuilder();
+        Guild guild = message.getGuild();
+        String roleName = "Unknown";
+
+        rolesExist(guild);
+        if (requiredRole != null) roleName = requiredRole.getName();
+
+        builder
+                .setColor(Color.YELLOW)
+                .setTitle("Registration", guild.getIconUrl())
+                .setDescription("Este comando irá guiar e dar exemplos sobre como utilizar o bot para registro.")
+                .addField("> 📝 Requisitos", "Para executar este comando, requer `Permission.MESSAGE_ROLES` ou o cargo `" + roleName + "`.", true)
+                .addField("> ❓ O que é", "É um comando feito para divulgar a live do Bigo na Twitch *(comando sujeito à remoção em caso de baixa frequência de usos)*.", true)
+                .addField("> ❗ Disclaimer", "Este comando NÃO É feito com a intenção de marcar everyone quando utilizado.", true)
+                .setFooter("Oficina Myuu", guild.getIconUrl());
+
+        channel.sendMessageEmbeds(builder.build()).queue();
+    }
+
     public static void run(Message message) {
-
-        if (message.getGuild().getIdLong() != 582430782577049600L) return;
-
         Member member = message.getMember();
         User author = message.getAuthor();
         Guild guild = message.getGuild();

@@ -1,8 +1,6 @@
 package bot.events;
 
-import bot.commands.Disconnect;
-import bot.commands.DisconnectAll;
-import bot.commands.Ping;
+import bot.commands.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;

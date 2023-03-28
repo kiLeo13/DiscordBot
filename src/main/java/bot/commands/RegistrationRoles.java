@@ -1,7 +1,6 @@
 package bot.commands;
 
 import bot.util.Channels;
-import bot.util.RegistrationRoles;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -12,10 +11,10 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
-public class RegisterInputRoles {
+public class RegistrationRoles {
     private static final EmbedBuilder embedBuilder = new EmbedBuilder();
 
-    private RegisterInputRoles() {}
+    private RegistrationRoles() {}
 
     public static void run(Message message) {
         setupEmbed(message.getGuild());
@@ -48,9 +47,9 @@ public class RegisterInputRoles {
         embedBuilder.setThumbnail("https://cdn.discordapp.com/attachments/631974560605929493/1086539928596398110/image.png");
         embedBuilder.setFooter("Oficina Myuu", "https://cdn.discordapp.com/attachments/631974560605929493/1086540588788228117/a_d51df27b11a16bbfaf5ce83acfeebfd8.png");
 
-        RegistrationRoles[] roles = RegistrationRoles.values();
+        bot.util.RegistrationRoles[] roles = bot.util.RegistrationRoles.values();
 
-        for (RegistrationRoles r : roles) {
+        for (bot.util.RegistrationRoles r : roles) {
             Role targetRole = guild.getRoleById(r.get());
 
             if (targetRole == null) embedBuilder.addField("> `" + r.name() + "`", "`⚠ Not Found`", false);
