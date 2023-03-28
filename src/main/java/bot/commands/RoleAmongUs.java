@@ -35,17 +35,13 @@ public class RoleAmongUs {
             return;
         }
 
-        try {
-            String targetRegex = args[1].replaceAll("[^0-9]+", "");
-
-            target = guild.retrieveMemberById(targetRegex).complete();
-        } catch (ArrayIndexOutOfBoundsException e) {
-            Extra.sendExpireMessage(channel,
-                    Messages.ERROR_MEMBER_NOT_FOUND.toMessage(),
-                    5000);
+        if (args.length < 2) {
+            Extra.sendExpireMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.toMessage(), 5000);
             message.delete().queue();
             return;
         }
+
+        target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
 
         if (target == null) {
             Extra.sendExpireMessage(channel,

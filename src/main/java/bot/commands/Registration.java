@@ -42,7 +42,7 @@ public class Registration {
 
     public static void run(Message message) {
 
-        if (message.getGuild().getIdLong() != 624008072544780309L) return;
+        if (message.getGuild().getIdLong() != 582430782577049600L) return;
 
         Member member = message.getMember();
         User author = message.getAuthor();
@@ -55,7 +55,6 @@ public class Registration {
 
         if (channel.getIdLong() != Channels.REGISTER_CHANNEL && !member.hasPermission(Permission.ADMINISTRATOR)) return;
         if (!member.getRoles().contains(requiredRole) && !member.hasPermission(Permission.MANAGE_ROLES)) return;
-
 
         try { areRolesSetupProperly(message); }
         catch (IllegalArgumentException | HierarchyException e) {
