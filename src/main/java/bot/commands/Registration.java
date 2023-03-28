@@ -279,12 +279,11 @@ public class Registration {
         String content = message.getContentRaw();
         String[] args = content.split(" ");
 
+        if (args.length < 2) return false;
         if (args[0].substring(2).length() <= 2) return false;
 
-        if (args.length < 2) return false;
-
         String[] registrationArgs = args[0].substring(2).split("");
-        String ageInput = args[0].substring(3, args[0].length()-2);
+        String ageInput = args[0].substring(3, args[0].length()-1);
 
         try { Integer.parseInt(ageInput);}
         catch (NumberFormatException e) { return false; }
