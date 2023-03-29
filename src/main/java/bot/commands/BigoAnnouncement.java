@@ -25,7 +25,7 @@ public class BigoAnnouncement {
                 .setTitle("Bigo Announcement", guild.getIconUrl())
                 .setDescription("Segue uma explicação mais detalhada sobre o comando fornecido.")
                 .addField("> 📝 Requisitos", "Para executar este comando, requer `Permission.MESSAGE_MANAGE` (em algum cargo, chat não serve) ou ser o Bigo.", true)
-                .addField("> ❓ O que é", "É um comando feito para divulgar a live do Bigo na Twitch *(comando sujeito à remoção em caso de baixa frequência de usos)*.", true)
+                .addField("> ❓ O que é", "Desenvolvido para divulgar a live do Bigo na Twitch *(comando sujeito à remoção em caso de baixa frequência de usos)*.", true)
                 .addField("> ❗ Disclaimer", "Este comando NÃO É feito com a intenção de marcar everyone quando utilizado.", true)
                 .setFooter("Oficina Myuu", guild.getIconUrl());
 

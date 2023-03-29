@@ -35,7 +35,7 @@ public class Puta {
             return;
         }
 
-        List<Long> allowedSwearingChannels = Channels.COMMAND_PUTA_CHANNELS;
+        List<Long> allowedSwearingChannels = Channels.COMMAND_PUTA_CHANNELS.toIds();
 
         Member mentionedMember = null;
         String[] args = message.getContentRaw().split(" ");

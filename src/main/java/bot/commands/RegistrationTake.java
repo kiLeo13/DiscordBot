@@ -59,7 +59,7 @@ public class RegistrationTake {
         String targetDiscriminator = target.getUser().getDiscriminator();
         String staffName = registerMaker.getUser().getName();
         String staffDiscriminator = registerMaker.getUser().getDiscriminator();
-        TextChannel channel = target.getGuild().getTextChannelById(Channels.REGISTER_LOG_CHANNEL);
+        TextChannel channel = target.getGuild().getTextChannelById(Channels.REGISTER_LOG_CHANNEL.toId());
 
         builder
                 .setColor(Color.RED)

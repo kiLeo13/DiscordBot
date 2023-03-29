@@ -54,8 +54,35 @@ public class Registration {
                 .setTitle("Registration", guild.getIconUrl())
                 .setDescription("Este comando irá guiar e dar exemplos sobre como utilizar o bot para registro.")
                 .addField("> 📝 Requisitos", "Para executar este comando, requer `Permission.MESSAGE_ROLES` ou o cargo `" + roleName + "`.", true)
-                .addField("> ❓ O que é", "É um comando feito para divulgar a live do Bigo na Twitch *(comando sujeito à remoção em caso de baixa frequência de usos)*.", true)
+                .addField("> ❓ O que é", "Desenvolvido para divulgar a live do Bigo na Twitch *(comando sujeito à remoção em caso de baixa frequência de usos)*.", true)
                 .addField("> ❗ Disclaimer", "Este comando NÃO É feito com a intenção de marcar everyone quando utilizado.", true)
+                .addField("> ⚙ Syntax: `r!<information> <@user>`", """
+                        Ex:
+                        `r!m-18p` | `r!m14p` - *Masculino, 14 anos, pc*
+                        `r!f+18m` | `r!f23m` - *Feminino, 23 anos, mobile*
+                        `r!n-13p` | `r!n9p` - *Não binário, 9 anos, pc*
+                        
+                        Final: "r!m16p <@596939790532739075>"
+                        """, false)
+                .addField("> 📋 Information", """
+                        **Gênero:**
+                        ```
+                        f -> Feminino
+                        m -> Masculino
+                        n -> Não binário
+                        ```
+                        **Idade:**
+                        ```
+                        -13 -> Menor de idade + (😻)
+                        -18 -> Menor de idade
+                        +18 -> Maior de idade
+                        ```
+                        **Plataforma:**
+                        ```
+                        m -> Mobile
+                        p -> Computador/PC
+                        ```
+                        """, false)
                 .setFooter("Oficina Myuu", guild.getIconUrl());
 
         channel.sendMessageEmbeds(builder.build()).queue();
@@ -71,7 +98,7 @@ public class Registration {
 
         if (author.isBot() || member == null) return;
 
-        if (channel.getIdLong() != Channels.REGISTER_CHANNEL && !member.hasPermission(Permission.ADMINISTRATOR)) return;
+        if (channel.getIdLong() != Channels.REGISTER_CHANNEL.toId() && !member.hasPermission(Permission.ADMINISTRATOR)) return;
         if (!member.getRoles().contains(requiredRole) && !member.hasPermission(Permission.MANAGE_ROLES)) return;
 
         try { areRolesSetupProperly(message); }
@@ -362,7 +389,7 @@ public class Registration {
         String staffName = registerMaker.getName();
         String staffDiscriminator = registerMaker.getDiscriminator();
         Guild guild = target.getGuild();
-        TextChannel channel = target.getGuild().getTextChannelById(Channels.REGISTER_LOG_CHANNEL);
+        TextChannel channel = target.getGuild().getTextChannelById(Channels.REGISTER_LOG_CHANNEL.toId());
 
         builder
                 .setColor(Color.GREEN)

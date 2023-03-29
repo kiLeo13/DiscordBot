@@ -25,7 +25,7 @@ public class RoleAmongUs {
         Role roleAmongUs = guild.getRoleById(Roles.ROLE_AMONG_US.toId());
 
         if (member == null || !isMemberAllowed(member)) return;
-        if (Channels.STAFF_AJUDANTES_CHANNEL != channel.getIdLong()) return;
+        if (Channels.STAFF_AJUDANTES_CHANNEL.toId() != channel.getIdLong()) return;
 
         if (roleAmongUs == null) {
             Extra.sendExpireMessage(channel,

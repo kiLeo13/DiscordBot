@@ -24,7 +24,7 @@ public class RegistrationRoles {
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
 
-        if (!Channels.COMMAND_REGISTER_ROLES_CHECK_CHANNELS.contains(channel.getIdLong())) return;
+        if (!Channels.COMMAND_REGISTER_ROLES_CHECK_CHANNELS.toIds().contains(channel.getIdLong())) return;
 
         if (author.isBot()) return;
         if (member == null || !member.hasPermission(Permission.ADMINISTRATOR)) return;

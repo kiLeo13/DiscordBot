@@ -24,13 +24,13 @@ public class ColorRoleSchedule {
         String content = message.getContentRaw();
         Guild guild = message.getGuild();
         MessageChannelUnion channel = message.getChannel();
-        TextChannel logChannel = guild.getTextChannelById(Channels.LOG_COLOR_ROLE_COMMAND_CHANNEL);
+        TextChannel logChannel = guild.getTextChannelById(Channels.LOG_COLOR_ROLE_COMMAND_CHANNEL.toId());
 
         String[] args = content.split(" ");
         Member target = fetchTarget(args[1], guild);
         Role color = fetchColor(args[2], guild);
 
-        if (!Channels.COMMAND_COLOR_ROLE_CHANNELS.contains(channel.getIdLong())) return;
+        if (!Channels.COMMAND_COLOR_ROLE_CHANNELS.toIds().contains(channel.getIdLong())) return;
 
         if (member == null || !member.hasPermission(Permission.MANAGE_ROLES)) return;
         if (author.isBot()) return;

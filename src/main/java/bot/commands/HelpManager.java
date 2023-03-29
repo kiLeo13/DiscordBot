@@ -23,19 +23,20 @@ public class HelpManager {
         if (author.isBot()) return;
         if (member == null || (!member.hasPermission(Permission.MESSAGE_MANAGE) && member.getRoles().contains(guild.getRoleById(StaffRoles.ROLE_STAFF.toId())))) return;
 
-        if (args.length < 2) {
+        if (args.length < 2 || args[1].startsWith(".help help")) {
             channel.sendMessageEmbeds(generalHelp(guild)).queue();
             message.delete().queue();
             return;
         }
 
         switch (args[1]) {
+            case "bigo" -> BigoAnnouncement.help(message);
+
+            case "disconnect" -> Disconnect.help(message);
 
             case "commands", "cmds" -> channel.sendMessageEmbeds(helpCommandsEmbed(guild)).queue();
 
             case "voicemoveall", "moveall", "voiceall" -> VoiceMoveAll.help(message);
-
-            case "bigo" -> BigoAnnouncement.help(message);
 
             default -> channel.sendMessage("Comando não encontrado, por favor digite o nome de um comando válido. Para saber todos os comandos válidos use `.help`").queue();
         }
@@ -69,9 +70,8 @@ public class HelpManager {
                         `disconnectall`
                         `help`
                         `ping`
-                        `puta`
                         `roles` (r!)
-                        `take` (r!)
+                        `take`  (r!)
                         `among`
                         `uptime`
                         `moveall`
