@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 
 import java.awt.*;
@@ -44,7 +45,7 @@ public class Registration {
         MessageChannelUnion channel = message.getChannel();
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = message.getGuild();
-        String roleName = "Unknown";
+        String roleName = "[???]";
 
         rolesExist(guild);
         if (requiredRole != null) roleName = requiredRole.getName();
@@ -137,9 +138,11 @@ public class Registration {
         List<Role> toGiveRoles = new ArrayList<>();
         List<Role> toTakeRoles = List.of(verified, notRegistered);
 
-        Member target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
+        Member target;
 
-        if (target == null) {
+        try {
+            target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
+        } catch (ErrorResponseException e) {
             sendExpireMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.toMessage(), 5000);
             message.delete().queue();
             return;
@@ -222,9 +225,11 @@ public class Registration {
         List<Role> toGiveRoles = new ArrayList<>();
         List<Role> toTakeRoles = List.of(verified, notRegistered);
 
-        Member target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
+        Member target;
 
-        if (target == null) {
+        try {
+            target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
+        } catch (ErrorResponseException e) {
             sendExpireMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.toMessage(), 5000);
             message.delete().queue();
             return;

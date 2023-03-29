@@ -1,44 +1,42 @@
-package bot.commands;
+package bot.commands.help;
 
-import bot.util.StaffRoles;
+import bot.commands.BigoAnnouncement;
+import bot.commands.DisconnectAll;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.hooks.SubscribeEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
-public class HelpManager {
-    private HelpManager() {}
+public class HelpHandler extends ListenerAdapter {
 
-    public static void run(Message message) {
+    @SubscribeEvent
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
 
-        User author = message.getAuthor();
-        String content = message.getContentRaw();
-        Member member = message.getMember();
+        User author = event.getAuthor();
+        Member member = event.getMember();
+        Message message = event.getMessage();
+        String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
         MessageChannelUnion channel = message.getChannel();
-        Guild guild = message.getGuild();
+        Guild guild = event.getGuild();
 
-        if (author.isBot()) return;
-        if (member == null || (!member.hasPermission(Permission.MESSAGE_MANAGE) && member.getRoles().contains(guild.getRoleById(StaffRoles.ROLE_STAFF.toId())))) return;
+        if (member == null || author.isBot()) return;
 
-        if (args.length < 2 || args[1].startsWith(".help help")) {
+        if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
             channel.sendMessageEmbeds(generalHelp(guild)).queue();
             message.delete().queue();
             return;
         }
 
         switch (args[1]) {
-            case "bigo" -> BigoAnnouncement.help(message);
+            case "commands" -> channel.sendMessageEmbeds(helpCommandsEmbed(guild)).queue();
 
-            case "disconnect" -> Disconnect.help(message);
-
-            case "commands", "cmds" -> channel.sendMessageEmbeds(helpCommandsEmbed(guild)).queue();
-
-            case "voicemoveall", "moveall", "voiceall" -> VoiceMoveAll.help(message);
-
-            default -> channel.sendMessage("Comando não encontrado, por favor digite o nome de um comando válido. Para saber todos os comandos válidos use `.help`").queue();
+            case "bigo" -> DisconnectAll.help(message);
         }
 
         message.delete().queue();

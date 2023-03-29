@@ -6,10 +6,13 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static bot.util.Extra.sendExpireMessage;
 
 public class RoleAmongUs {
     private RoleAmongUs() {}
@@ -41,12 +44,10 @@ public class RoleAmongUs {
             return;
         }
 
-        target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
-
-        if (target == null) {
-            Extra.sendExpireMessage(channel,
-                    Messages.ERROR_MEMBER_NOT_FOUND.toMessage(),
-                    5000);
+        try {
+            target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
+        } catch (ErrorResponseException e) {
+            sendExpireMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.toMessage(), 5000);
             message.delete().queue();
             return;
         }

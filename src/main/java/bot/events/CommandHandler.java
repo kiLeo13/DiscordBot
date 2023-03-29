@@ -1,6 +1,7 @@
 package bot.events;
 
 import bot.commands.*;
+import bot.commands.help.HelpHandler;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -33,7 +34,6 @@ public class CommandHandler extends ListenerAdapter {
         }
 
         if (contentLC.startsWith(".say")) Say.speak(message);
-        if (contentLC.startsWith(".help")) HelpManager.run(message);
         if (contentLC.startsWith(".among")) RoleAmongUs.run(message);
         if (contentLC.startsWith(".uptime")) Uptime.run(message);
         if (contentLC.startsWith(".disconnectall")) DisconnectAll.run(message);
