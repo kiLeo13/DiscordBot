@@ -30,9 +30,10 @@ public class CommandHandler extends ListenerAdapter {
             case "r!roles" -> RegistrationRoles.run(message);
 
             case "r!help" -> Registration.help(message);
-            case ".help" -> HelpManager.run(message);
         }
 
+        if (contentLC.startsWith(".say")) Say.speak(message);
+        if (contentLC.startsWith(".help")) HelpManager.run(message);
         if (contentLC.startsWith(".among")) RoleAmongUs.run(message);
         if (contentLC.startsWith(".uptime")) Uptime.run(message);
         if (contentLC.startsWith(".disconnectall")) DisconnectAll.run(message);

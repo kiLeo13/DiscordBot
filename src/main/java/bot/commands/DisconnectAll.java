@@ -16,6 +16,14 @@ import java.util.List;
 public class DisconnectAll {
     private DisconnectAll() {}
 
+    public static void help(Message message) {
+
+
+
+
+
+    }
+
     public static void run(Message message) {
 
         User author = message.getAuthor();

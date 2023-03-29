@@ -33,7 +33,6 @@ public class BigoAnnouncement {
     }
 
     public static void run(Message message) {
-
         User author = message.getAuthor();
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();

@@ -51,12 +51,12 @@ public class Registration {
 
         builder
                 .setColor(Color.YELLOW)
-                .setTitle("Registration", guild.getIconUrl())
+                .setTitle("Registration")
+                .setThumbnail(guild.getIconUrl())
                 .setDescription("Este comando irá guiar e dar exemplos sobre como utilizar o bot para registro.")
-                .addField("> 📝 Requisitos", "Para executar este comando, requer `Permission.MESSAGE_ROLES` ou o cargo `" + roleName + "`.", true)
-                .addField("> ❓ O que é", "Desenvolvido para divulgar a live do Bigo na Twitch *(comando sujeito à remoção em caso de baixa frequência de usos)*.", true)
-                .addField("> ❗ Disclaimer", "Este comando NÃO É feito com a intenção de marcar everyone quando utilizado.", true)
-                .addField("> ⚙ Syntax: `r!<information> <@user>`", """
+                .addField("> 📝 Requisitos", "Requer `MANAGE_ROLES` ou o cargo `" + roleName + "`.", true)
+                .addField("> ❓ O que é", "Desenvolvido para facilitar o sistema de registro da Oficina.", true)
+                .addField("> ⚙ Syntax: `r!<parameters> <@user>`", """
                         Ex:
                         `r!m-18p` | `r!m14p` - *Masculino, 14 anos, pc*
                         `r!f+18m` | `r!f23m` - *Feminino, 23 anos, mobile*
@@ -64,7 +64,7 @@ public class Registration {
                         
                         Final: "r!m16p <@596939790532739075>"
                         """, false)
-                .addField("> 📋 Information", """
+                .addField("> 📋 Parameters", """
                         **Gênero:**
                         ```
                         f -> Feminino
