@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 
 import java.util.concurrent.TimeUnit;
 
-public class Extra {
-    private Extra() {}
+public class BotSystem {
+    private BotSystem() {}
 
     public static void sendExpireMessage(MessageChannelUnion channel, String message, int time) {
         channel.sendMessage(message)
@@ -31,5 +31,11 @@ public class Extra {
                 .queueAfter(time, TimeUnit.MILLISECONDS,
                         null, new ErrorHandler()
                                 .ignore(ErrorResponse.UNKNOWN_MESSAGE));
+    }
+
+    public static void delete(Message message) {
+        message.delete()
+                .queue(null, new ErrorHandler()
+                        .ignore(ErrorResponse.UNKNOWN_MESSAGE));
     }
 }

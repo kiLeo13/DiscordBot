@@ -1,6 +1,7 @@
 package bot.commands;
 
-import bot.util.Extra;
+import bot.util.BotSystem;
+import bot.util.Command;
 import bot.util.Messages;
 import bot.util.StaffRoles;
 import net.dv8tion.jda.api.Permission;
@@ -13,10 +14,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.List;
 
-public class DisconnectAll {
-    private DisconnectAll() {}
-
-    public static void help(Message message) {
+public class DisconnectAll implements Command {
+    @Override
+    public void help(Message message) {
 
 
 
@@ -24,7 +24,8 @@ public class DisconnectAll {
 
     }
 
-    public static void run(Message message) {
+    @Override
+    public void run(Message message) {
 
         User author = message.getAuthor();
         Member member = message.getMember();
@@ -44,13 +45,13 @@ public class DisconnectAll {
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) { voiceChannel = null; }
 
         if (voiceChannel == null) {
-            Extra.sendExpireMessage(channel, Messages.ERROR_CHANNEL_NOT_FOUND.toMessage(), 10000);
+            BotSystem.sendExpireMessage(channel, Messages.ERROR_CHANNEL_NOT_FOUND.toMessage(), 10000);
             message.delete().queue();
             return;
         }
 
         if (voiceChannel.getMembers().size() == 0) {
-            Extra.sendExpireMessage(channel, "O canal de voz já está vazio.", 5000);
+            BotSystem.sendExpireMessage(channel, "O canal de voz já está vazio.", 5000);
             message.delete().queue();
             return;
         }

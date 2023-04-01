@@ -1,6 +1,7 @@
 package bot.commands;
 
-import bot.util.Extra;
+import bot.util.BotSystem;
+import bot.util.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -14,10 +15,10 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VoiceMoveAll {
-    private VoiceMoveAll() {}
+public class VoiceMoveAll implements Command {
 
-    protected static void help(Message message) {
+    @Override
+    public void help(Message message) {
         EmbedBuilder builder = new EmbedBuilder();
 
         MessageChannelUnion channel = message.getChannel();
@@ -35,7 +36,8 @@ public class VoiceMoveAll {
         channel.sendMessageEmbeds(builder.build()).queue();
     }
 
-    public static void run(Message message) {
+    @Override
+    public void run(Message message) {
 
         User author = message.getAuthor();
         Guild guild = message.getGuild();
@@ -58,7 +60,7 @@ public class VoiceMoveAll {
 
         for (VoiceChannel v : vChannels)
             if (v == null) {
-                Extra.sendExpireMessage(channel, "<@" + author.getIdLong() + "> canal de voz não encontrado.", 5000);
+                BotSystem.sendExpireMessage(channel, "<@" + author.getIdLong() + "> canal de voz não encontrado.", 5000);
                 message.delete().queue();
                 return;
             }
@@ -70,25 +72,25 @@ public class VoiceMoveAll {
         if (futureChannelMemberLimit == 0) futureChannelMemberLimit = Integer.MAX_VALUE;
 
         if (currentChannelMemberAmount == 0) {
-            Extra.sendExpireMessage(channel, "<@" + author.getIdLong() + "> não tem ninguém conectado neste canal de voz.", 5000);
+            BotSystem.sendExpireMessage(channel, "<@" + author.getIdLong() + "> não tem ninguém conectado neste canal de voz.", 5000);
             message.delete().queue();
             return;
         }
 
         if (futureChannelMemberAmount == futureChannelMemberLimit && !content.endsWith("--force")) {
-            Extra.sendExpireMessage(channel, "<@" + author.getIdLong() + "> o canal de destino já está lotado, para ignorar este aviso adicione `--force` no fim do comando.", 10000);
+            BotSystem.sendExpireMessage(channel, "<@" + author.getIdLong() + "> o canal de destino já está lotado, para ignorar este aviso adicione `--force` no fim do comando.", 10000);
             message.delete().queue();
             return;
         }
 
         if (currentChannelMemberAmount + futureChannelMemberAmount > futureChannelMemberLimit && !content.endsWith("--force")) {
-            Extra.sendExpireMessage(channel, "<@" + author.getIdLong() + "> o canal de voz de destino irá passar do limite de usuários ao executar o comando, caso queira movê-los mesmo assim, adicione `--force` no fim do comando.", 10000);
+            BotSystem.sendExpireMessage(channel, "<@" + author.getIdLong() + "> o canal de voz de destino irá passar do limite de usuários ao executar o comando, caso queira movê-los mesmo assim, adicione `--force` no fim do comando.", 10000);
             message.delete().queue();
             return;
         }
 
         if (vChannels.get(0).getIdLong() == vChannels.get(1).getIdLong()) {
-            Extra.sendExpireMessage(channel, "<@" + author.getIdLong() + "> você forneceu o mesmo canal de voz nos dois argumentos.", 5000);
+            BotSystem.sendExpireMessage(channel, "<@" + author.getIdLong() + "> você forneceu o mesmo canal de voz nos dois argumentos.", 5000);
             message.delete().queue();
             return;
         }

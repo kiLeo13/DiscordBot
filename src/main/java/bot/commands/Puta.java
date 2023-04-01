@@ -2,7 +2,8 @@ package bot.commands;
 
 import bot.data.BotFiles;
 import bot.util.Channels;
-import bot.util.Extra;
+import bot.util.BotSystem;
+import bot.util.Command;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -11,12 +12,17 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import static bot.util.Extra.*;
+import static bot.util.BotSystem.*;
 
-public class Puta {
-    private Puta() {}
+public class Puta implements Command {
 
-    public static void run(Message message) {
+    @Override
+    public void help(Message message) {
+
+    }
+
+    @Override
+    public void run(Message message) {
 
         if (message.getGuild().getIdLong() != 1111L) {
             List<String> blocked = List.of(
@@ -27,7 +33,7 @@ public class Puta {
 
             int random = (int) (Math.random() * blocked.size());
 
-            Extra.sendExpireMessage(message.getChannel(),
+            BotSystem.sendExpireMessage(message.getChannel(),
                     "<@" + message.getAuthor().getIdLong() + "> " + blocked.get(random),
                     10000);
 

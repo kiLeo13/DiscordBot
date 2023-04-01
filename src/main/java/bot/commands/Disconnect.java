@@ -1,7 +1,8 @@
 package bot.commands;
 
 import bot.util.Channels;
-import bot.util.Extra;
+import bot.util.BotSystem;
+import bot.util.Command;
 import bot.util.Messages;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -14,10 +15,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import java.awt.*;
 import java.util.List;
 
-public class Disconnect {
-    private Disconnect() {}
+public class Disconnect implements Command {
 
-    protected static void help(Message message) {
+    @Override
+    public void help(Message message) {
         EmbedBuilder builder = new EmbedBuilder();
 
         MessageChannelUnion channel = message.getChannel();
@@ -47,7 +48,8 @@ public class Disconnect {
         channel.sendMessageEmbeds(builder.build()).queue();
     }
 
-    public static void run(Message message) {
+    @Override
+    public void run(Message message) {
         List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_CHANNELS.toIds();
         if (allowedDisconnectChannels.isEmpty()) return;
 
@@ -62,7 +64,7 @@ public class Disconnect {
             guild.kickVoiceMember(member).queue();
         } catch (IllegalStateException exception) {
             message.delete().queue();
-            Extra.sendExpireMessage(channel,
+            BotSystem.sendExpireMessage(channel,
                     "<@" + member.getIdLong() + "> " + Messages.ERROR_CHANNEL_NOT_FOUND.toMessage(),
                     10000);
             return;

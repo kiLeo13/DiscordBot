@@ -1,6 +1,7 @@
 package bot.commands;
 
 import bot.Main;
+import bot.util.Command;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -9,10 +10,10 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-public class Ping {
-    private Ping() {}
+public class Ping implements Command {
 
-    public static void run(Message message) {
+    @Override
+    public void run(Message message) {
 
         JDA api = Main.getApi();
         User author = message.getAuthor();
@@ -26,9 +27,9 @@ public class Ping {
 
         message.delete().queue();
 
-        channel.sendMessage("📡**｜**<@" + author.getIdLong() + "> **Oie!**\n\n" +
-                "⏱**｜Gateway Ping**: `" + gatewayPing + "ms`\n" +
-                "⚙**｜API Ping**: `" + apiPing + "ms`\n")
+        channel.sendMessage("📡** | **<@" + author.getIdLong() + "> **Oie!**\n\n" +
+                "🕒** | Gateway Ping**: `" + gatewayPing + "ms`\n" +
+                "📡** | API Ping**: `" + apiPing + "ms`\n")
                 .queue();
     }
 
@@ -39,8 +40,13 @@ public class Ping {
         long gatewayPing = api.getGatewayPing();
 
         e.reply("> **Pong!**\n\n" +
-                        "⏱**｜Gateway Ping**: `" + gatewayPing + "ms`\n" +
-                        "📡**｜API Ping**: `" + apiPing + "ms`\n")
+                        "🕒** | Gateway Ping**: `" + gatewayPing + "ms`\n" +
+                        "📡** | API Ping**: `" + apiPing + "ms`\n")
                 .queue();
+    }
+
+    @Override
+    public void help(Message message) {
+
     }
 }

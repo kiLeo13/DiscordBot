@@ -1,14 +1,28 @@
 package bot.events;
 
-import bot.commands.*;
-import bot.commands.help.HelpHandler;
+import bot.util.Command;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
 public class CommandHandler extends ListenerAdapter {
+    private final HashMap<List<String>, Command> commands = new HashMap<>();
+    private static CommandHandler INSTANCE;
+    private static final String PREFIX = ".";
+    private static final String PREFIX_REGISTER = "r!";
+
+    private CommandHandler() {}
+
+    public static CommandHandler getInstance() {
+        if (INSTANCE == null) INSTANCE = new CommandHandler();
+        return INSTANCE;
+    }
 
     @SubscribeEvent
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
@@ -17,33 +31,43 @@ public class CommandHandler extends ListenerAdapter {
         if (event.getAuthor().isBot()) return;
 
         Message message = event.getMessage();
-        String contentLC = message.getContentRaw().toLowerCase();
+        String content = message.getContentRaw();
 
-        switch (contentLC) {
-            // case ".crole" -> ColorRoleSchedule.run(message);
+        // Run command
+        if (content.toLowerCase(Locale.ROOT).startsWith(PREFIX))
+            runCommand(message);
+    }
 
-            case ".disconnect" -> Disconnect.run(message);
+    private void runCommand(Message message) {
+        String input = message.getContentRaw();
+        String[] split = input.split(" ");
+        String cmd = split[0];
 
-            case ".ping" -> Ping.run(message);
+        Command command = null;
+        for (List<String> i : commands.keySet()) {
+            if (!i.contains(cmd)) continue;
 
-            case ".bigo" -> BigoAnnouncement.run(message);
-
-            case "r!roles" -> RegistrationRoles.run(message);
-
-            case "r!help" -> Registration.help(message);
+            command = commands.get(i);
+            break;
         }
 
-        if (contentLC.startsWith(".say")) Say.speak(message);
-        if (contentLC.startsWith(".among")) RoleAmongUs.run(message);
-        if (contentLC.startsWith(".uptime")) Uptime.run(message);
-        if (contentLC.startsWith(".disconnectall")) DisconnectAll.run(message);
-        if (contentLC.startsWith(".moveall")) VoiceMoveAll.run(message);
-        if (contentLC.startsWith(".puta")) Puta.run(message);
+        if (command == null) return;
 
-        // Register related
-        if (contentLC.startsWith("r!take")) RegistrationTake.run(message);
-        if (contentLC.startsWith("r!") && !contentLC.startsWith("r!take")) {
-            Registration.run(message);
-        }
+        command.run(message);
+    }
+
+    public void addListenerCommand(String name, Command command) {
+        final HashMap<String, String> placeholders = new HashMap<>();
+
+        placeholders.put("{prefix}", PREFIX);
+        placeholders.put("{r!-prefix}", PREFIX_REGISTER);
+
+        for (String i : placeholders.keySet())
+            name = name.replaceAll(i, placeholders.get(i));
+
+        if (name.stripTrailing().equals(""))
+            throw new IllegalArgumentException("Command name cannot be empty");
+
+        commands.put(List.of(name), command);
     }
 }

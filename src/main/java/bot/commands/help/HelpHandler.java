@@ -1,7 +1,5 @@
 package bot.commands.help;
 
-import bot.commands.BigoAnnouncement;
-import bot.commands.DisconnectAll;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -11,12 +9,14 @@ import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.Arrays;
 
 public class HelpHandler extends ListenerAdapter {
 
     @SubscribeEvent
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
 
+        String[] commands = {"commands", "disconnectall", "registrationtake", "say", "voicemoveall"};
         User author = event.getAuthor();
         Member member = event.getMember();
         Message message = event.getMessage();
@@ -33,11 +33,13 @@ public class HelpHandler extends ListenerAdapter {
             return;
         }
 
-        switch (args[1]) {
-            case "commands" -> channel.sendMessageEmbeds(helpCommandsEmbed(guild)).queue();
-
-            case "bigo" -> DisconnectAll.help(message);
+        if (!Arrays.asList(commands).contains(args[1])) {
+            channel.sendMessage("Não achamos nenhuma ajuda para ´" + args[1] + "`.").queue();
+            message.delete().queue();
+            return;
         }
+
+
 
         message.delete().queue();
     }

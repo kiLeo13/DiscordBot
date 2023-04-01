@@ -1,5 +1,6 @@
 package bot.commands;
 
+import bot.util.Command;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -14,10 +15,15 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Say {
-    private Say() {}
+public class Say implements Command {
 
-    public static void speak(Message message) {
+    @Override
+    public void help(Message message) {
+
+    }
+
+    @Override
+    public void run(Message message) {
 
         User author = message.getAuthor();
         Member member = message.getMember();

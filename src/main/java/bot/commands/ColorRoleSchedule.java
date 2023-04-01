@@ -2,7 +2,7 @@ package bot.commands;
 
 import bot.util.Channels;
 import bot.util.ColorRoles;
-import bot.util.Extra;
+import bot.util.BotSystem;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -40,7 +40,7 @@ public class ColorRoleSchedule {
                     "`" + args[2] + "` digitou o nome de um cargo de cor incorretamente (" + args[2] + ").");
 
             message.delete().queue();
-            Extra.sendExpireMessage(channel,
+            BotSystem.sendExpireMessage(channel,
                     "<@" + author.getId() + "> could not find `" + args[2] + "`, did you type it correctly?",
                     10000);
             return;
@@ -48,7 +48,7 @@ public class ColorRoleSchedule {
 
         if (target == null) {
             message.delete().queue();
-            Extra.sendExpireMessage(channel,
+            BotSystem.sendExpireMessage(channel,
                     "<@" + author.getId() + "> user `" + args[1] + "` not found.",
                     5000);
             return;
@@ -57,7 +57,7 @@ public class ColorRoleSchedule {
         // Guild related
         guild.addRoleToMember(target, color).queue();
         message.delete().queue();
-        Extra.sendExpireMessage(channel,
+        BotSystem.sendExpireMessage(channel,
                 "<@" + author.getId() + "> ",
                 20000);
 

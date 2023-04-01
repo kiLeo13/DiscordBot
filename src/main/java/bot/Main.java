@@ -1,5 +1,7 @@
 package bot;
 
+import bot.commands.*;
+import bot.commands.help.HelpHandler;
 import bot.commands.misc.PayServer;
 import bot.data.BotConfig;
 import bot.events.CommandHandler;
@@ -48,16 +50,19 @@ public final class Main {
                     .awaitReady();
 
             updateCommands(api);
+
             init = System.currentTimeMillis();
+            api.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Oficina"), false);
         } catch (InterruptedException e) {
             e.printStackTrace();
             System.out.println("Failed to login, exiting...");
             return;
         }
 
-        runRunnables(api);
-        profile(api);
+        // Registers
         registerEvents(api);
+        registerCommands();
+        runRunnables(api);
     }
 
     public static JDA getApi() {
@@ -65,9 +70,27 @@ public final class Main {
     }
 
     private static void registerEvents(JDA api) {
-        api.addEventListener(new CommandHandler());
+        api.addEventListener(CommandHandler.getInstance());
         api.addEventListener(new MessageReceivedGeneral());
         api.addEventListener(new SlashCommand());
+        api.addEventListener(new HelpHandler());
+    }
+
+    private static void registerCommands() {
+        CommandHandler commands = CommandHandler.getInstance();
+
+        commands.addListenerCommand("{prefix}bigo", new BigoAnnouncement());
+        commands.addListenerCommand("{prefix}disconnectall", new DisconnectAll());
+        commands.addListenerCommand("{prefix}disconnect", new Disconnect());
+        commands.addListenerCommand("{prefix}ping", new Ping());
+        commands.addListenerCommand("{prefix}puta", new Puta());
+        commands.addListenerCommand("{prefix}among", new RoleAmongUs());
+        commands.addListenerCommand("{prefix}say", new Say());
+        commands.addListenerCommand("{prefix}uptime", new Uptime());
+        commands.addListenerCommand("{prefix}voicemoveall", new VoiceMoveAll());
+
+        commands.addListenerCommand("{r-prefix}roles", new RegistrationRoles());
+        commands.addListenerCommand("{r-prefix}take", new RegistrationTake());
     }
 
     private static void updateCommands(JDA jda) {
@@ -97,10 +120,6 @@ public final class Main {
 
     public static long getInitTime() {
         return init;
-    }
-
-    private static void profile(JDA api) {
-        api.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Oficina"), false);
     }
 
     private static void runRunnables(JDA api) {

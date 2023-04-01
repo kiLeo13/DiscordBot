@@ -1,6 +1,7 @@
 package bot.commands;
 
 import bot.util.Channels;
+import bot.util.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -11,12 +12,16 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
-public class RegistrationRoles {
+public class RegistrationRoles implements Command {
     private static final EmbedBuilder embedBuilder = new EmbedBuilder();
 
-    private RegistrationRoles() {}
+    @Override
+    public void help(Message message) {
 
-    public static void run(Message message) {
+    }
+
+    @Override
+    public void run(Message message) {
         setupEmbed(message.getGuild());
 
         MessageEmbed messageEmbed = embedBuilder.build();

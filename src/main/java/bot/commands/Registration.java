@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static bot.util.Extra.sendExpireMessage;
+import static bot.util.BotSystem.sendExpireMessage;
 
 public class Registration {
     private static Role requiredRole;

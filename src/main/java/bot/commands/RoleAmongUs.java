@@ -12,12 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static bot.util.Extra.sendExpireMessage;
+import static bot.util.BotSystem.sendExpireMessage;
 
-public class RoleAmongUs {
-    private RoleAmongUs() {}
+public class RoleAmongUs implements Command {
 
-    public static void run(Message message) {
+    @Override
+    public void help(Message message) {
+
+    }
+
+    @Override
+    public void run(Message message) {
 
         MessageChannelUnion channel = message.getChannel();
         Member member = message.getMember();
@@ -31,7 +36,7 @@ public class RoleAmongUs {
         if (Channels.STAFF_AJUDANTES_CHANNEL.toId() != channel.getIdLong()) return;
 
         if (roleAmongUs == null) {
-            Extra.sendExpireMessage(channel,
+            BotSystem.sendExpireMessage(channel,
                     Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.toMessage(),
                     10000);
             message.delete().queue();
@@ -39,7 +44,7 @@ public class RoleAmongUs {
         }
 
         if (args.length < 2) {
-            Extra.sendExpireMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.toMessage(), 5000);
+            BotSystem.sendExpireMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.toMessage(), 5000);
             message.delete().queue();
             return;
         }

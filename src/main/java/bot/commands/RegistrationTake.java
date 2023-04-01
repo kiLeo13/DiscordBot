@@ -1,6 +1,7 @@
 package bot.commands;
 
 import bot.util.Channels;
+import bot.util.Command;
 import bot.util.RegistrationRoles;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -12,10 +13,15 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RegistrationTake {
-    private RegistrationTake() {}
+public class RegistrationTake implements Command {
 
-    public static void run(Message message) {
+    @Override
+    public void help(Message message) {
+
+    }
+
+    @Override
+    public void run(Message message) {
 
         User author = message.getAuthor();
         Member member = message.getMember();

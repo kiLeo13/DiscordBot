@@ -1,6 +1,7 @@
 package bot.commands;
 
 import bot.Main;
+import bot.util.Command;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -12,12 +13,16 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
-public class Uptime {
+public class Uptime implements Command {
     private static byte timeZone;
 
-    private Uptime() {}
+    @Override
+    public void help(Message message) {
 
-    public static void run(Message message) {
+    }
+
+    @Override
+    public void run(Message message) {
 
         timeZone = -3;
 
