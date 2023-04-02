@@ -1,7 +1,7 @@
 package bot.commands;
 
 import bot.util.Channels;
-import bot.util.Command;
+import bot.util.CommandExecutor;
 import bot.util.RegistrationRoles;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -13,7 +13,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RegistrationTake implements Command {
+public class RegistrationTake implements CommandExecutor {
 
     @Override
     public void help(Message message) {

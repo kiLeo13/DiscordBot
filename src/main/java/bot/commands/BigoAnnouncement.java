@@ -1,6 +1,6 @@
 package bot.commands;
 
-import bot.util.Command;
+import bot.util.CommandExecutor;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
 import java.util.HashMap;
 
-public class BigoAnnouncement implements Command {
+public class BigoAnnouncement implements CommandExecutor {
 
     @Override
     public void run(Message message) {
@@ -31,7 +31,7 @@ public class BigoAnnouncement implements Command {
 
     @Override
     public void help(Message message) {
-
+        // No help
     }
 
     private static String getAnnouncement(String str) {

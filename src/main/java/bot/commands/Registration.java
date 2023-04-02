@@ -1,6 +1,7 @@
 package bot.commands;
 
 import bot.util.Channels;
+import bot.util.CommandExecutor;
 import bot.util.Messages;
 import bot.util.RegistrationRoles;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -18,7 +19,9 @@ import java.util.List;
 
 import static bot.util.BotSystem.sendExpireMessage;
 
-public class Registration {
+public class Registration implements CommandExecutor {
+    private static Registration INSTANCE;
+
     private static Role requiredRole;
 
     // Final Register
@@ -39,57 +42,16 @@ public class Registration {
     // Plataform
     private static Role pc;
     private static Role mobile;
+
     private Registration() {}
 
-    public static void help(Message message) {
-        MessageChannelUnion channel = message.getChannel();
-        EmbedBuilder builder = new EmbedBuilder();
-        Guild guild = message.getGuild();
-        String roleName = "[???]";
-
-        rolesExist(guild);
-        if (requiredRole != null) roleName = requiredRole.getName();
-
-        builder
-                .setColor(Color.YELLOW)
-                .setTitle("Registration")
-                .setThumbnail(guild.getIconUrl())
-                .setDescription("Este comando irá guiar e dar exemplos sobre como utilizar o bot para registro.")
-                .addField("> 📝 Requisitos", "Requer `MANAGE_ROLES` ou o cargo `" + roleName + "`.", true)
-                .addField("> ❓ O que é", "Desenvolvido para facilitar o sistema de registro da Oficina.", true)
-                .addField("> ⚙ Syntax: `r!<parameters> <@user>`", """
-                        Ex:
-                        `r!m-18p` | `r!m14p` - *Masculino, 14 anos, pc*
-                        `r!f+18m` | `r!f23m` - *Feminino, 23 anos, mobile*
-                        `r!n-13p` | `r!n9p` - *Não binário, 9 anos, pc*
-                        
-                        Final: "r!m16p <@596939790532739075>"
-                        """, false)
-                .addField("> 📋 Parameters", """
-                        **Gênero:**
-                        ```
-                        f -> Feminino
-                        m -> Masculino
-                        n -> Não binário
-                        ```
-                        **Idade:**
-                        ```
-                        -13 -> Menor de idade + (😻)
-                        -18 -> Menor de idade
-                        +18 -> Maior de idade
-                        ```
-                        **Plataforma:**
-                        ```
-                        m -> Mobile
-                        p -> Computador/PC
-                        ```
-                        """, false)
-                .setFooter("Oficina Myuu", guild.getIconUrl());
-
-        channel.sendMessageEmbeds(builder.build()).queue();
+    public static Registration getInstance() {
+        if (INSTANCE == null) INSTANCE = new Registration();
+        return INSTANCE;
     }
 
-    public static void run(Message message) {
+    @Override
+    public void run(Message message) {
         Member member = message.getMember();
         User author = message.getAuthor();
         Guild guild = message.getGuild();
@@ -99,7 +61,6 @@ public class Registration {
 
         if (author.isBot() || member == null) return;
 
-        if (channel.getIdLong() != Channels.REGISTER_CHANNEL.toId() && !member.hasPermission(Permission.ADMINISTRATOR)) return;
         if (!member.getRoles().contains(requiredRole) && !member.hasPermission(Permission.MANAGE_ROLES)) return;
 
         try { areRolesSetupProperly(message); }
@@ -123,6 +84,55 @@ public class Registration {
 
         sendExpireMessage(channel, Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.toMessage(), 5000);
         message.delete().queue();
+    }
+
+    @Override
+    public void help(Message message) {
+        MessageChannelUnion channel = message.getChannel();
+        EmbedBuilder builder = new EmbedBuilder();
+        Guild guild = message.getGuild();
+        String roleName = "[???]";
+
+        rolesExist(guild);
+        if (requiredRole != null) roleName = requiredRole.getName();
+
+        builder
+                .setColor(Color.YELLOW)
+                .setTitle("Registration")
+                .setThumbnail(guild.getIconUrl())
+                .setDescription("Este comando irá guiar e dar exemplos sobre como utilizar o bot para registro.")
+                .addField("> 📝 Requisitos", "Requer `MANAGE_ROLES` ou o cargo `" + roleName + "`.", true)
+                .addField("> ❓ O que é", "Desenvolvido para facilitar o sistema de registro da Oficina.", true)
+                .addField("> ⚙ Syntax: `r!<parameters> <@user>`", """
+                        Ex:
+                        `r!m-18p` | `r!m14p` - *Masculino, 14 anos, pc*
+                        `r!f+18m` | `r!f23m` - *Feminino, 23 anos, mobile*
+                        `r!n-13p` | `r!n9p`  - *Não binário, 9 anos, pc*
+                        
+                        Final: "r!m16p <@596939790532739075>"
+                        """, false)
+                .addField("> 📋 Parameters", """
+                        > **Gênero:**
+                        ```
+                        f -> Feminino
+                        m -> Masculino
+                        n -> Não binário
+                        ```
+                        > **Idade:**
+                        ```
+                        -13 -> Menor de idade + (😻)
+                        -18 -> Menor de idade
+                        +18 -> Maior de idade
+                        ```
+                        > **Plataforma:**
+                        ```
+                        m -> Mobile
+                        p -> Computador/PC
+                        ```
+                        """, false)
+                .setFooter("Oficina Myuu", guild.getIconUrl());
+
+        channel.sendMessageEmbeds(builder.build()).queue();
     }
 
     private static void performExact(Message message) {

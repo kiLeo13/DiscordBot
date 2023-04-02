@@ -1,7 +1,7 @@
 package bot.commands;
 
 import bot.util.Channels;
-import bot.util.Command;
+import bot.util.CommandExecutor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
-public class RegistrationRoles implements Command {
+public class RegistrationRoles implements CommandExecutor {
     private static final EmbedBuilder embedBuilder = new EmbedBuilder();
 
     @Override

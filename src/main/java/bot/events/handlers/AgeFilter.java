@@ -20,6 +20,7 @@ public class AgeFilter {
         Member member = message.getMember();
         String[] args = message.getContentRaw().replaceAll("[^0-9 ]+", "").split(" ");
         MessageChannelUnion channel = message.getChannel();
+        boolean hasNumber = false;
 
         if (!filterChannels.contains(channel.getIdLong())) return;
         if (member == null) return;
@@ -32,9 +33,13 @@ public class AgeFilter {
             try {
                 int number = Integer.parseInt(i);
 
-                // Are you really 30 years old in a server for kids?
-                if (number > 30 || number < 1) message.delete().queue();
+                // Are you really 30 years old OR EVEN -1 YEAR OLD? :oooo
+                if (number > 30 || number < 0) message.delete().queue();
+                hasNumber = true;
             } catch (NumberFormatException ignore) {}
         }
+
+        // Hmmm you're one of those people who never age, right?
+        if (!hasNumber) message.delete().queue();
     }
 }

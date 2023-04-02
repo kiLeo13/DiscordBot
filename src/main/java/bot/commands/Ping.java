@@ -1,7 +1,7 @@
 package bot.commands;
 
 import bot.Main;
-import bot.util.Command;
+import bot.util.CommandExecutor;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-public class Ping implements Command {
+public class Ping implements CommandExecutor {
 
     @Override
     public void run(Message message) {
@@ -47,6 +47,6 @@ public class Ping implements Command {
 
     @Override
     public void help(Message message) {
-
+        // No help
     }
 }

@@ -2,7 +2,7 @@ package bot.commands;
 
 import bot.util.Channels;
 import bot.util.BotSystem;
-import bot.util.Command;
+import bot.util.CommandExecutor;
 import bot.util.Messages;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import java.awt.*;
 import java.util.List;
 
-public class Disconnect implements Command {
+public class Disconnect implements CommandExecutor {
 
     @Override
     public void help(Message message) {

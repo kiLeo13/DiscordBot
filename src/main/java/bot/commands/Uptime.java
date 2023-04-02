@@ -1,7 +1,7 @@
 package bot.commands;
 
 import bot.Main;
-import bot.util.Command;
+import bot.util.CommandExecutor;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -13,7 +13,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
-public class Uptime implements Command {
+public class Uptime implements CommandExecutor {
     private static byte timeZone;
 
     @Override
@@ -30,8 +30,8 @@ public class Uptime implements Command {
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
         String response = formatted("""
-                🕒**｜Uptime:** `<uptime>`
-                ⏰**｜Desde:** `<init-date> às <init-time> (<time-zone>)`
+                🕒** | Uptime:** `<uptime>`
+                ⏰** | Desde:** `<init-date> às <init-time> (<time-zone>)`
                 """);
 
         if (author.isBot()) return;

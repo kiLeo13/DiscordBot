@@ -2,8 +2,8 @@ package bot.util;
 
 import net.dv8tion.jda.api.entities.Message;
 
-public interface Command {
-    void help(Message message);
-
+public interface CommandExecutor {
     void run(Message message);
+
+    void help(Message message);
 }

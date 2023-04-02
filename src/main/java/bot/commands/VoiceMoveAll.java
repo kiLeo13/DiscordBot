@@ -1,7 +1,7 @@
 package bot.commands;
 
 import bot.util.BotSystem;
-import bot.util.Command;
+import bot.util.CommandExecutor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -15,7 +15,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VoiceMoveAll implements Command {
+public class VoiceMoveAll implements CommandExecutor {
 
     @Override
     public void help(Message message) {

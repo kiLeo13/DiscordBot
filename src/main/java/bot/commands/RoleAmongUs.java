@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static bot.util.BotSystem.sendExpireMessage;
 
-public class RoleAmongUs implements Command {
+public class RoleAmongUs implements CommandExecutor {
 
     @Override
     public void help(Message message) {

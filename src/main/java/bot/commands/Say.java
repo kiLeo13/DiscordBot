@@ -1,6 +1,6 @@
 package bot.commands;
 
-import bot.util.Command;
+import bot.util.CommandExecutor;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Say implements Command {
+public class Say implements CommandExecutor {
 
     @Override
     public void help(Message message) {

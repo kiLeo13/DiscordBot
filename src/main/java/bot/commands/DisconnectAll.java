@@ -1,7 +1,7 @@
 package bot.commands;
 
 import bot.util.BotSystem;
-import bot.util.Command;
+import bot.util.CommandExecutor;
 import bot.util.Messages;
 import bot.util.StaffRoles;
 import net.dv8tion.jda.api.Permission;
@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.List;
 
-public class DisconnectAll implements Command {
+public class DisconnectAll implements CommandExecutor {
     @Override
     public void help(Message message) {
 

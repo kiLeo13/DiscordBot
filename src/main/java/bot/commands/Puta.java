@@ -3,7 +3,7 @@ package bot.commands;
 import bot.data.BotFiles;
 import bot.util.Channels;
 import bot.util.BotSystem;
-import bot.util.Command;
+import bot.util.CommandExecutor;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -14,7 +14,7 @@ import java.util.List;
 
 import static bot.util.BotSystem.*;
 
-public class Puta implements Command {
+public class Puta implements CommandExecutor {
 
     @Override
     public void help(Message message) {

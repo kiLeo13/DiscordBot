@@ -1,6 +1,7 @@
 package bot.events;
 
-import bot.util.Command;
+import bot.commands.Registration;
+import bot.util.CommandExecutor;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -8,11 +9,9 @@ import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 
 public class CommandHandler extends ListenerAdapter {
-    private final HashMap<List<String>, Command> commands = new HashMap<>();
+    private final HashMap<String, CommandExecutor> commands = new HashMap<>();
     private static CommandHandler INSTANCE;
     private static final String PREFIX = ".";
     private static final String PREFIX_REGISTER = "r!";
@@ -27,47 +26,49 @@ public class CommandHandler extends ListenerAdapter {
     @SubscribeEvent
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
 
-        if (event.getGuild().getIdLong() != 582430782577049600L) return;
+        if (event.getGuild().getIdLong() != 624008072544780309L) return;
         if (event.getAuthor().isBot()) return;
 
         Message message = event.getMessage();
         String content = message.getContentRaw();
 
+        if (!content.startsWith(PREFIX) && !content.startsWith(PREFIX_REGISTER)) return;
+
         // Run command
-        if (content.toLowerCase(Locale.ROOT).startsWith(PREFIX))
-            runCommand(message);
+        runCommand(message);
     }
 
-    private void runCommand(Message message) {
+    public void runCommand(Message message) {
+        CommandExecutor registration = Registration.getInstance();
         String input = message.getContentRaw();
-        String[] split = input.split(" ");
-        String cmd = split[0];
+        String cmd = input.split(" ")[0];
 
-        Command command = null;
-        for (List<String> i : commands.keySet()) {
-            if (!i.contains(cmd)) continue;
-
-            command = commands.get(i);
-            break;
-        }
-
+        CommandExecutor command = commands.get(cmd);
         if (command == null) return;
+
+        // If registration command?
+        if (cmd.startsWith("r!"))
+            registration.run(message);
 
         command.run(message);
     }
 
-    public void addListenerCommand(String name, Command command) {
-        final HashMap<String, String> placeholders = new HashMap<>();
+    public void addListenerCommand(String name, CommandExecutor command) {
+        final HashMap<String, String> prefixes = new HashMap<>();
 
-        placeholders.put("{prefix}", PREFIX);
-        placeholders.put("{r!-prefix}", PREFIX_REGISTER);
+        prefixes.put("<default>", PREFIX);
+        prefixes.put("<register>", PREFIX_REGISTER);
 
-        for (String i : placeholders.keySet())
-            name = name.replaceAll(i, placeholders.get(i));
+        for (String i : prefixes.keySet())
+            name = name.replaceAll(i, prefixes.get(i));
 
         if (name.stripTrailing().equals(""))
             throw new IllegalArgumentException("Command name cannot be empty");
 
-        commands.put(List.of(name), command);
+        commands.put(name, command);
+    }
+
+    public HashMap<String, CommandExecutor> getCommands() {
+        return commands;
     }
 }
