@@ -1,7 +1,6 @@
 package bot.commands;
 
-import bot.util.Channels;
-import bot.util.CommandExecutor;
+import bot.util.*;
 import bot.util.RegistrationRoles;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -16,11 +15,6 @@ import java.util.List;
 public class RegistrationTake implements CommandExecutor {
 
     @Override
-    public void help(Message message) {
-
-    }
-
-    @Override
     public void run(Message message) {
 
         User author = message.getAuthor();
@@ -31,6 +25,7 @@ public class RegistrationTake implements CommandExecutor {
         MessageChannelUnion channel = message.getChannel();
         Member target;
 
+        if (channel.getIdLong() == Channels.REGISTER_CHANNEL.toId()) return;
         if (member == null || !member.hasPermission(Permission.MANAGE_ROLES)) return;
 
         try {
@@ -39,15 +34,16 @@ public class RegistrationTake implements CommandExecutor {
         } catch (IndexOutOfBoundsException e) { target = null; }
 
         if (target == null) {
-            channel.sendMessage("<@" + author.getIdLong() + "> membro não encontrado").queue();
+            BotSystem.sendExpireMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
+            message.delete().queue();
             return;
         }
 
         List<Role> toRemoveRoles = toRemove(target);
         List<Role> toGiveRoles = toGive(guild);
 
-        if (target.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_NOT_REGISTERED.get()))
-                && !target.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_REGISTERED.get()))) {
+        if (target.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_NOT_REGISTERED.toId()))
+                && !target.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_REGISTERED.toId()))) {
             channel.sendMessage("<@" + author.getIdLong() + "> o membro <@" + target.getIdLong() + "> não está registrado.").queue();
             message.delete().queue();
             return;
@@ -98,7 +94,7 @@ public class RegistrationTake implements CommandExecutor {
         List<Role> finalRoles = new ArrayList<>();
 
         for (RegistrationRoles r : roles) {
-            Role targetRole = guild.getRoleById(r.get());
+            Role targetRole = guild.getRoleById(r.toId());
 
             if (r.emoji().equals("✅") && target.getRoles().contains(targetRole))
                 finalRoles.add(targetRole);
@@ -112,7 +108,7 @@ public class RegistrationTake implements CommandExecutor {
         List<Role> finalRoles = new ArrayList<>();
 
         for (RegistrationRoles r : roles)
-            if (r.emoji().equals("❌")) finalRoles.add(guild.getRoleById(r.get()));
+            if (r.emoji().equals("❌")) finalRoles.add(guild.getRoleById(r.toId()));
 
         return finalRoles;
     }

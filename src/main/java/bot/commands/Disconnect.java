@@ -62,7 +62,7 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
         } catch (IllegalStateException exception) {
             message.delete().queue();
             BotSystem.sendExpireMessage(channel,
-                    "<@" + member.getIdLong() + "> " + Messages.ERROR_CHANNEL_NOT_FOUND.toMessage(),
+                    "<@" + member.getIdLong() + "> " + Messages.ERROR_CHANNEL_NOT_FOUND.message(),
                     10000);
             return;
         }
@@ -72,7 +72,7 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
     }
 
     @Override
-    public void run(SlashCommandInteractionEvent e) {
+    public void runAsSlash(SlashCommandInteractionEvent e) {
 
         List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_CHANNELS.toIds();
         if (!allowedDisconnectChannels.contains(e.getChannel().getIdLong())) return;
@@ -85,7 +85,7 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
         try {
             guild.kickVoiceMember(member).queue();
         } catch (IllegalStateException exception) {
-            e.reply(Messages.ERROR_CHANNEL_NOT_FOUND.toMessage())
+            e.reply(Messages.ERROR_CHANNEL_NOT_FOUND.message())
                     .setEphemeral(true)
                     .queue();
             return;

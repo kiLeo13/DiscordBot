@@ -26,7 +26,7 @@ public enum RegistrationRoles {
         this.emoji = emoji;
     }
 
-    public long get() { return this.roleId; }
+    public long toId() { return this.roleId; }
 
     public String emoji() { return this.emoji; }
 }

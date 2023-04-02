@@ -37,14 +37,14 @@ public class RoleAmongUs implements CommandExecutor {
 
         if (roleAmongUs == null) {
             BotSystem.sendExpireMessage(channel,
-                    Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.toMessage(),
+                    Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.message(),
                     10000);
             message.delete().queue();
             return;
         }
 
         if (args.length < 2) {
-            BotSystem.sendExpireMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.toMessage(), 5000);
+            BotSystem.sendExpireMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 5000);
             message.delete().queue();
             return;
         }
@@ -52,7 +52,7 @@ public class RoleAmongUs implements CommandExecutor {
         try {
             target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
         } catch (ErrorResponseException e) {
-            sendExpireMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.toMessage(), 5000);
+            sendExpireMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
             message.delete().queue();
             return;
         }

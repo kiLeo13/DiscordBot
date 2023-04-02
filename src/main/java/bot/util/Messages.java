@@ -5,7 +5,7 @@ public enum Messages {
     ERROR_TOO_FEW_ARGUMENTS("Você não forneceu argumentos o suficiente."),
     ERROR_MEMBER_NOT_FOUND("Membro não encontrado."),
     ERROR_REQUIRED_ROLES_NOT_FOUND("Um ou mais cargos necessários para esta operação não foram encontrados! Pedimos desculpas."),
-    ERROR_HIERARCHY_HIGHER_ROLE("Um ou mais cargo estão acima do meu cargo mais alto! Por favor, ajuste a hierarquia do servidor corretamente.");
+    ERROR_VOICE_CHANNEL_EMPTY("O canal informado já está vazio.");
 
     final String message;
 
@@ -13,7 +13,7 @@ public enum Messages {
         this.message = message;
     }
 
-    public String toMessage() {
+    public String message() {
         return this.message;
     }
 }

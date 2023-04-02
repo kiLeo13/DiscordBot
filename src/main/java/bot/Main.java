@@ -85,7 +85,7 @@ public final class Main {
         commands.addListenerCommand("<default>among", new RoleAmongUs());
         commands.addListenerCommand("<default>say", new Say());
         commands.addListenerCommand("<default>uptime", new Uptime());
-        commands.addListenerCommand("<default>voicemoveall", new VoiceMoveAll());
+        commands.addListenerCommand("<default>moveall", new VoiceMoveAll());
 
         commands.addListenerCommand("<register>roles", new RegistrationRoles());
         commands.addListenerCommand("<register>take", new RegistrationTake());
@@ -95,26 +95,26 @@ public final class Main {
         SlashHandler slash = SlashHandler.getInstance();
         List<CommandData> commands = new ArrayList<>();
 
-        // Disconnect
-        commands.add(Commands.slash("disconnect", "Disconnects the player from the current voice-channel."));
+        /* ==================== Disconnect ==================== */
+        commands.add(Commands.slash("disconnect", "Desconecta o usuário do canal de voz atual."));
 
-        // Ping
+        /* ==================== Ping ==================== */
         commands.add(Commands.slash("ping", "Sends you the ping.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
-        // Disconnectall
-        OptionData disonnectAllChannels = new OptionData(OptionType.CHANNEL, "channel", "Decides which channel should players be disconnected from.", true)
+        /* ==================== Disconnectall ==================== */
+        OptionData disonnectAllChannels = new OptionData(OptionType.CHANNEL, "channel", "Decide de qual canal os membros devem ser desconectados.", true)
                 .setChannelTypes(ChannelType.VOICE);
-        OptionData disconnectAllChannelsOptions = new OptionData(OptionType.STRING, "filter", "Filters the members to be disconnected.", false)
+        OptionData disconnectAllChannelsOptions = new OptionData(OptionType.STRING, "filter", "Filtra os membros a NÃO serem desconectados.", false)
                 .addChoice("Staff", "staff")
                 .addChoice("Eventos", "eventos")
                 .addChoice("Rádio", "radio")
                 .addChoice("Rádio & Eventos", "both");
 
-        commands.add(Commands.slash("disconnectall", "Disconnects every user from a voice-channel (with filtering feature).")
+        commands.add(Commands.slash("disconnectall", "Desconecta todos os membros de um canal de voz (opção de filtragem)")
                 .addOptions(disonnectAllChannels, disconnectAllChannelsOptions));
 
-        // Registration
+        /* ==================== Registration ==================== */
         OptionData registrationGender = new OptionData(OptionType.STRING, "gender", "O gênero do membro a ser registrado.", true)
                 .addChoice("Feminino", "female")
                 .addChoice("Masculino", "male")
@@ -128,9 +128,22 @@ public final class Main {
                 .addChoice("Computador 💻", "pc")
                 .addChoice("Mobile 📱", "mobile");
 
-        commands.add(Commands.slash("register", "Registers a new member.")
+        commands.add(Commands.slash("register", "Registra um novo membro.")
                 .addOptions(registrationGender, registrationAge, registrationPlataform, registrationTarget)
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES)));
+
+        /* ==================== Move All ==================== */
+        OptionData initialChannel = new OptionData(OptionType.CHANNEL, "init-channel", "Canal onde os membros atualmente estão.", true)
+               .setChannelTypes(ChannelType.VOICE);
+
+        OptionData finalChannel = new OptionData(OptionType.CHANNEL, "final-channel", "Canal para onde os membros irão ser movidos.", true)
+                .setChannelTypes(ChannelType.VOICE);
+
+        OptionData shouldOverride = new OptionData(OptionType.BOOLEAN, "should-ignore", "Define se o bot deve ignorar as limitações de chat, como por exemplo, limite de membros.", false);
+
+        commands.add(Commands.slash("moveall", "Move todos os membros de um canal de voz para outro.")
+                .addOptions(initialChannel, finalChannel, shouldOverride)
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
         jda.updateCommands().addCommands(commands).queue();
 
@@ -139,6 +152,7 @@ public final class Main {
         slash.addListenerCommand("ping", new Ping());
         slash.addListenerCommand("disconnectall", new DisconnectAll());
         slash.addListenerCommand("register", Registration.getInstance());
+        slash.addListenerCommand("moveall", new VoiceMoveAll());
     }
 
     public static long getInitTime() {

@@ -16,11 +16,6 @@ public class RegistrationRoles implements CommandExecutor {
     private static final EmbedBuilder embedBuilder = new EmbedBuilder();
 
     @Override
-    public void help(Message message) {
-
-    }
-
-    @Override
     public void run(Message message) {
         setupEmbed(message.getGuild());
 
@@ -29,7 +24,7 @@ public class RegistrationRoles implements CommandExecutor {
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
 
-        if (!Channels.COMMAND_REGISTER_ROLES_CHECK_CHANNELS.toIds().contains(channel.getIdLong())) return;
+        if (channel.getIdLong() == Channels.REGISTER_CHANNEL.toId()) return;
 
         if (author.isBot()) return;
         if (member == null || !member.hasPermission(Permission.ADMINISTRATOR)) return;
@@ -55,7 +50,7 @@ public class RegistrationRoles implements CommandExecutor {
         bot.util.RegistrationRoles[] roles = bot.util.RegistrationRoles.values();
 
         for (bot.util.RegistrationRoles r : roles) {
-            Role targetRole = guild.getRoleById(r.get());
+            Role targetRole = guild.getRoleById(r.toId());
 
             if (targetRole == null) embedBuilder.addField("> `" + r.name() + "`", "`⚠ Not Found`", false);
             else embedBuilder.addField("> `" + r.name() + "`", "<@&" + targetRole.getIdLong() + ">", false);

@@ -34,7 +34,7 @@ public class DisconnectAll implements CommandExecutor, SlashExecutor {
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) { voiceChannel = null; }
 
         if (voiceChannel == null) {
-            BotSystem.sendExpireMessage(channel, Messages.ERROR_CHANNEL_NOT_FOUND.toMessage(), 10000);
+            BotSystem.sendExpireMessage(channel, Messages.ERROR_CHANNEL_NOT_FOUND.message(), 10000);
             message.delete().queue();
             return;
         }
@@ -53,7 +53,7 @@ public class DisconnectAll implements CommandExecutor, SlashExecutor {
     }
 
     @Override
-    public void run(SlashCommandInteractionEvent event) {
+    public void runAsSlash(SlashCommandInteractionEvent event) {
 
         OptionMapping option = event.getOption("filter");
 
