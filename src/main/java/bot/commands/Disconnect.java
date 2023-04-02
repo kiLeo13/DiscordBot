@@ -1,9 +1,6 @@
 package bot.commands;
 
-import bot.util.Channels;
-import bot.util.BotSystem;
-import bot.util.CommandExecutor;
-import bot.util.Messages;
+import bot.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -15,7 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import java.awt.*;
 import java.util.List;
 
-public class Disconnect implements CommandExecutor {
+public class Disconnect implements CommandExecutor, SlashExecutor {
 
     @Override
     public void help(Message message) {
@@ -74,7 +71,8 @@ public class Disconnect implements CommandExecutor {
         message.delete().queue();
     }
 
-    public static void run(SlashCommandInteractionEvent e) {
+    @Override
+    public void run(SlashCommandInteractionEvent e) {
 
         List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_CHANNELS.toIds();
         if (!allowedDisconnectChannels.contains(e.getChannel().getIdLong())) return;

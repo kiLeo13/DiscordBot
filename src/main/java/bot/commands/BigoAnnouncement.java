@@ -29,11 +29,6 @@ public class BigoAnnouncement implements CommandExecutor {
         channel.sendMessage(announcement).queue();
     }
 
-    @Override
-    public void help(Message message) {
-        // No help
-    }
-
     private static String getAnnouncement(String str) {
         HashMap<String, String> placeholders = new HashMap<>();
 

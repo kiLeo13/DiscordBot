@@ -5,7 +5,7 @@ import bot.commands.misc.PayServer;
 import bot.data.BotConfig;
 import bot.events.CommandHandler;
 import bot.events.MessageReceivedGeneral;
-import bot.events.SlashCommand;
+import bot.events.SlashHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -71,7 +71,7 @@ public final class Main {
     private static void registerEvents(JDA api) {
         api.addEventListener(CommandHandler.getInstance());
         api.addEventListener(new MessageReceivedGeneral());
-        api.addEventListener(new SlashCommand());
+        api.addEventListener(SlashHandler.getInstance());
     }
 
     private static void registerCommands() {
@@ -92,6 +92,7 @@ public final class Main {
     }
 
     private static void updateCommands(JDA jda) {
+        SlashHandler slash = SlashHandler.getInstance();
         List<CommandData> commands = new ArrayList<>();
 
         // Disconnect
@@ -102,18 +103,42 @@ public final class Main {
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
         // Disconnectall
-        OptionData channel = new OptionData(OptionType.CHANNEL, "channel", "Decides which channel should players be disconnected from.", true)
+        OptionData disonnectAllChannels = new OptionData(OptionType.CHANNEL, "channel", "Decides which channel should players be disconnected from.", true)
                 .setChannelTypes(ChannelType.VOICE);
-        OptionData filter = new OptionData(OptionType.STRING, "filter", "Filters the members to be disconnected.", false)
+        OptionData disconnectAllChannelsOptions = new OptionData(OptionType.STRING, "filter", "Filters the members to be disconnected.", false)
                 .addChoice("Staff", "staff")
                 .addChoice("Eventos", "eventos")
                 .addChoice("Rádio", "radio")
                 .addChoice("Rádio & Eventos", "both");
 
         commands.add(Commands.slash("disconnectall", "Disconnects every user from a voice-channel (with filtering feature).")
-                .addOptions(channel, filter));
+                .addOptions(disonnectAllChannels, disconnectAllChannelsOptions));
+
+        // Registration
+        OptionData registrationGender = new OptionData(OptionType.STRING, "gender", "O gênero do membro a ser registrado.", true)
+                .addChoice("Feminino", "female")
+                .addChoice("Masculino", "male")
+                .addChoice("Não binário", "nonBinary");
+
+        OptionData registrationAge = new OptionData(OptionType.INTEGER, "age", "A idade do membro a ser registrado.", true);
+
+        OptionData registrationTarget = new OptionData(OptionType.USER, "target", "O membro a ser registrado.", true);
+
+        OptionData registrationPlataform = new OptionData(OptionType.STRING, "plataform", "A plataforma que o membro a ser registrado usa o Discord.", true)
+                .addChoice("Computador 💻", "pc")
+                .addChoice("Mobile 📱", "mobile");
+
+        commands.add(Commands.slash("register", "Registers a new member.")
+                .addOptions(registrationGender, registrationAge, registrationPlataform, registrationTarget)
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES)));
 
         jda.updateCommands().addCommands(commands).queue();
+
+        // Internally register all the slash commands
+        slash.addListenerCommand("disconnect", new Disconnect());
+        slash.addListenerCommand("ping", new Ping());
+        slash.addListenerCommand("disconnectall", new DisconnectAll());
+        slash.addListenerCommand("register", Registration.getInstance());
     }
 
     public static long getInitTime() {

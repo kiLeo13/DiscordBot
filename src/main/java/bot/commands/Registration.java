@@ -1,14 +1,13 @@
 package bot.commands;
 
-import bot.util.Channels;
-import bot.util.CommandExecutor;
-import bot.util.Messages;
+import bot.util.*;
 import bot.util.RegistrationRoles;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 
@@ -19,7 +18,7 @@ import java.util.List;
 
 import static bot.util.BotSystem.sendExpireMessage;
 
-public class Registration implements CommandExecutor {
+public class Registration implements CommandExecutor, SlashExecutor {
     private static Registration INSTANCE;
 
     private static Role requiredRole;
@@ -60,6 +59,9 @@ public class Registration implements CommandExecutor {
         boolean rolesExist = rolesExist(guild);
 
         if (author.isBot() || member == null) return;
+
+        // Is the channel correct?
+        if (channel.getIdLong() != Channels.REGISTER_CHANNEL.toId()) return;
 
         if (!member.getRoles().contains(requiredRole) && !member.hasPermission(Permission.MANAGE_ROLES)) return;
 
@@ -313,6 +315,12 @@ public class Registration implements CommandExecutor {
                 10000);
 
         deleteLastMessageByUser(target, channel);
+    }
+
+    // This is the slash command version
+    @Override
+    public void run(SlashCommandInteractionEvent event) {
+
     }
 
     private static boolean isInputExact(Message message) {

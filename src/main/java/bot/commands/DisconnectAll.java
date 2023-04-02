@@ -1,9 +1,6 @@
 package bot.commands;
 
-import bot.util.BotSystem;
-import bot.util.CommandExecutor;
-import bot.util.Messages;
-import bot.util.StaffRoles;
+import bot.util.*;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
@@ -14,15 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.List;
 
-public class DisconnectAll implements CommandExecutor {
-    @Override
-    public void help(Message message) {
-
-
-
-
-
-    }
+public class DisconnectAll implements CommandExecutor, SlashExecutor {
 
     @Override
     public void run(Message message) {
@@ -63,7 +52,8 @@ public class DisconnectAll implements CommandExecutor {
         message.delete().queue();
     }
 
-    public static void run(SlashCommandInteractionEvent event) {
+    @Override
+    public void run(SlashCommandInteractionEvent event) {
 
         OptionMapping option = event.getOption("filter");
 

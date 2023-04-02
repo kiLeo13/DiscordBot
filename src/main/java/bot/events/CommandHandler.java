@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 
 public class CommandHandler extends ListenerAdapter {
-    private final HashMap<String, CommandExecutor> commands = new HashMap<>();
+    private static final HashMap<String, CommandExecutor> commands = new HashMap<>();
     private static CommandHandler INSTANCE;
     private static final String PREFIX = ".";
     private static final String PREFIX_REGISTER = "r!";
