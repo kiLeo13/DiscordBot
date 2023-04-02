@@ -215,7 +215,6 @@ public class Registration implements CommandExecutor, SlashExecutor {
         guild.modifyMemberRoles(target, toGiveRoles, toTakeRoles).queue();
 
         logRegister(target, toGiveRoles, toTakeRoles, author);
-        logRegister(author, target.getUser(), String.valueOf(genderInput), ageInput, String.valueOf(plataformInput));
 
         sendExpireMessage(channel,
                 "<@" + author.getId() + "> você registrou com sucesso <@" + target.getIdLong() + ">.",
@@ -269,13 +268,12 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // Finnally the register system
         char genderInput = registerArgs[0].toLowerCase().charAt(0);
-        String ageFormatted = formatAge(registerArgs);
         int ageInput = Integer.parseInt(Arrays.toString(registerArgs).replaceAll("[^\\d+\\-]", ""));
         char plataformInput = registerArgs[registerArgs.length-1].toLowerCase().charAt(0);
 
         // What? Are you -2 years old?
         if (ageInput < 0) {
-            sendExpireMessage(channel, "<@" + author.getIdLong() + "> você não pode colocar uma idade negativa.", 5000);
+            sendExpireMessage(channel, "<@" + author.getIdLong() + "> você não pode inserir uma idade negativa.", 5000);
             message.delete().queue();
             return;
         }
@@ -288,12 +286,9 @@ public class Registration implements CommandExecutor, SlashExecutor {
         }
 
         // Age
-        if (ageInput < 13) {
-            toGiveRoles.add(underage);
-            toGiveRoles.add(under13);
-        }
-        if (ageInput >= 13 && ageInput < 18) toGiveRoles.add(underage);
         if (ageInput >= 18) toGiveRoles.add(adult);
+        if (ageInput < 18) toGiveRoles.add(underage);
+        if (ageInput < 13) toGiveRoles.add(under13);
 
         // Plataform
         switch (plataformInput) {
@@ -308,7 +303,6 @@ public class Registration implements CommandExecutor, SlashExecutor {
         guild.modifyMemberRoles(target, toGiveRoles, toTakeRoles).queue();
 
         logRegister(target, toGiveRoles, toTakeRoles, author);
-        logRegister(author, target.getUser(), String.valueOf(genderInput), ageFormatted, String.valueOf(plataformInput));
 
         sendExpireMessage(channel,
                 "<@" + author.getId() + "> você registrou com sucesso <@" + target.getIdLong() + ">.",
@@ -320,7 +314,57 @@ public class Registration implements CommandExecutor, SlashExecutor {
     // This is the slash command version
     @Override
     public void run(SlashCommandInteractionEvent event) {
+        // We can ignore all these warnings since these options are set as required
+        User author = event.getUser();
+        String genderInput = event.getOption("gender").getAsString();
+        int ageInput = event.getOption("age").getAsInt();
+        String plataformInput = event.getOption("plataform").getAsString();
+        Member target = event.getOption("target").getAsMember();
+        Guild guild = event.getGuild();
 
+        // Which roles should we give and take?
+        List<Role> toGiveRoles = new ArrayList<>();
+        List<Role> toTakeRoles = List.of(verified, notRegistered);
+
+        if (author.isBot() || target == null || !event.isFromGuild()) return;
+
+        if (target.getIdLong() == author.getIdLong()) {
+            event.reply("Você não pode registrar você mesmo.").setEphemeral(true).queue();
+            return;
+        }
+
+        if (ageInput < 0) {
+            event.reply("Você não pode inserir uma idade negativa.").setEphemeral(true).queue();
+            return;
+        }
+
+        // Gender
+        switch (genderInput) {
+            case "Feminino" -> toGiveRoles.add(female);
+            case "Masculino" -> toGiveRoles.add(male);
+            case "Não binário" -> toGiveRoles.add(nonBinary);
+        }
+
+        // Age
+        if (ageInput >= 18) toGiveRoles.add(adult);
+        if (ageInput < 18) toGiveRoles.add(underage);
+        if (ageInput < 13) toGiveRoles.add(under13);
+
+        // Plataform
+        switch (plataformInput) {
+            case "Mobile 📱" -> toGiveRoles.add(mobile);
+            case "Computador 💻" -> toGiveRoles.add(pc);
+        }
+
+        toGiveRoles.add(registered);
+
+        // Give and take the provided roles
+        guild.modifyMemberRoles(target, toGiveRoles, toTakeRoles).queue();
+
+        logRegister(target, toGiveRoles, toTakeRoles, author);
+
+        event.reply("Você registrou com sucesso <@" + target.getIdLong() + ">.").setEphemeral(true).queue();
+        deleteLastMessageByUser(target, event.getChannel());
     }
 
     private static boolean isInputExact(Message message) {
@@ -330,17 +374,6 @@ public class Registration implements CommandExecutor, SlashExecutor {
         List<String> ages = List.of("-13", "-18", "+18");
 
         return ages.contains(ageInput);
-    }
-
-    private static String formatAge(String[] registerArgs) {
-        int age = Integer.parseInt(Arrays.toString(registerArgs).replaceAll("[^\\d+\\-]", ""));
-        String returned = "Unknown";
-
-        if (age < 13) returned = "-13";
-        if (age >= 13 && age < 18) returned = "-18";
-        if (age >= 18) returned = "+18";
-
-        return returned;
     }
 
     private static boolean isInputValid(Message message) {
@@ -427,15 +460,6 @@ public class Registration implements CommandExecutor, SlashExecutor {
         else System.out.println("Não foi possível salvar o registro pois nenhum chat foi encontrado.");
     }
 
-    private static void logRegister(User moderator, User target, String gender, String age, String plataform) {
-        System.out.println("\n" + moderator.getName() + "#" + moderator.getDiscriminator() +
-                " registrou o membro " + target.getName() + "#" + target.getDiscriminator() +
-                "\n\nCargos:" +
-                "\nGênero: " + getFullGender(gender) +
-                "\nIdade: " + getFullAge(age) +
-                "\nPlataforma: " + getFullPlataform(plataform));
-    }
-
     private static String getFormattedRolesToEmbed(List<Role> roles) {
         StringBuilder builder = new StringBuilder();
 
@@ -457,45 +481,5 @@ public class Registration implements CommandExecutor, SlashExecutor {
             m.delete().queue();
             break;
         }
-    }
-
-    private static String getFullPlataform(String plataform) {
-        String returned = "Unknown";
-
-        switch (plataform) {
-            case "m" -> returned = "Mobile";
-
-            case "p" -> returned = "Computador";
-        }
-
-         return returned;
-    }
-
-    private static String getFullAge(String age) {
-        String returned = "Unknown";
-
-        switch (age) {
-            case "-13" -> returned = "Menor de idade + (😻)";
-
-            case "-18" -> returned = "Menor de idade";
-
-            case "+18" -> returned = "Maior de idade";
-        }
-
-        return returned;
-    }
-
-    private static String getFullGender(String gender) {
-        String returned = "Unknown";
-
-        switch (gender) {
-            case "f" -> returned = "Feminino";
-
-            case "m" -> returned = "Masculino";
-
-            case "n" -> returned = "Não binário";
-        }
-
-        return returned;
     }
 }
