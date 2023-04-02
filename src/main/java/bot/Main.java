@@ -33,9 +33,7 @@ public final class Main {
 
     public static void main(String[] args) {
         try { createYamlFiles(); }
-        catch (IOException e) {
-            System.out.println("Could not load YAML files.");
-        }
+        catch (IOException e) { System.out.println("Could not load YAML files."); }
 
         try {
             api = JDABuilder.createDefault(BotConfig.getToken(),
