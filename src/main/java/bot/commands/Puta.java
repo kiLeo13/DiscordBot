@@ -2,7 +2,7 @@ package bot.commands;
 
 import bot.data.BotFiles;
 import bot.util.Channels;
-import bot.util.BotSystem;
+import bot.util.Bot;
 import bot.util.CommandExecutor;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import static bot.util.BotSystem.*;
+import static bot.util.Bot.*;
 
 public class Puta implements CommandExecutor {
 
@@ -33,7 +33,7 @@ public class Puta implements CommandExecutor {
 
             int random = (int) (Math.random() * blocked.size());
 
-            BotSystem.sendExpireMessage(message.getChannel(),
+            Bot.sendExpireMessage(message.getChannel(),
                     "<@" + message.getAuthor().getIdLong() + "> " + blocked.get(random),
                     10000);
 

@@ -1,6 +1,6 @@
 package bot.commands;
 
-import bot.util.BotSystem;
+import bot.util.Bot;
 import bot.util.CommandExecutor;
 import bot.util.Messages;
 import bot.util.SlashExecutor;
@@ -44,7 +44,7 @@ public class VoiceMoveAll implements CommandExecutor, SlashExecutor {
 
         for (VoiceChannel v : vChannels)
             if (v == null) {
-                BotSystem.sendExpireMessage(channel, "<@" + author.getIdLong() + "> canal de voz não encontrado.", 5000);
+                Bot.sendExpireMessage(channel, "<@" + author.getIdLong() + "> canal de voz não encontrado.", 5000);
                 message.delete().queue();
                 return;
             }
@@ -56,25 +56,25 @@ public class VoiceMoveAll implements CommandExecutor, SlashExecutor {
         int futureChannelMemberLimit = vChannels.get(1).getUserLimit() <= 0 ? Integer.MAX_VALUE : vChannels.get(1).getUserLimit();
 
         if (currentChannelMemberAmount == 0) {
-            BotSystem.sendExpireMessage(channel, Messages.ERROR_VOICE_CHANNEL_EMPTY.message(), 5000);
+            Bot.sendExpireMessage(channel, Messages.ERROR_VOICE_CHANNEL_EMPTY.message(), 5000);
             message.delete().queue();
             return;
         }
 
         if (futureChannelMemberAmount == futureChannelMemberLimit && !content.endsWith("--force")) {
-            BotSystem.sendExpireMessage(channel, "<@" + author.getIdLong() + "> o canal de destino já está lotado, para ignorar este aviso adicione `--force` no fim do comando.", 10000);
+            Bot.sendExpireMessage(channel, "<@" + author.getIdLong() + "> o canal de destino já está lotado, para ignorar este aviso adicione `--force` no fim do comando.", 10000);
             message.delete().queue();
             return;
         }
 
         if (currentChannelMemberAmount + futureChannelMemberAmount > futureChannelMemberLimit && !content.endsWith("--force")) {
-            BotSystem.sendExpireMessage(channel, "<@" + author.getIdLong() + "> o canal de voz de destino irá passar do limite de usuários ao executar o comando, caso queira movê-los mesmo assim, adicione `--force` no fim do comando.", 10000);
+            Bot.sendExpireMessage(channel, "<@" + author.getIdLong() + "> o canal de voz de destino irá passar do limite de usuários ao executar o comando, caso queira movê-los mesmo assim, adicione `--force` no fim do comando.", 10000);
             message.delete().queue();
             return;
         }
 
         if (vChannels.get(0).getIdLong() == vChannels.get(1).getIdLong()) {
-            BotSystem.sendExpireMessage(channel, "<@" + author.getIdLong() + "> você forneceu o mesmo canal de voz nos dois argumentos.", 5000);
+            Bot.sendExpireMessage(channel, "<@" + author.getIdLong() + "> você forneceu o mesmo canal de voz nos dois argumentos.", 5000);
             message.delete().queue();
             return;
         }

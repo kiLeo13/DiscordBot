@@ -1,7 +1,7 @@
 package bot.events;
 
 import bot.commands.Registration;
-import bot.util.BotSystem;
+import bot.util.Bot;
 import bot.util.CommandExecutor;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.IMentionable;
@@ -42,9 +42,9 @@ public class CommandHandler extends ListenerAdapter {
         // If someone mentions me...
         if (args.length == 1 && !mentions.isEmpty()) {
             if (mentions.get(0).getIdLong() == guild.getSelfMember().getIdLong())
-                BotSystem.sendExpireReply(message, "Olá! Meu prefixo é `.` (ou o que o Myuu quiser ***lol***)", 15000);
+                Bot.sendExpireReply(message, "Olá! Meu prefixo é `.` (ou o que o Myuu quiser ***lol***)", 15000);
 
-            BotSystem.deleteAfter(message, 16000);
+            Bot.deleteAfter(message, 16000);
             return;
         }
 

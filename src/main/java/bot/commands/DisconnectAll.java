@@ -34,13 +34,13 @@ public class DisconnectAll implements CommandExecutor, SlashExecutor {
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) { voiceChannel = null; }
 
         if (voiceChannel == null) {
-            BotSystem.sendExpireMessage(channel, Messages.ERROR_CHANNEL_NOT_FOUND.message(), 10000);
+            Bot.sendExpireMessage(channel, Messages.ERROR_CHANNEL_NOT_FOUND.message(), 10000);
             message.delete().queue();
             return;
         }
 
         if (voiceChannel.getMembers().size() == 0) {
-            BotSystem.sendExpireMessage(channel, "O canal de voz já está vazio.", 5000);
+            Bot.sendExpireMessage(channel, "O canal de voz já está vazio.", 5000);
             message.delete().queue();
             return;
         }

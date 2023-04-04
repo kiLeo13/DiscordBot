@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 
 import java.util.concurrent.TimeUnit;
 
-public class BotSystem {
-    private BotSystem() {}
+public class Bot {
+    private Bot() {}
 
     public static void sendExpireMessage(MessageChannelUnion channel, String message, int time) {
         channel.sendMessage(message)

@@ -17,31 +17,31 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static bot.util.BotSystem.sendExpireMessage;
+import static bot.util.Bot.sendExpireMessage;
 
 public class Registration implements CommandExecutor, SlashExecutor {
     private static Registration INSTANCE;
 
-    private static Role requiredRole;
+    private Role requiredRole;
 
     // Final Register
-    private static Role notRegistered;
-    private static Role registered;
-    private static Role verified;
+    private Role notRegistered;
+    private Role registered;
+    private Role verified;
 
     // Gender
-    private static Role male;
-    private static Role female;
-    private static Role nonBinary;
+    private Role male;
+    private Role female;
+    private Role nonBinary;
 
     // Age
-    private static Role adult;
-    private static Role underage;
-    private static Role under13;
+    private Role adult;
+    private Role underage;
+    private Role under13;
 
     // Plataform
-    private static Role pc;
-    private static Role mobile;
+    private Role pc;
+    private Role mobile;
 
     private Registration() {}
 
@@ -138,7 +138,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         channel.sendMessageEmbeds(builder.build()).queue();
     }
 
-    private static void performExact(Message message) {
+    private void performExact(Message message) {
 
         String content = message.getContentRaw();
         User author = message.getAuthor();
@@ -149,7 +149,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // Which roles should we give and take?
         List<Role> toGiveRoles = new ArrayList<>();
-        List<Role> toTakeRoles = List.of(verified, notRegistered);
+        List<Role> toTakeRoles = new ArrayList<>(2);
 
         Member target;
 
@@ -209,6 +209,10 @@ public class Registration implements CommandExecutor, SlashExecutor {
             case 'p' -> toGiveRoles.add(pc);
         }
 
+        // Adding roles to be takien
+        if (target.getRoles().contains(notRegistered)) toTakeRoles.add(notRegistered);
+        if (target.getRoles().contains(verified)) toTakeRoles.add(verified);
+
         toGiveRoles.add(registered);
         message.delete().queue();
 
@@ -224,7 +228,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         deleteLastMessageByUser(target, channel);
     }
 
-    private static void performDynamic(Message message) {
+    private void performDynamic(Message message) {
 
         String content = message.getContentRaw();
         User author = message.getAuthor();
@@ -235,7 +239,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // Which roles should we give and take?
         List<Role> toGiveRoles = new ArrayList<>();
-        List<Role> toTakeRoles = List.of(verified, notRegistered);
+        List<Role> toTakeRoles = new ArrayList<>(2);
 
         Member target;
 
@@ -297,6 +301,10 @@ public class Registration implements CommandExecutor, SlashExecutor {
             case 'p' -> toGiveRoles.add(pc);
         }
 
+        // Adding roles to be takien
+        if (target.getRoles().contains(notRegistered)) toTakeRoles.add(notRegistered);
+        if (target.getRoles().contains(verified)) toTakeRoles.add(verified);
+
         toGiveRoles.add(registered);
         message.delete().queue();
 
@@ -337,7 +345,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // Which roles should we give and take?
         List<Role> toGiveRoles = new ArrayList<>();
-        List<Role> toTakeRoles = List.of(verified, notRegistered);
+        List<Role> toTakeRoles = new ArrayList<>(2);
 
         if (author.isBot() || target == null) return;
 
@@ -374,8 +382,9 @@ public class Registration implements CommandExecutor, SlashExecutor {
             case "pc" -> toGiveRoles.add(pc);
         }
 
-        System.out.println("Plataform: " + plataformInput);
-        System.out.println("Gender: " + genderInput);
+        // Adding roles to be takien
+        if (target.getRoles().contains(notRegistered)) toTakeRoles.add(notRegistered);
+        if (target.getRoles().contains(verified)) toTakeRoles.add(verified);
 
         toGiveRoles.add(registered);
 
@@ -388,7 +397,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         deleteLastMessageByUser(target, event.getChannel());
     }
 
-    private static boolean isInputExact(Message message) {
+    private boolean isInputExact(Message message) {
         String content = message.getContentRaw();
         String[] args = content.split(" ");
         String ageInput = args[0].substring(3, args[0].length()-1);
@@ -397,7 +406,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         return ages.contains(ageInput);
     }
 
-    private static boolean isInputValid(Message message) {
+    private boolean isInputValid(Message message) {
         String content = message.getContentRaw();
         String[] args = content.split(" ");
 
@@ -416,7 +425,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         return begins.contains(registrationArgs[0]) && ends.contains(registrationArgs[registrationArgs.length - 1]);
     }
 
-    private static boolean rolesExist(Guild guild) {
+    private boolean rolesExist(Guild guild) {
         requiredRole = guild.getRoleById(RegistrationRoles.ROLE_REQUIRED.toId());
 
         notRegistered = guild.getRoleById(RegistrationRoles.ROLE_NOT_REGISTERED.toId());
@@ -443,7 +452,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         return true;
     }
 
-    private static void areRolesSetupProperly(Guild guild) {
+    private void areRolesSetupProperly(Guild guild) {
         RegistrationRoles[] roles = RegistrationRoles.values();
 
         for (RegistrationRoles r : roles) {
@@ -458,7 +467,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         }
     }
 
-    private static void logRegister(Member target, List<Role> givenRoles, List<Role> removedRoles, User author) {
+    private void logRegister(Member target, List<Role> givenRoles, List<Role> removedRoles, User author) {
         EmbedBuilder builder = new EmbedBuilder();
         String targetName = target.getUser().getName();
         String targetDiscriminator = target.getUser().getDiscriminator();
@@ -492,7 +501,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         );
     }
 
-    private static String getLog(String log, User author, Member target, List<Role> givenRoles) {
+    private String getLog(String log, User author, Member target, List<Role> givenRoles) {
         final HashMap<String, String> placeholders = new HashMap<>();
         User targetUser = target.getUser();
 
@@ -519,7 +528,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         return log;
     }
 
-    private static String formattedRolesToEmbed(List<Role> roles) {
+    private String formattedRolesToEmbed(List<Role> roles) {
         StringBuilder builder = new StringBuilder();
 
         for (Role r : roles) {
@@ -531,7 +540,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         return builder.toString().stripTrailing();
     }
 
-    private static void deleteLastMessageByUser(Member target, MessageChannelUnion channel) {
+    private void deleteLastMessageByUser(Member target, MessageChannelUnion channel) {
         List<Message> history = channel.asTextChannel().getHistory().retrievePast(20).complete();
 
         for (Message m : history) {

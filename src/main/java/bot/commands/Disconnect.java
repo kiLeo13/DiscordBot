@@ -61,7 +61,7 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
             guild.kickVoiceMember(member).queue();
         } catch (IllegalStateException exception) {
             message.delete().queue();
-            BotSystem.sendExpireMessage(channel,
+            Bot.sendExpireMessage(channel,
                     "<@" + member.getIdLong() + "> " + Messages.ERROR_CHANNEL_NOT_FOUND.message(),
                     10000);
             return;

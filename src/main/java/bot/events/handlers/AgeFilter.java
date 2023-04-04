@@ -1,11 +1,13 @@
 package bot.events.handlers;
 
+import bot.util.Bot;
 import bot.util.Channels;
 import bot.util.RegistrationRoles;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
 import java.util.List;
@@ -21,9 +23,10 @@ public class AgeFilter {
         String[] args = message.getContentRaw().replaceAll("[^0-9 ]+", "").split(" ");
         MessageChannelUnion channel = message.getChannel();
         boolean hasNumber = false;
+        User author = message.getAuthor();
 
         if (!filterChannels.contains(channel.getIdLong())) return;
-        if (member == null) return;
+        if (member == null || author.isBot()) return;
 
         Role requiredRole = message.getGuild().getRoleById(RegistrationRoles.ROLE_REQUIRED.toId());
 
@@ -34,12 +37,16 @@ public class AgeFilter {
                 int number = Integer.parseInt(i);
 
                 // Are you really 30 years old OR EVEN -1 YEAR OLD? :oooo
-                if (number > 30 || number < 0) message.delete().queue();
+                if (number > 30 || number < 0) {
+                    Bot.delete(message);
+                    return;
+                }
+
                 hasNumber = true;
             } catch (NumberFormatException ignore) {}
         }
 
         // Hmmm you're one of those people who never age, right?
-        if (!hasNumber) message.delete().queue();
+        if (!hasNumber) Bot.delete(message);
     }
 }

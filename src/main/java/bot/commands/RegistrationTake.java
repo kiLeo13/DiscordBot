@@ -34,7 +34,7 @@ public class RegistrationTake implements CommandExecutor {
         } catch (IndexOutOfBoundsException e) { target = null; }
 
         if (target == null) {
-            BotSystem.sendExpireMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
+            Bot.sendExpireMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
             message.delete().queue();
             return;
         }

@@ -93,14 +93,14 @@ public final class Main {
         SlashHandler slash = SlashHandler.getInstance();
         List<CommandData> commands = new ArrayList<>();
 
-        /* ==================== Disconnect ==================== */
+        /* []====================[] Disconnect []====================[] */
         commands.add(Commands.slash("disconnect", "Desconecta o usuário do canal de voz atual."));
 
-        /* ==================== Ping ==================== */
+        /* []====================[] Ping []====================[] */
         commands.add(Commands.slash("ping", "Sends you the ping.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
-        /* ==================== Disconnectall ==================== */
+        /* []====================[] Disconnectall []====================[] */
         OptionData disonnectAllChannels = new OptionData(OptionType.CHANNEL, "channel", "Decide de qual canal os membros devem ser desconectados.", true)
                 .setChannelTypes(ChannelType.VOICE);
         OptionData disconnectAllChannelsOptions = new OptionData(OptionType.STRING, "filter", "Filtra os membros a NÃO serem desconectados.", false)
@@ -112,7 +112,7 @@ public final class Main {
         commands.add(Commands.slash("disconnectall", "Desconecta todos os membros de um canal de voz (opção de filtragem)")
                 .addOptions(disonnectAllChannels, disconnectAllChannelsOptions));
 
-        /* ==================== Registration ==================== */
+        /* []====================[] Registration []====================[] */
         OptionData registrationGender = new OptionData(OptionType.STRING, "gender", "O gênero do membro a ser registrado.", true)
                 .addChoice("Feminino", "female")
                 .addChoice("Masculino", "male")
@@ -130,7 +130,7 @@ public final class Main {
                 .addOptions(registrationGender, registrationAge, registrationPlataform, registrationTarget)
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES)));
 
-        /* ==================== Move All ==================== */
+        /* []====================[] Move All []====================[] */
         OptionData initialChannel = new OptionData(OptionType.CHANNEL, "init-channel", "Canal onde os membros atualmente estão.", true)
                .setChannelTypes(ChannelType.VOICE);
 
