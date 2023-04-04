@@ -32,7 +32,3 @@ src/main/java/bot/data/
 
 # Target directory
 target/
-
-# Some util stuff, like channels & roles
-*/Channels.java
-*/RegistrationRoles.java
