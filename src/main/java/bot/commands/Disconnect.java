@@ -3,6 +3,7 @@ package bot.commands;
 import bot.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -13,6 +14,56 @@ import java.awt.*;
 import java.util.List;
 
 public class Disconnect implements CommandExecutor, SlashExecutor {
+
+    @Override
+    public void run(Message message) {
+        List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_CHANNELS.toIds();
+        if (allowedDisconnectChannels.isEmpty()) return;
+
+        MessageChannelUnion channel = message.getChannel();
+        Member member = message.getMember();
+        Guild guild = message.getGuild();
+
+        if (!allowedDisconnectChannels.contains(channel.getIdLong())) return;
+        if (member == null) return;
+
+        GuildVoiceState voiceState = member.getVoiceState();
+
+        if (voiceState == null || !voiceState.inAudioChannel()) {
+            Bot.sendExpireMessage(channel, Messages.ERROR_VOICE_CHANNEL_NOT_FOUND.message(), 10000);
+            return;
+        }
+
+        guild.kickVoiceMember(member).queue();
+
+        Bot.sendExpireMessage(channel, "Ok, desconectado :)", 10000);
+        message.delete().queue();
+    }
+
+    @Override
+    public void runSlash(SlashCommandInteractionEvent event) {
+
+        List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_CHANNELS.toIds();
+        if (!allowedDisconnectChannels.contains(event.getChannel().getIdLong())) return;
+
+        Guild guild = event.getGuild();
+        Member member = event.getMember();
+
+        if (guild == null || member == null) return;
+
+        GuildVoiceState voiceState = member.getVoiceState();
+
+        if (voiceState == null || !voiceState.inAudioChannel()) {
+            event.reply(Messages.ERROR_VOICE_CHANNEL_NOT_FOUND.message()).setEphemeral(true).queue();
+            return;
+        }
+
+        guild.kickVoiceMember(member).queue();
+
+        event.reply("Ok, desconectado :)")
+                .setEphemeral(true)
+                .queue();
+    }
 
     @Override
     public void help(Message message) {
@@ -43,56 +94,5 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
                 .setFooter("Oficina Myuu", guild.getIconUrl());
 
         channel.sendMessageEmbeds(builder.build()).queue();
-    }
-
-    @Override
-    public void run(Message message) {
-        List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_CHANNELS.toIds();
-        if (allowedDisconnectChannels.isEmpty()) return;
-
-        MessageChannelUnion channel = message.getChannel();
-        Member member = message.getMember();
-        Guild guild = message.getGuild();
-
-        if (!allowedDisconnectChannels.contains(channel.getIdLong())) return;
-        if (member == null) return;
-
-        try {
-            guild.kickVoiceMember(member).queue();
-        } catch (IllegalStateException exception) {
-            message.delete().queue();
-            Bot.sendExpireMessage(channel,
-                    "<@" + member.getIdLong() + "> " + Messages.ERROR_CHANNEL_NOT_FOUND.message(),
-                    10000);
-            return;
-        }
-
-        channel.sendMessage("<@" + member.getId() + "> ok, desconectado :)").queue();
-        message.delete().queue();
-    }
-
-    @Override
-    public void runAsSlash(SlashCommandInteractionEvent e) {
-
-        List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_CHANNELS.toIds();
-        if (!allowedDisconnectChannels.contains(e.getChannel().getIdLong())) return;
-
-        Guild guild = e.getGuild();
-        Member member = e.getMember();
-
-        if (guild == null || member == null) return;
-
-        try {
-            guild.kickVoiceMember(member).queue();
-        } catch (IllegalStateException exception) {
-            e.reply(Messages.ERROR_CHANNEL_NOT_FOUND.message())
-                    .setEphemeral(true)
-                    .queue();
-            return;
-        }
-
-        e.reply("Ok, desconectado :)")
-                .setEphemeral(true)
-                .queue();
     }
 }

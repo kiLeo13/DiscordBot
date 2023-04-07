@@ -1,73 +1,54 @@
 package bot.commands;
 
-import bot.util.Channels;
-import bot.util.ColorRoles;
 import bot.util.Bot;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
+import bot.util.Channels;
+import bot.util.Messages;
+import bot.util.SlashExecutor;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
-public class ColorRoleSchedule {
-    private ColorRoleSchedule() {}
+public class ColorRoleSchedule implements SlashExecutor {
 
-    public static void run(Message message) {
+    @Override
+    public void runSlash(SlashCommandInteractionEvent event) {
 
-        // Usage: .color <user> <color>
-
-        User author = message.getAuthor();
-        Member member = message.getMember();
-        String content = message.getContentRaw();
-        Guild guild = message.getGuild();
-        MessageChannelUnion channel = message.getChannel();
+        // Usage: /color <user> <color>
+        User author = event.getUser();
+        Guild guild = event.getGuild();
+        Member target = event.getOption("member").getAsMember();
+        Role color = guild.getRoleById(event.getOption("color").getAsString());
         TextChannel logChannel = guild.getTextChannelById(Channels.LOG_COLOR_ROLE_COMMAND_CHANNEL.toId());
 
-        String[] args = content.split(" ");
-        Member target = fetchTarget(args[1], guild);
-        Role color = fetchColor(args[2], guild);
-
-        if (!Channels.COMMAND_COLOR_ROLE_CHANNELS.toIds().contains(channel.getIdLong())) return;
-
-        if (member == null || !member.hasPermission(Permission.MANAGE_ROLES)) return;
-        if (author.isBot()) return;
-
-        if (color == null) {
-            System.out.println("Staff " + author.getName() + "#" + author.getDiscriminator() +
-                    "`" + args[2] + "` digitou o nome de um cargo de cor incorretamente (" + args[2] + ").");
-
-            message.delete().queue();
-            Bot.sendExpireMessage(channel,
-                    "<@" + author.getId() + "> could not find `" + args[2] + "`, did you type it correctly?",
-                    10000);
+        if (target == null) {
+            event.reply(Messages.ERROR_MEMBER_NOT_FOUND.message()).setEphemeral(true).queue();
             return;
         }
 
-        if (target == null) {
-            message.delete().queue();
-            Bot.sendExpireMessage(channel,
-                    "<@" + author.getId() + "> user `" + args[1] + "` not found.",
-                    5000);
+        if (color == null) {
+            event.reply(Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.message()).setEphemeral(true).queue();
             return;
         }
 
         // Guild related
         guild.addRoleToMember(target, color).queue();
-        message.delete().queue();
-        Bot.sendExpireMessage(channel,
-                "<@" + author.getId() + "> ",
-                20000);
+        event.reply("// ---------- > INSERT A MESSAGE HERE <---------- //").setEphemeral(false).queue();
+        Bot.sendExpireMessage(guild.getTextChannelById(Channels.CHANNEL_BANK.toId()), "<@" + target.getIdLong() + "> cargo `" + color.getName() + "` foi adicioando com sucesso.", 60000);
 
         String logMessage = logMessage("""
                 Staff: `<author-name>#<author-discriminator>` `<authorId>`
                 Membro: `<target-name>#<target-discriminator>` - `<targetId>`
                 Cargo: `<role-name>`
                 
-                Data: `<date>` às `<time>`
-                Data de Remoção: `<date-remove>` às `<time-remove>`
+                Data: `<date>`
+                Data de Remoção: `<date-remove>`
                 """, author, target.getUser(), color);
 
         // Log related
@@ -79,45 +60,7 @@ public class ColorRoleSchedule {
 
     }
 
-    private static Member fetchTarget(String arg, Guild guild) {
-        arg = arg.replaceAll("[^0-9]+", "");
-
-        return guild.retrieveMemberById(arg).complete();
-    }
-
-    private static Role fetchColor(String arg, Guild guild) {
-        arg = arg.toLowerCase()
-                .replaceAll("[^A-Za-z]", "");
-
-        switch (arg) {
-            case "fire", "fireelement" -> {
-                return guild.getRoleById(ColorRoles.FIRE_ELEMENT.toLong());
-            }
-
-            case "earth", "earthelement" -> {
-                return guild.getRoleById(ColorRoles.EARTH_ELEMENT.toLong());
-            }
-
-            case "water", "waterelement" -> {
-                return guild.getRoleById(ColorRoles.WATER_ELEMENT.toLong());
-            }
-
-            case "light", "lightelement" -> {
-                return guild.getRoleById(ColorRoles.LIGHT_ELEMENT.toLong());
-            }
-
-            case "air", "airelement" -> {
-                return guild.getRoleById(ColorRoles.AIR_ELEMENT.toLong());
-            }
-
-            default -> {
-                return null;
-            }
-        }
-    }
-
     private static String logMessage(String str, User author, User target, Role color) {
-
         final HashMap<String, String> placeHolder = new HashMap<>();
 
         LocalDateTime date = LocalDateTime.now();
@@ -132,11 +75,8 @@ public class ColorRoleSchedule {
         placeHolder.put("<target-discriminator>", target.getDiscriminator());
         placeHolder.put("<target-id>", target.getId());
 
-        placeHolder.put("<date>", date.format(dateFormatter));
-        placeHolder.put("<time>", date.format(timeFormatter));
-
-        placeHolder.put("<date-remove>", date.plusDays(30).format(dateFormatter));
-        placeHolder.put("<time-remove>", date.plusDays(30).format(timeFormatter));
+        placeHolder.put("<date>", date.format(dateFormatter) + " às " + date.format(timeFormatter));
+        placeHolder.put("<date-remove>", date.plusDays(60).format(dateFormatter) + " às " + date.plusDays(60).format(timeFormatter));
 
         placeHolder.put("<role-name>", color.getName());
 

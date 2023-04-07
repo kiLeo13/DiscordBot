@@ -17,11 +17,6 @@ import static bot.util.Bot.sendExpireMessage;
 public class RoleAmongUs implements CommandExecutor {
 
     @Override
-    public void help(Message message) {
-
-    }
-
-    @Override
     public void run(Message message) {
 
         MessageChannelUnion channel = message.getChannel();

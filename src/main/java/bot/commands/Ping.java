@@ -35,7 +35,7 @@ public class Ping implements CommandExecutor, SlashExecutor {
     }
 
     @Override
-    public void runAsSlash(SlashCommandInteractionEvent e) {
+    public void runSlash(SlashCommandInteractionEvent e) {
 
         JDA api = Main.getApi();
         long apiPing = api.getRestPing().complete();

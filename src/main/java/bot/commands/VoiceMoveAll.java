@@ -44,7 +44,7 @@ public class VoiceMoveAll implements CommandExecutor, SlashExecutor {
 
         for (VoiceChannel v : vChannels)
             if (v == null) {
-                Bot.sendExpireMessage(channel, "<@" + author.getIdLong() + "> canal de voz não encontrado.", 5000);
+                Bot.sendExpireMessage(channel, Messages.ERROR_VOICE_CHANNEL_NOT_FOUND.message(), 5000);
                 message.delete().queue();
                 return;
             }
@@ -62,19 +62,19 @@ public class VoiceMoveAll implements CommandExecutor, SlashExecutor {
         }
 
         if (futureChannelMemberAmount == futureChannelMemberLimit && !content.endsWith("--force")) {
-            Bot.sendExpireMessage(channel, "<@" + author.getIdLong() + "> o canal de destino já está lotado, para ignorar este aviso adicione `--force` no fim do comando.", 10000);
+            Bot.sendExpireMessage(channel, "O canal de destino já está lotado, para ignorar este aviso adicione `--force` no fim do comando.", 10000);
             message.delete().queue();
             return;
         }
 
         if (currentChannelMemberAmount + futureChannelMemberAmount > futureChannelMemberLimit && !content.endsWith("--force")) {
-            Bot.sendExpireMessage(channel, "<@" + author.getIdLong() + "> o canal de voz de destino irá passar do limite de usuários ao executar o comando, caso queira movê-los mesmo assim, adicione `--force` no fim do comando.", 10000);
+            Bot.sendExpireMessage(channel, "O canal de voz de destino irá passar do limite de usuários ao executar o comando, caso queira movê-los mesmo assim, adicione `--force` no fim do comando.", 10000);
             message.delete().queue();
             return;
         }
 
         if (vChannels.get(0).getIdLong() == vChannels.get(1).getIdLong()) {
-            Bot.sendExpireMessage(channel, "<@" + author.getIdLong() + "> você forneceu o mesmo canal de voz nos dois argumentos.", 5000);
+            Bot.sendExpireMessage(channel, Messages.ERROR_SAME_ARGUMENTS_PROVIDED.message(), 5000);
             message.delete().queue();
             return;
         }
@@ -83,12 +83,12 @@ public class VoiceMoveAll implements CommandExecutor, SlashExecutor {
 
         inChannelMembers.forEach(m -> guild.moveVoiceMember(m, vChannels.get(1)).queue());
 
-        channel.sendMessage("<@" + author.getIdLong() + "> todos os membros de `#" + vChannels.get(0).getName() + "` agora estão em `#" + vChannels.get(1).getName() + "`!").queue();
+        Bot.sendExpireMessage(channel, "Todos os membros de `#" + vChannels.get(0).getName() + "` agora estão em `#" + vChannels.get(1).getName() + "`!", 10000);
         message.delete().queue();
     }
 
     @Override
-    public void runAsSlash(SlashCommandInteractionEvent event) {
+    public void runSlash(SlashCommandInteractionEvent event) {
         VoiceChannel initChannel = event.getOption("init-channel").getAsChannel().asVoiceChannel();
         VoiceChannel finalChannel = event.getOption("final-channel").getAsChannel().asVoiceChannel();
         boolean override = event.getOption("should-ignore") != null && event.getOption("should-ignore").getAsBoolean();
@@ -120,7 +120,9 @@ public class VoiceMoveAll implements CommandExecutor, SlashExecutor {
         List<Member> initMembers = initChannel.getMembers();
 
         initMembers.forEach(m -> event.getGuild().moveVoiceMember(m, finalChannel).queue());
-        event.reply("Todos os membros de `#" + initChannel.getName() + "` agora estão em `#" + finalChannel.getName() + "`!").setEphemeral(false).queue();
+        event.reply("Todos os membros de `#" + initChannel.getName() + "` agora estão em `#" + finalChannel.getName() + "`!")
+                .setEphemeral(true)
+                .queue();
     }
 
     @Override

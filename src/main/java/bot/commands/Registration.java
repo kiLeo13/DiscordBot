@@ -322,7 +322,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
     // This is the slash command version
     @Override
-    public void runAsSlash(SlashCommandInteractionEvent event) {
+    public void runSlash(SlashCommandInteractionEvent event) {
         // We can ignore all these warnings since these options are set as required
         User author = event.getUser();
         String genderInput = event.getOption("gender").getAsString();

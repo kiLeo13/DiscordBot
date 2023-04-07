@@ -23,7 +23,7 @@ public class SlashHandler extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
 
         // Yeah, it HAS to be run in a guild
-        if (!event.isFromGuild()) return;
+        if (!event.isFromGuild() || event.getUser().isBot()) return;
 
         runCommand(event);
     }
@@ -34,7 +34,7 @@ public class SlashHandler extends ListenerAdapter {
         SlashExecutor command = commands.get(cmd);
         if (command == null) return;
 
-        command.runAsSlash(event);
+        command.runSlash(event);
     }
 
     public void addListenerCommand(String name, SlashExecutor command) {

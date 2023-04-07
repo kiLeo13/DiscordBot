@@ -1,11 +1,13 @@
 package bot;
 
+import bot.commands.Shutdown;
 import bot.commands.*;
 import bot.commands.misc.PayServer;
 import bot.data.BotConfig;
 import bot.events.CommandHandler;
 import bot.events.MessageReceivedGeneral;
 import bot.events.SlashHandler;
+import bot.util.ElementRoles;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -143,6 +145,23 @@ public final class Main {
                 .addOptions(initialChannel, finalChannel, shouldOverride)
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
+        /* []====================[] Color Role []====================[] */
+        OptionData optionColorTarget = new OptionData(OptionType.USER, "member", "Qual membro deve receber o cargo de cor informado.", true);
+        OptionData optionColorRole = new OptionData(OptionType.STRING, "color", "Qual o cargo de cor a ser dado ao membro infromado.", true)
+                .addChoice("Fire Element \uD83D\uDD25", ElementRoles.FIRE_ELEMENT.toStringId())
+                .addChoice("Earth Element \uD83C\uDF3F", ElementRoles.EARTH_ELEMENT.toStringId())
+                .addChoice("Water Element \uD83D\uDCA7", ElementRoles.WATER_ELEMENT.toStringId())
+                .addChoice("Light Element \uD83C\uDF1F", ElementRoles.LIGHT_ELEMENT.toStringId())
+                .addChoice("Air Element \uD83D\uDCA8", ElementRoles.AIR_ELEMENT.toStringId());
+
+        commands.add(Commands.slash("color", "Dá o cargo de cor para o membro informado.")
+                .addOptions(optionColorTarget, optionColorRole)
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES)));
+
+        /* []====================[] Color Role []====================[] */
+        commands.add(Commands.slash("shutdown", "Desliga o bot em caso de emergência.")
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
+
         jda.updateCommands().addCommands(commands).queue();
 
         // Internally register all the slash commands
@@ -151,6 +170,8 @@ public final class Main {
         slash.addListenerCommand("disconnectall", new DisconnectAll());
         slash.addListenerCommand("register", Registration.getInstance());
         slash.addListenerCommand("moveall", new VoiceMoveAll());
+        slash.addListenerCommand("color", new ColorRoleSchedule());
+        slash.addListenerCommand("shutdown", new Shutdown());
     }
 
     public static long getInitTime() {
