@@ -58,7 +58,7 @@ public class CommandHandler extends ListenerAdapter {
     public void addListenerCommand(String name, CommandExecutor command) {
         final HashMap<String, String> prefixes = new HashMap<>();
 
-        prefixes.put("<default>", PREFIX);
+        prefixes.put("<prefix>", PREFIX);
         prefixes.put("<register>", PREFIX_REGISTER);
 
         for (String i : prefixes.keySet())

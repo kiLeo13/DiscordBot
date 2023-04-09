@@ -79,18 +79,19 @@ public final class Main {
     private static void registerOldCommands() {
         CommandHandler commands = CommandHandler.getInstance();
 
-        commands.addListenerCommand("<default>bigo", new BigoAnnouncement());
-
-        commands.addListenerCommand("<default>disconnect", new Disconnect());
-        commands.addListenerCommand("<default>dd", new Disconnect());
-
-        commands.addListenerCommand("<default>ping", new Ping());
-        commands.addListenerCommand("<default>puta", new Puta());
-        commands.addListenerCommand("<default>among", new RoleAmongUs());
-        commands.addListenerCommand("<default>say", new Say());
-        commands.addListenerCommand("<default>uptime", new Uptime());
-        commands.addListenerCommand("<default>moveall", new VoiceMoveAll()); // @Deprecated
-        commands.addListenerCommand("<default>clear", new Clear());
+        commands.addListenerCommand("<prefix>bigo", new BigoAnnouncement());
+        commands.addListenerCommand("<prefix>disconnect", new Disconnect());
+        commands.addListenerCommand("<prefix>dd", new Disconnect()); // Disconnect and dd are the same yes
+        commands.addListenerCommand("<prefix>ping", new Ping());
+        commands.addListenerCommand("<prefix>puta", new Puta());
+        commands.addListenerCommand("<prefix>nerd", new Nerd());
+        commands.addListenerCommand("<prefix>among", new RoleAmongUs());
+        commands.addListenerCommand("<prefix>say", new Say());
+        commands.addListenerCommand("<prefix>uptime", new Uptime());
+        commands.addListenerCommand("<prefix>moveall", new VoiceMoveAll()); // @Deprecated
+        commands.addListenerCommand("<prefix>clear", new Clear());
+        commands.addListenerCommand("<prefix>userinfo", new Userinfo());
+        commands.addListenerCommand("<prefix>avatar", new Avatar());
 
         commands.addListenerCommand("<register>roles", new RegistrationRoles());
         commands.addListenerCommand("<register>take", new RegistrationTake());

@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class Bot {
     private Bot() {}
 
-    public static void sendExpireMessage(MessageChannelUnion channel, String message, int time) {
+    public static void sendGhostMessage(MessageChannelUnion channel, String message, int time) {
         if (channel == null) return;
         channel.sendMessage(message)
                 .delay(time, TimeUnit.MILLISECONDS)
@@ -20,9 +20,7 @@ public class Bot {
                         .ignore(ErrorResponse.UNKNOWN_MESSAGE));
     }
 
-    public static void sendExpireMessage(MessageChannelUnion channel, String message, int time, Object... formats) {
-        message = String.format(message, formats);
-
+    public static void sendGhostMessage(TextChannel channel, String message, int time) {
         if (channel == null) return;
         channel.sendMessage(message)
                 .delay(time, TimeUnit.MILLISECONDS)
@@ -31,16 +29,7 @@ public class Bot {
                         .ignore(ErrorResponse.UNKNOWN_MESSAGE));
     }
 
-    public static void sendExpireMessage(TextChannel channel, String message, int time) {
-        if (channel == null) return;
-        channel.sendMessage(message)
-                .delay(time, TimeUnit.MILLISECONDS)
-                .flatMap(Message::delete)
-                .queue(null, new ErrorHandler()
-                        .ignore(ErrorResponse.UNKNOWN_MESSAGE));
-    }
-
-    public static void sendExpireReply(Message message, String content, int time) {
+    public static void sendGhostReply(Message message, String content, int time) {
         message.reply(content)
                 .delay(time, TimeUnit.MILLISECONDS)
                 .flatMap(Message::delete)

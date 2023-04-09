@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static bot.util.Bot.sendExpireMessage;
+import static bot.util.Bot.sendGhostMessage;
 
 public class Registration implements CommandExecutor, SlashExecutor {
     private static Registration INSTANCE;
@@ -68,13 +68,13 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         try { areRolesSetupProperly(guild); }
         catch (IllegalArgumentException | HierarchyException e) {
-            sendExpireMessage(channel, e.getMessage(), 10000);
+            Bot.sendGhostMessage(channel, e.getMessage(), 10000);
             message.delete().queue();
             return;
         }
 
         if (!isInputValid(message)) {
-            sendExpireMessage(channel, "O padrão de registro usado `" + content + "` não é válido.", 5000);
+            Bot.sendGhostMessage(channel, "O padrão de registro usado `" + content + "` não é válido.", 5000);
             message.delete().queue();
             return;
         }
@@ -85,7 +85,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
             return;
         }
 
-        sendExpireMessage(channel, Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.message(), 5000);
+        Bot.sendGhostMessage(channel, Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.message(), 5000);
         message.delete().queue();
     }
 
@@ -156,7 +156,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         try {
             target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
         } catch (ErrorResponseException e) {
-            sendExpireMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
+            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
             message.delete().queue();
             return;
         }
@@ -169,14 +169,14 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // Why would someone register themselves?
         if (target.getIdLong() == author.getIdLong()) {
-            sendExpireMessage(channel, "<@" + author.getIdLong() + "> Você não pode registrar você mesmo.", 5000);
+            Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> Você não pode registrar você mesmo.", 5000);
             message.delete().queue();
             return;
         }
 
         // Why would someone register someone that is already registered?
         if (target.getRoles().contains(registered)) {
-            sendExpireMessage(channel, "<@" + author.getIdLong() + "> O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.", 5000);
+            Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.", 5000);
             message.delete().queue();
             return;
         }
@@ -221,7 +221,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         logRegister(target, toGiveRoles, toTakeRoles, author);
 
-        sendExpireMessage(channel,
+        Bot.sendGhostMessage(channel,
                 "<@" + author.getId() + "> você registrou com sucesso <@" + target.getIdLong() + ">.",
                 10000);
 
@@ -246,7 +246,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         try {
             target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
         } catch (ErrorResponseException e) {
-            sendExpireMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
+            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
             message.delete().queue();
             return;
         }
@@ -259,14 +259,14 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // Why would someone register themselves?
         if (target.getIdLong() == author.getIdLong()) {
-            sendExpireMessage(channel, "<@" + author.getIdLong() + "> Você não pode registrar você mesmo.", 5000);
+            Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> Você não pode registrar você mesmo.", 5000);
             message.delete().queue();
             return;
         }
 
         // Why would someone register someone that is already registered?
         if (target.getRoles().contains(registered)) {
-            sendExpireMessage(channel, "<@" + author.getIdLong() + "> O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.", 5000);
+            Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.", 5000);
             message.delete().queue();
             return;
         }
@@ -278,7 +278,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // What? Are you -2 years old?
         if (ageInput < 0) {
-            sendExpireMessage(channel, "<@" + author.getIdLong() + "> você não pode inserir uma idade negativa.", 5000);
+            Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> você não pode inserir uma idade negativa.", 5000);
             message.delete().queue();
             return;
         }
@@ -313,7 +313,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         logRegister(target, toGiveRoles, toTakeRoles, author);
 
-        sendExpireMessage(channel,
+        Bot.sendGhostMessage(channel,
                 "<@" + author.getId() + "> você registrou com sucesso <@" + target.getIdLong() + ">.",
                 10000);
 

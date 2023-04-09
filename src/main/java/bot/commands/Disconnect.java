@@ -28,13 +28,13 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
         GuildVoiceState voiceState = member.getVoiceState();
 
         if (voiceState == null || !voiceState.inAudioChannel()) {
-            Bot.sendExpireMessage(channel, Messages.ERROR_VOICE_CHANNEL_NOT_FOUND.message(), 10000);
+            Bot.sendGhostMessage(channel, Messages.ERROR_VOICE_CHANNEL_NOT_FOUND.message(), 10000);
             return;
         }
 
         guild.kickVoiceMember(member).queue();
 
-        Bot.sendExpireMessage(channel, "Ok, desconectado :)", 10000);
+        Bot.sendGhostMessage(channel, "Ok, desconectado :)", 10000);
         message.delete().queue();
     }
 

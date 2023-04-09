@@ -33,7 +33,7 @@ public class Puta implements CommandExecutor {
 
             int random = (int) (Math.random() * blocked.size());
 
-            Bot.sendExpireMessage(message.getChannel(),
+            Bot.sendGhostMessage(message.getChannel(),
                     "<@" + message.getAuthor().getIdLong() + "> " + blocked.get(random),
                     10000);
 
@@ -59,13 +59,13 @@ public class Puta implements CommandExecutor {
 
             if (args.length >= 2) mentionedMember = message.getMentions().getMembers().get(0);
         } catch (FileNotFoundException e) {
-            sendExpireMessage(channel,
+            sendGhostMessage(channel,
                     "Arquivo `swearings.yml` não foi encontrado.",
                     10000);
             System.out.println("Arquivo 'swearings.yml' não foi encontrado, ignorando comando...");
             return;
         } catch (IndexOutOfBoundsException e) {
-            sendExpireReply(message, "Membro `" + args[1] + "` não encontrado.", 5000);
+            sendGhostReply(message, "Membro `" + args[1] + "` não encontrado.", 5000);
             deleteAfter(message, 6000);
             return;
         }

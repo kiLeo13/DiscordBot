@@ -22,7 +22,7 @@ public class VoiceMoveAll implements CommandExecutor, SlashExecutor {
     public void run(Message message) {
         Member member = message.getMember();
         if (member != null && member.hasPermission(Permission.MANAGE_SERVER))
-            Bot.sendExpireMessage(message.getChannel(), "*This command is now Slash only. Please, opt using `/moveall` instead.*", 15000);
+            Bot.sendGhostMessage(message.getChannel(), "*This command is now Slash only. Please, opt using `/moveall` instead.*", 15000);
     }
 
     @Override

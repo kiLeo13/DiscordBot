@@ -18,11 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Say implements CommandExecutor {
 
     @Override
-    public void help(Message message) {
-
-    }
-
-    @Override
     public void run(Message message) {
 
         User author = message.getAuthor();
@@ -41,6 +36,7 @@ public class Say implements CommandExecutor {
 
         List<InputStream> streams = new ArrayList<>();
         List<String> fileNames = new ArrayList<>();
+
         attachments.forEach(f -> {
             fileNames.add(f.getFileName());
             try { streams.add(f.getProxy().download().get()); }
