@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static bot.util.Bot.sendExpireMessage;
-
 public class RoleAmongUs implements CommandExecutor {
 
     @Override
@@ -47,7 +45,7 @@ public class RoleAmongUs implements CommandExecutor {
         try {
             target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
         } catch (ErrorResponseException e) {
-            sendExpireMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
+            Bot.sendExpireMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
             message.delete().queue();
             return;
         }

@@ -4,6 +4,7 @@ import bot.commands.Shutdown;
 import bot.commands.*;
 import bot.commands.misc.PayServer;
 import bot.data.BotConfig;
+import bot.events.BlockLorittaExploit;
 import bot.events.CommandHandler;
 import bot.events.MessageReceivedGeneral;
 import bot.events.SlashHandler;
@@ -48,7 +49,7 @@ public final class Main {
                     .build()
                     .awaitReady();
 
-            updateCommands(api);
+            registerApplicationCommands(api);
 
             init = System.currentTimeMillis();
             api.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Oficina"), false);
@@ -60,7 +61,7 @@ public final class Main {
 
         // Registers
         registerEvents(api);
-        registerCommands();
+        registerOldCommands();
         runRunnables(api);
     }
 
@@ -72,26 +73,30 @@ public final class Main {
         api.addEventListener(CommandHandler.getInstance());
         api.addEventListener(new MessageReceivedGeneral());
         api.addEventListener(SlashHandler.getInstance());
+        api.addEventListener(new BlockLorittaExploit());
     }
 
-    private static void registerCommands() {
+    private static void registerOldCommands() {
         CommandHandler commands = CommandHandler.getInstance();
 
         commands.addListenerCommand("<default>bigo", new BigoAnnouncement());
-        commands.addListenerCommand("<default>disconnectall", new DisconnectAll());
+
         commands.addListenerCommand("<default>disconnect", new Disconnect());
+        commands.addListenerCommand("<default>dd", new Disconnect());
+
         commands.addListenerCommand("<default>ping", new Ping());
         commands.addListenerCommand("<default>puta", new Puta());
         commands.addListenerCommand("<default>among", new RoleAmongUs());
         commands.addListenerCommand("<default>say", new Say());
         commands.addListenerCommand("<default>uptime", new Uptime());
-        commands.addListenerCommand("<default>moveall", new VoiceMoveAll());
+        commands.addListenerCommand("<default>moveall", new VoiceMoveAll()); // @Deprecated
+        commands.addListenerCommand("<default>clear", new Clear());
 
         commands.addListenerCommand("<register>roles", new RegistrationRoles());
         commands.addListenerCommand("<register>take", new RegistrationTake());
     }
 
-    private static void updateCommands(JDA jda) {
+    private static void registerApplicationCommands(JDA jda) {
         SlashHandler slash = SlashHandler.getInstance();
         List<CommandData> commands = new ArrayList<>();
 
@@ -102,17 +107,18 @@ public final class Main {
         commands.add(Commands.slash("ping", "Sends you the ping.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
-        /* []====================[] Disconnectall []====================[] */
+        /* []====================[] Disconnect All []====================[] */
         OptionData disonnectAllChannels = new OptionData(OptionType.CHANNEL, "channel", "Decide de qual canal os membros devem ser desconectados.", true)
                 .setChannelTypes(ChannelType.VOICE);
         OptionData disconnectAllChannelsOptions = new OptionData(OptionType.STRING, "filter", "Filtra os membros a NÃO serem desconectados.", false)
-                .addChoice("Staff", "staff")
-                .addChoice("Eventos", "eventos")
-                .addChoice("Rádio", "radio")
-                .addChoice("Rádio & Eventos", "both");
+                .addChoice("Staff ✩", "staff")
+                .addChoice("Eventos 🎈", "eventos")
+                .addChoice("Rádio 📻", "radio")
+                .addChoice("Rádio & Eventos 🎤", "both");
 
         commands.add(Commands.slash("disconnectall", "Desconecta todos os membros de um canal de voz (opção de filtragem)")
-                .addOptions(disonnectAllChannels, disconnectAllChannelsOptions));
+                .addOptions(disonnectAllChannels, disconnectAllChannelsOptions)
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES)));
 
         /* []====================[] Registration []====================[] */
         OptionData registrationGender = new OptionData(OptionType.STRING, "gender", "O gênero do membro a ser registrado.", true)

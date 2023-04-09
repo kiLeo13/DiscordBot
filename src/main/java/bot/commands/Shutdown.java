@@ -20,7 +20,15 @@ public class Shutdown implements SlashExecutor {
         Bot.setTimeout(() -> {
             api.getPresence().setPresence(OnlineStatus.OFFLINE, false);
             api.shutdownNow();
-            System.out.println("Bot has gone offline!\nRequested by: [" + user.getName() + "#" + user.getDiscriminator() + "]");
+            System.out.printf("""
+                    
+                    ==============================
+                    
+                    ⚠ Bot has gone offline!
+                    Requested by: [ %s#%s ]
+                    
+                    ==============================
+                    """, user.getName(), user.getDiscriminator());
         }, 5000);
     }
 }

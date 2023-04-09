@@ -17,14 +17,12 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
 
     @Override
     public void run(Message message) {
-        List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_CHANNELS.toIds();
-        if (allowedDisconnectChannels.isEmpty()) return;
 
         MessageChannelUnion channel = message.getChannel();
         Member member = message.getMember();
         Guild guild = message.getGuild();
 
-        if (!allowedDisconnectChannels.contains(channel.getIdLong())) return;
+        if (!Channels.COMMAND_DISCONNECT_SELF_CHANNELS.toIds().contains(channel.getIdLong())) return;
         if (member == null) return;
 
         GuildVoiceState voiceState = member.getVoiceState();
@@ -43,7 +41,7 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
     @Override
     public void runSlash(SlashCommandInteractionEvent event) {
 
-        List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_CHANNELS.toIds();
+        List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_SELF_CHANNELS.toIds();
         if (!allowedDisconnectChannels.contains(event.getChannel().getIdLong())) return;
 
         Guild guild = event.getGuild();
@@ -71,7 +69,7 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
 
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
-        List<Long> requiredChannel = Channels.COMMAND_DISCONNECT_CHANNELS.toIds();
+        List<Long> requiredChannel = Channels.COMMAND_DISCONNECT_SELF_CHANNELS.toIds();
         StringBuilder channelsName = new StringBuilder();
         String channels;
 

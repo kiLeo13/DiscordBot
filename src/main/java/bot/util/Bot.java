@@ -20,6 +20,17 @@ public class Bot {
                         .ignore(ErrorResponse.UNKNOWN_MESSAGE));
     }
 
+    public static void sendExpireMessage(MessageChannelUnion channel, String message, int time, Object... formats) {
+        message = String.format(message, formats);
+
+        if (channel == null) return;
+        channel.sendMessage(message)
+                .delay(time, TimeUnit.MILLISECONDS)
+                .flatMap(Message::delete)
+                .queue(null, new ErrorHandler()
+                        .ignore(ErrorResponse.UNKNOWN_MESSAGE));
+    }
+
     public static void sendExpireMessage(TextChannel channel, String message, int time) {
         if (channel == null) return;
         channel.sendMessage(message)
@@ -56,7 +67,7 @@ public class Bot {
                 Thread.sleep(delay);
                 task.run();
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }).start();
     }
