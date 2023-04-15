@@ -1,5 +1,6 @@
 package bot.commands;
 
+import bot.util.Bot;
 import bot.util.CommandExecutor;
 import bot.util.Roles;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,12 +21,12 @@ public class Nerd implements CommandExecutor {
         MessageChannelUnion channel = message.getChannel();
 
         if (salada == null || alfea == null) {
-            System.out.println("Could not find role 'salada' or 'alfea'. Ignoring `.nerd` command...");
+            System.out.println("Could not find role 'salada' or 'alfea'. Ignoring `nerd` command...");
             return;
         }
 
         if (member == null || !(member.getRoles().contains(salada) && member.getRoles().contains(alfea))) return;
 
-        channel.sendMessage("").queue();
+        Bot.sendGhostMessage(channel, "*This command is still in development stages.*", 10000);
     }
 }

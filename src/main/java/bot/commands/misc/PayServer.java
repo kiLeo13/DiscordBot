@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 
 import java.awt.*;
@@ -22,8 +23,11 @@ public class PayServer extends Thread {
     private int day;
 
     public PayServer(JDA api) {
-        myuu = api.getUserById(183645448509194240L);
-        if (myuu == null) throw new IllegalArgumentException("Myuu cannot be null");
+        try {
+            myuu = api.retrieveUserById(183645448509194240L).complete();
+        } catch (ErrorResponseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

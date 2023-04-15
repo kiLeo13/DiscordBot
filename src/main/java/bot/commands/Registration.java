@@ -1,23 +1,19 @@
 package bot.commands;
 
-import bot.util.*;
 import bot.util.RegistrationRoles;
+import bot.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-
-import static bot.util.Bot.sendGhostMessage;
 
 public class Registration implements CommandExecutor, SlashExecutor {
     private static Registration INSTANCE;
@@ -52,6 +48,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
     @Override
     public void run(Message message) {
+
         Member member = message.getMember();
         User author = message.getAuthor();
         Guild guild = message.getGuild();
@@ -151,12 +148,11 @@ public class Registration implements CommandExecutor, SlashExecutor {
         List<Role> toGiveRoles = new ArrayList<>();
         List<Role> toTakeRoles = new ArrayList<>(2);
 
-        Member target;
+        Member target = Bot.findMember(guild, args[1]);
 
-        try {
-            target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
-        } catch (ErrorResponseException e) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
+        // If target member was not found
+        if (target == null) {
+            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
             message.delete().queue();
             return;
         }
@@ -169,14 +165,14 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // Why would someone register themselves?
         if (target.getIdLong() == author.getIdLong()) {
-            Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> Você não pode registrar você mesmo.", 5000);
+            Bot.sendGhostMessage(channel, "Você não pode registrar você mesmo.", 5000);
             message.delete().queue();
             return;
         }
 
         // Why would someone register someone that is already registered?
         if (target.getRoles().contains(registered)) {
-            Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.", 5000);
+            Bot.sendGhostMessage(channel, "O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.", 5000);
             message.delete().queue();
             return;
         }
@@ -241,12 +237,11 @@ public class Registration implements CommandExecutor, SlashExecutor {
         List<Role> toGiveRoles = new ArrayList<>();
         List<Role> toTakeRoles = new ArrayList<>(2);
 
-        Member target;
+        Member target = Bot.findMember(guild, args[1]);
 
-        try {
-            target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
-        } catch (ErrorResponseException e) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
+        // If target member was not found
+        if (target == null) {
+            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
             message.delete().queue();
             return;
         }
@@ -426,28 +421,28 @@ public class Registration implements CommandExecutor, SlashExecutor {
     }
 
     private boolean rolesExist(Guild guild) {
-        requiredRole = guild.getRoleById(RegistrationRoles.ROLE_REQUIRED.toId());
+        requiredRole = guild.getRoleById(RegistrationRoles.ROLE_REQUIRED.id());
 
-        notRegistered = guild.getRoleById(RegistrationRoles.ROLE_NOT_REGISTERED.toId());
-        registered = guild.getRoleById(RegistrationRoles.ROLE_REGISTERED.toId());
-        verified = guild.getRoleById(RegistrationRoles.ROLE_VERIFIED.toId());
+        notRegistered = guild.getRoleById(RegistrationRoles.ROLE_NOT_REGISTERED.id());
+        registered = guild.getRoleById(RegistrationRoles.ROLE_REGISTERED.id());
+        verified = guild.getRoleById(RegistrationRoles.ROLE_VERIFIED.id());
 
-        male = guild.getRoleById(RegistrationRoles.ROLE_MALE.toId());
-        female = guild.getRoleById(RegistrationRoles.ROLE_FEMALE.toId());
-        nonBinary = guild.getRoleById(RegistrationRoles.ROLE_NON_BINARY.toId());
+        male = guild.getRoleById(RegistrationRoles.ROLE_MALE.id());
+        female = guild.getRoleById(RegistrationRoles.ROLE_FEMALE.id());
+        nonBinary = guild.getRoleById(RegistrationRoles.ROLE_NON_BINARY.id());
 
-        adult = guild.getRoleById(RegistrationRoles.ROLE_ADULT.toId());
-        underage = guild.getRoleById(RegistrationRoles.ROLE_UNDERAGE.toId());
-        under13 = guild.getRoleById(RegistrationRoles.ROLE_UNDER13.toId());
+        adult = guild.getRoleById(RegistrationRoles.ROLE_ADULT.id());
+        underage = guild.getRoleById(RegistrationRoles.ROLE_UNDERAGE.id());
+        under13 = guild.getRoleById(RegistrationRoles.ROLE_UNDER13.id());
 
-        pc = guild.getRoleById(RegistrationRoles.ROLE_COMPUTER.toId());
-        mobile = guild.getRoleById(RegistrationRoles.ROLE_MOBILE.toId());
+        pc = guild.getRoleById(RegistrationRoles.ROLE_COMPUTER.id());
+        mobile = guild.getRoleById(RegistrationRoles.ROLE_MOBILE.id());
 
         // Were all roles found?
         RegistrationRoles[] roles = RegistrationRoles.values();
 
         for (RegistrationRoles i : roles)
-            if (guild.getRoleById(i.toId()) == null) return false;
+            if (guild.getRoleById(i.id()) == null) return false;
 
         return true;
     }
@@ -456,7 +451,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         RegistrationRoles[] roles = RegistrationRoles.values();
 
         for (RegistrationRoles r : roles) {
-            Role targetRole = guild.getRoleById(r.toId());
+            Role targetRole = guild.getRoleById(r.id());
             Role selfHighest = guild.getSelfMember().getRoles().get(0);
 
             if (targetRole == null)
@@ -488,44 +483,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         if (channel != null) channel.sendMessageEmbeds(builder.build()).queue();
         else System.out.println("Não foi possível salvar o registro pois nenhum chat foi encontrado.");
 
-        System.out.println(
-                getLog("""
-                        \s
-                        <author> registrou o membro <target>
-                        
-                        Cargos:
-                        Gênero: <gender>
-                        Idade: <age>
-                        Plataforma: <plataform>
-                        """, author, target, givenRoles)
-        );
-    }
-
-    private String getLog(String log, User author, Member target, List<Role> givenRoles) {
-        final HashMap<String, String> placeholders = new HashMap<>();
-        User targetUser = target.getUser();
-
-        placeholders.put("<author>", author.getName() + "#" + author.getDiscriminator());
-        placeholders.put("<target>", targetUser.getName() + "#" + targetUser.getDiscriminator());
-
-        // Gender input
-        if (givenRoles.get(0).getIdLong() == RegistrationRoles.ROLE_FEMALE.toId()) placeholders.put("<gender>", "Feminino");
-        if (givenRoles.get(0).getIdLong() == RegistrationRoles.ROLE_MALE.toId()) placeholders.put("<gender>", "Masculino");
-        if (givenRoles.get(0).getIdLong() == RegistrationRoles.ROLE_NON_BINARY.toId()) placeholders.put("<gender>", "Não binário");
-
-        // Age input
-        if (givenRoles.get(1).getIdLong() == RegistrationRoles.ROLE_ADULT.toId()) placeholders.put("<age>", "Maior de idade");
-        if (givenRoles.get(1).getIdLong() == RegistrationRoles.ROLE_UNDERAGE.toId()) placeholders.put("<age>", "Menor de idade");
-        if (givenRoles.get(1).getIdLong() == RegistrationRoles.ROLE_UNDER13.toId()) placeholders.put("<age>", "Menor de idade + (😻)");
-
-        // Plataform input
-        if (givenRoles.get(givenRoles.size()-2).getIdLong() == RegistrationRoles.ROLE_MOBILE.toId()) placeholders.put("<plataform>", "Mobile");
-        if (givenRoles.get(givenRoles.size()-2).getIdLong() == RegistrationRoles.ROLE_COMPUTER.toId()) placeholders.put("<plataform>", "Computador");
-
-        for (String i : placeholders.keySet())
-            log = log.replaceAll(i, placeholders.get(i));
-
-        return log;
+        System.out.printf("\n%s#%s registrou o membro %s#%s!\n", author.getName(), author.getDiscriminator(), targetName, targetDiscriminator);
     }
 
     private String formattedRolesToEmbed(List<Role> roles) {

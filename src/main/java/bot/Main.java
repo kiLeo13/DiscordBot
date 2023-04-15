@@ -3,6 +3,8 @@ package bot;
 import bot.commands.Shutdown;
 import bot.commands.*;
 import bot.commands.misc.PayServer;
+import bot.commands.misc.WordFilter;
+import bot.commands.register.Buttons;
 import bot.data.BotConfig;
 import bot.events.BlockLorittaExploit;
 import bot.events.CommandHandler;
@@ -74,16 +76,18 @@ public final class Main {
         api.addEventListener(new MessageReceivedGeneral());
         api.addEventListener(SlashHandler.getInstance());
         api.addEventListener(new BlockLorittaExploit());
+        api.addEventListener(new Buttons());
+
+        api.addEventListener(new WordFilter());
     }
 
     private static void registerOldCommands() {
         CommandHandler commands = CommandHandler.getInstance();
 
         commands.addListenerCommand("<prefix>bigo", new BigoAnnouncement());
-        commands.addListenerCommand("<prefix>disconnect", new Disconnect());
-        commands.addListenerCommand("<prefix>dd", new Disconnect()); // Disconnect and dd are the same yes
         commands.addListenerCommand("<prefix>ping", new Ping());
         commands.addListenerCommand("<prefix>puta", new Puta());
+        commands.addListenerCommand(new Disconnect(), "<prefix>dd", "<prefix>disconnect");
         commands.addListenerCommand("<prefix>nerd", new Nerd());
         commands.addListenerCommand("<prefix>among", new RoleAmongUs());
         commands.addListenerCommand("<prefix>say", new Say());
@@ -92,6 +96,9 @@ public final class Main {
         commands.addListenerCommand("<prefix>clear", new Clear());
         commands.addListenerCommand("<prefix>userinfo", new Userinfo());
         commands.addListenerCommand("<prefix>avatar", new Avatar());
+        commands.addListenerCommand("<prefix>help", new Help());
+        commands.addListenerCommand("<prefix>banner", new Banner());
+        commands.addListenerCommand("<prefix>disconnectafter", new DisconnectAfter());
 
         commands.addListenerCommand("<register>roles", new RegistrationRoles());
         commands.addListenerCommand("<register>take", new RegistrationTake());
@@ -169,6 +176,31 @@ public final class Main {
         commands.add(Commands.slash("shutdown", "Desliga o bot em caso de emergência.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
+        /* []====================[] Avatar []====================[] */
+        OptionData targetAvatar = new OptionData(OptionType.USER, "user", "O avatar do usuário a ser enviado.", false);
+        OptionData avatarGuild = new OptionData(OptionType.STRING, "from-guild", "O avatar a ser mostrado é o que está no servidor ou no perfil do usuário?", false)
+                .addChoice("Do Servidor 🌎", "guild")
+                .addChoice("Do Usuário 👥", "user");
+
+        commands.add(Commands.slash("avatar", "Mostra o avatar do usuário.")
+                .addOptions(targetAvatar, avatarGuild));
+
+        /* []====================[] Banner []====================[] */
+        OptionData targetBanner = new OptionData(OptionType.USER, "user", "O banner do usuário a ser enviado.", false);
+
+        commands.add(Commands.slash("banner", "Mostra o banner do usuário.")
+                .addOptions(targetBanner)
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
+
+        /* []====================[] Banner []====================[] */
+        OptionData disconnectScheduleUser = new OptionData(OptionType.USER, "user", "O usuário a ser desconectado.", true);
+        OptionData disconnectScheduleTime = new OptionData(OptionType.INTEGER, "time", "O tempo a esperar antes de desconectar o usuário (em segundos).", true);
+
+        commands.add(Commands.slash("disconnectafter", "Desconecta um usuário depois de um certo tempo.")
+                .addOptions(disconnectScheduleTime, disconnectScheduleUser)
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
+
+        // Registering it
         jda.updateCommands().addCommands(commands).queue();
 
         // Internally register all the slash commands
@@ -179,6 +211,9 @@ public final class Main {
         slash.addListenerCommand("moveall", new VoiceMoveAll());
         slash.addListenerCommand("color", new ColorRoleSchedule());
         slash.addListenerCommand("shutdown", new Shutdown());
+        slash.addListenerCommand("avatar", new Avatar());
+        slash.addListenerCommand("banner", new Banner());
+        slash.addListenerCommand("disconnectafter", new DisconnectAfter());
     }
 
     public static long getInitTime() {

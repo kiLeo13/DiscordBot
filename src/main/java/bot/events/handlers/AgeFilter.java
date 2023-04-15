@@ -28,7 +28,7 @@ public class AgeFilter {
         if (!filterChannels.contains(channel.getIdLong())) return;
         if (member == null || author.isBot()) return;
 
-        Role requiredRole = message.getGuild().getRoleById(RegistrationRoles.ROLE_REQUIRED.toId());
+        Role requiredRole = message.getGuild().getRoleById(RegistrationRoles.ROLE_REQUIRED.id());
 
         if (member.hasPermission(Permission.MANAGE_SERVER) || member.getRoles().contains(requiredRole)) return;
 

@@ -42,8 +42,8 @@ public class RegistrationTake implements CommandExecutor {
         List<Role> toRemoveRoles = toRemove(target);
         List<Role> toGiveRoles = toGive(guild);
 
-        if (target.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_NOT_REGISTERED.toId()))
-                && !target.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_REGISTERED.toId()))) {
+        if (target.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_NOT_REGISTERED.id()))
+                && !target.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_REGISTERED.id()))) {
             channel.sendMessage("<@" + author.getIdLong() + "> o membro <@" + target.getIdLong() + "> não está registrado.").queue();
             message.delete().queue();
             return;
@@ -94,7 +94,7 @@ public class RegistrationTake implements CommandExecutor {
         List<Role> finalRoles = new ArrayList<>();
 
         for (RegistrationRoles r : roles) {
-            Role targetRole = guild.getRoleById(r.toId());
+            Role targetRole = guild.getRoleById(r.id());
 
             if (r.emoji().equals("✅") && target.getRoles().contains(targetRole))
                 finalRoles.add(targetRole);
@@ -108,7 +108,7 @@ public class RegistrationTake implements CommandExecutor {
         List<Role> finalRoles = new ArrayList<>();
 
         for (RegistrationRoles r : roles)
-            if (r.emoji().equals("❌")) finalRoles.add(guild.getRoleById(r.toId()));
+            if (r.emoji().equals("❌")) finalRoles.add(guild.getRoleById(r.id()));
 
         return finalRoles;
     }

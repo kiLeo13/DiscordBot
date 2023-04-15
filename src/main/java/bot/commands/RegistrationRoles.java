@@ -50,7 +50,7 @@ public class RegistrationRoles implements CommandExecutor {
         bot.util.RegistrationRoles[] roles = bot.util.RegistrationRoles.values();
 
         for (bot.util.RegistrationRoles r : roles) {
-            Role targetRole = guild.getRoleById(r.toId());
+            Role targetRole = guild.getRoleById(r.id());
 
             if (targetRole == null) embedBuilder.addField("> `" + r.name() + "`", "`⚠ Not Found`", false);
             else embedBuilder.addField("> `" + r.name() + "`", "<@&" + targetRole.getIdLong() + ">", false);

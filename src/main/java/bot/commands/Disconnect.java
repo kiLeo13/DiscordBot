@@ -29,6 +29,7 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
 
         if (voiceState == null || !voiceState.inAudioChannel()) {
             Bot.sendGhostMessage(channel, Messages.ERROR_VOICE_CHANNEL_NOT_FOUND.message(), 10000);
+            message.delete().queue();
             return;
         }
 
@@ -83,7 +84,7 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
 
         builder
                 .setColor(Color.YELLOW)
-                .setTitle("Disconnect", guild.getIconUrl())
+                .setTitle("Disconnect")
                 .setDescription("Segue uma explicação mais detalhada sobre o comando fornecido.")
                 .addField("> 📝 Requisitos", "Para executar este comando, requer estar nos canais:\n" + channels, true)
                 .addField("> ❓ O que é", "Desenvolvido para desconectar o usuário de um canal de voz caso esteja lagados e não consigam sair naturalmente.", true)

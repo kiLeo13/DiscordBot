@@ -69,4 +69,14 @@ public class CommandHandler extends ListenerAdapter {
 
         commands.put(name, command);
     }
+
+    public void addListenerCommand(CommandExecutor command, String... name) {
+        for (String n : name) {
+            n = n.replaceAll("<prefix>", PREFIX);
+
+            if (n.stripTrailing().equals("")) throw new IllegalArgumentException("Command name cannot be empty");
+
+            commands.put(n, command);
+        }
+    }
 }
