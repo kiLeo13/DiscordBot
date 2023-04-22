@@ -87,24 +87,25 @@ public final class Main {
     private static void registerOldCommands() {
         CommandHandler commands = CommandHandler.getInstance();
 
-        commands.addListenerCommand("<prefix>bigo", new BigoAnnouncement());
-        commands.addListenerCommand("<prefix>ping", new Ping());
-        commands.addListenerCommand("<prefix>puta", new Puta());
-        commands.addListenerCommand(new Disconnect(), "<prefix>dd", "<prefix>disconnect");
-        commands.addListenerCommand("<prefix>nerd", new Nerd());
-        commands.addListenerCommand("<prefix>among", new RoleAmongUs());
-        commands.addListenerCommand("<prefix>say", new Say());
-        commands.addListenerCommand("<prefix>uptime", new Uptime());
-        commands.addListenerCommand("<prefix>moveall", new VoiceMoveAll()); // @Deprecated
-        commands.addListenerCommand("<prefix>clear", new Clear());
-        commands.addListenerCommand("<prefix>userinfo", new Userinfo());
-        commands.addListenerCommand("<prefix>avatar", new Avatar());
-        commands.addListenerCommand("<prefix>help", new Help());
-        commands.addListenerCommand("<prefix>banner", new Banner());
-        commands.addListenerCommand("<prefix>serverinfo", new ServerInfo());
+        commands.addCommand("<prefix>bigo", new BigoAnnouncement());
+        commands.addCommand("<prefix>ping", new Ping());
+        commands.addCommand("<prefix>puta", new Puta());
+        commands.addCommand(new Disconnect(), "<prefix>dd", "<prefix>disconnect");
+        commands.addCommand("<prefix>nerd", new Nerd());
+        commands.addCommand("<prefix>among", new RoleAmongUs());
+        commands.addCommand("<prefix>say", new Say());
+        commands.addCommand("<prefix>uptime", new Uptime());
+        commands.addCommand("<prefix>moveall", new VoiceMoveAll()); // @Deprecated
+        commands.addCommand("<prefix>clear", new Clear());
+        commands.addCommand("<prefix>userinfo", new Userinfo());
+        commands.addCommand("<prefix>avatar", new Avatar());
+        commands.addCommand("<prefix>help", new Help());
+        commands.addCommand("<prefix>banner", new Banner());
+        commands.addCommand("<prefix>serverinfo", new ServerInfo());
+        commands.addCommand("<prefix>linff", new Linff());
 
-        commands.addListenerCommand("<register>roles", new RegistrationRoles());
-        commands.addListenerCommand("<register>take", new RegistrationTake());
+        commands.addCommand("<register>roles", new RegistrationRoles());
+        commands.addCommand("<register>take", new RegistrationTake());
     }
 
     private static void registerApplicationCommands(JDA jda) {

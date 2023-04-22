@@ -54,7 +54,7 @@ public class CommandHandler extends ListenerAdapter {
         command.run(message);
     }
 
-    public void addListenerCommand(String name, CommandExecutor command) {
+    public void addCommand(String name, CommandExecutor command) {
         final HashMap<String, String> prefixes = new HashMap<>();
 
         prefixes.put("<prefix>", BotConfig.PREFIX);
@@ -72,7 +72,7 @@ public class CommandHandler extends ListenerAdapter {
         commands.put(name, command);
     }
 
-    public void addListenerCommand(CommandExecutor command, String... name) {
+    public void addCommand(CommandExecutor command, String... name) {
         for (String n : name) {
             n = n.replaceAll("<prefix>", BotConfig.PREFIX);
 
