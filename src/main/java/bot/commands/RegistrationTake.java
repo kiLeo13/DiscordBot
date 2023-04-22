@@ -68,7 +68,7 @@ public class RegistrationTake implements CommandExecutor {
                 .setThumbnail(target.getEffectiveAvatarUrl())
                 .setTitle("Registro de `" + targetName + "#" + targetDiscriminator + "` removido!")
                 .setDescription("Removido por `" + staffName + "#" + staffDiscriminator + "`\n ")
-                .addField("> **Cargos Dados**", getFormattedRolesToEmbed(givenRoles) + "", true)
+                .addField("> **Cargos Dados**", getFormattedRolesToEmbed(givenRoles), true)
                 .addField("> **Cargos Removidos**", getFormattedRolesToEmbed(removedRoles), true)
                 .setFooter("Oficina Myuu", "https://cdn.discordapp.com/attachments/631974560605929493/1086540588788228117/a_d51df27b11a16bbfaf5ce83acfeebfd8.png");
 

@@ -17,11 +17,6 @@ public class Uptime implements CommandExecutor {
     private static byte timeZone;
 
     @Override
-    public void help(Message message) {
-
-    }
-
-    @Override
     public void run(Message message) {
 
         timeZone = -3;

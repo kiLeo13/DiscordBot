@@ -37,15 +37,18 @@ public final class Main {
     private static long init;
 
     public static void main(String[] args) {
-        try { createYamlFiles(); }
-        catch (IOException e) { System.out.println("Could not load YAML files."); }
+        try {
+            createYamlFiles();
+        } catch (IOException e) {
+            System.out.println("Could not load YAML files.");
+        }
 
         try {
             api = JDABuilder.createDefault(BotConfig.getToken(),
                             GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT,
                             GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MEMBERS,
                             GatewayIntent.GUILD_EMOJIS_AND_STICKERS, GatewayIntent.SCHEDULED_EVENTS,
-                            GatewayIntent.GUILD_PRESENCES)
+                            GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
                     .setEventManager(new AnnotatedEventManager())
                     .enableCache(CacheFlag.VOICE_STATE)
                     .build()
@@ -98,7 +101,7 @@ public final class Main {
         commands.addListenerCommand("<prefix>avatar", new Avatar());
         commands.addListenerCommand("<prefix>help", new Help());
         commands.addListenerCommand("<prefix>banner", new Banner());
-        commands.addListenerCommand("<prefix>disconnectafter", new DisconnectAfter());
+        commands.addListenerCommand("<prefix>serverinfo", new ServerInfo());
 
         commands.addListenerCommand("<register>roles", new RegistrationRoles());
         commands.addListenerCommand("<register>take", new RegistrationTake());
@@ -172,7 +175,7 @@ public final class Main {
                 .addOptions(optionColorTarget, optionColorRole)
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES)));
 
-        /* []====================[] Color Role []====================[] */
+        /* []====================[] Shutdown []====================[] */
         commands.add(Commands.slash("shutdown", "Desliga o bot em caso de emergência.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
@@ -192,12 +195,12 @@ public final class Main {
                 .addOptions(targetBanner)
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
-        /* []====================[] Banner []====================[] */
-        OptionData disconnectScheduleUser = new OptionData(OptionType.USER, "user", "O usuário a ser desconectado.", true);
-        OptionData disconnectScheduleTime = new OptionData(OptionType.INTEGER, "time", "O tempo a esperar antes de desconectar o usuário (em segundos).", true);
-
-        commands.add(Commands.slash("disconnectafter", "Desconecta um usuário depois de um certo tempo.")
-                .addOptions(disconnectScheduleTime, disconnectScheduleUser)
+        /* []====================[] Bot Status []====================[] */
+        OptionData activityOption = new OptionData(OptionType.STRING, "link", "O link da live.");
+        OptionData activityName = new OptionData(OptionType.STRING, "name", "Define o nome da live para aparecer no perfil.");
+        
+        commands.add(Commands.slash("stream", "Define os status do bot.")
+                .addOptions(activityOption, activityName)
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
         // Registering it
@@ -213,7 +216,7 @@ public final class Main {
         slash.addListenerCommand("shutdown", new Shutdown());
         slash.addListenerCommand("avatar", new Avatar());
         slash.addListenerCommand("banner", new Banner());
-        slash.addListenerCommand("disconnectafter", new DisconnectAfter());
+        slash.addListenerCommand("stream", new Botstatus());
     }
 
     public static long getInitTime() {

@@ -4,22 +4,20 @@ import bot.data.BotFiles;
 import bot.util.Channels;
 import bot.util.Bot;
 import bot.util.CommandExecutor;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
+import java.awt.*;
 import java.io.FileNotFoundException;
 import java.util.List;
 
 import static bot.util.Bot.*;
 
 public class Puta implements CommandExecutor {
-
-    @Override
-    public void help(Message message) {
-
-    }
 
     @Override
     public void run(Message message) {
@@ -78,6 +76,18 @@ public class Puta implements CommandExecutor {
             channel.sendMessage(mention(mentionedMember) + " " + swearSentence).queue();
             message.delete().queue();
         }
+    }
+
+    @Override
+    public MessageEmbed help(Message message) {
+        EmbedBuilder builder = new EmbedBuilder();
+
+        builder
+                .setColor(Color.PINK)
+                .setTitle("Sexo kênte")
+                .setDescription("Sexo Sexo Sexo Sexo Sexo Sexo Sexo Sexo Sexo Sexo Sexo ");
+
+        return builder.build();
     }
 
     private static String mention(Member member) {

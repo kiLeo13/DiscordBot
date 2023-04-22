@@ -15,16 +15,18 @@ import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class PayServer extends Thread {
     private final User myuu;
-    private static boolean hasInformed;
     private int day;
+    private int hour;
+    private static final List<Integer> hours = List.of(12, 15, 17, 20);
 
     public PayServer(JDA api) {
         try {
-            myuu = api.retrieveUserById(183645448509194240L).complete();
+            myuu = api.retrieveUserById(596939790532739075L).complete();
         } catch (ErrorResponseException e) {
             throw new RuntimeException(e);
         }
@@ -33,9 +35,9 @@ public class PayServer extends Thread {
     @Override
     public void run() {
         while (true) {
-            updateDay();
+            updateDate();
 
-            if (day == 20 && !hasInformed) {
+            if (day == 20 && hours.contains(hour)) {
                 inform(myuu, """
                         Hoje é dia `<date>`
                         
@@ -43,17 +45,16 @@ public class PayServer extends Thread {
                         
                         Link: <<link>>
                         """);
-                hasInformed = true;
-            } else
-                hasInformed = false;
+            }
 
-            try { Thread.sleep(3600000); }
+            try { Thread.sleep(3600 * 1000); }
             catch (InterruptedException e) { break; }
         }
     }
 
-    private void updateDay() {
+    private void updateDate() {
         day = LocalDateTime.now().getDayOfMonth();
+        hour = LocalDateTime.now().getHour();
     }
 
     private void inform(User user, String content) {
@@ -78,7 +79,7 @@ public class PayServer extends Thread {
 
         user.openPrivateChannel()
                 .flatMap(channel -> channel.sendMessageEmbeds(finalContent))
-                .delay(5, TimeUnit.DAYS)
+                .delay(5, TimeUnit.HOURS)
                 .flatMap(Message::delete)
                 .queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE));
     }
@@ -87,13 +88,18 @@ public class PayServer extends Thread {
         EmbedBuilder builder = new EmbedBuilder();
         Guild oficina = Main.getApi().getGuildById(582430782577049600L);
 
-        if (oficina == null) throw new IllegalAccessException();
+        if (oficina == null) throw new IllegalAccessException("Oficina cannot be null");
+
+        String banner = oficina.getBannerUrl() == null ? "" : oficina.getBannerUrl();
+
+        if (!banner.equals(""))
+            banner += "?size=2048";
 
         builder.setTitle("Pagar Servidor DO BOT")
                 .setColor(Color.PINK)
                 .setThumbnail(Main.getApi().getSelfUser().getAvatarUrl())
                 .addField("> Assunto", content, false)
-                .setImage(oficina.getBannerUrl())
+                .setImage(banner)
                 .setFooter("Oficina Myuu", oficina.getIconUrl());
 
         return builder.build();

@@ -106,7 +106,7 @@ public class Userinfo implements CommandExecutor, SlashExecutor {
                 .setThumbnail(target.getUser().getAvatarUrl())
                 .setColor(color)
                 .addField("📅 Criação da Conta", String.format("<t:%d>\n<t:%d:R>", creation, creation), true)
-                .addField("🌐 ID do Usuário", "`" + target.getIdLong() + "`", true)
+                .addField("🌐 User ID", "`" + target.getIdLong() + "`", true)
                 .addField("🌟 Entrou no Servidor", String.format("<t:%d>", joined), true)
                 .setFooter("Oficina Myuu", target.getGuild().getIconUrl());
 

@@ -87,8 +87,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
     }
 
     @Override
-    public void help(Message message) {
-        MessageChannelUnion channel = message.getChannel();
+    public MessageEmbed help(Message message) {
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = message.getGuild();
         String roleName = "[???]";
@@ -132,7 +131,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
                         """, false)
                 .setFooter("Oficina Myuu", guild.getIconUrl());
 
-        channel.sendMessageEmbeds(builder.build()).queue();
+        return builder.build();
     }
 
     private void performExact(Message message) {
@@ -318,7 +317,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
     // This is the slash command version
     @Override
     public void runSlash(SlashCommandInteractionEvent event) {
-        // We can ignore all these warnings since these options are set as required
+        // We can ignore all the warnings since these options are set as required
         User author = event.getUser();
         String genderInput = event.getOption("gender").getAsString();
         int ageInput = event.getOption("age").getAsInt();

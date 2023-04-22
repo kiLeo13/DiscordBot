@@ -28,7 +28,7 @@ public class Ping implements CommandExecutor, SlashExecutor {
 
         message.delete().queue();
 
-        channel.sendMessage("📡** | **<@" + author.getIdLong() + "> **Oie!**\n\n" +
+        channel.sendMessage("<@" + author.getIdLong() + "> **Oie!** <:Hiro:855653864693694494>\n\n" +
                 "🕒** | Gateway Ping**: `" + gatewayPing + "ms`\n" +
                 "📡** | API Ping**: `" + apiPing + "ms`\n")
                 .queue();
