@@ -216,7 +216,7 @@ public final class Main {
         slash.addListenerCommand("shutdown", new Shutdown());
         slash.addListenerCommand("avatar", new Avatar());
         slash.addListenerCommand("banner", new Banner());
-        slash.addListenerCommand("stream", new Botstatus());
+        slash.addListenerCommand("stream", new BotStatus());
     }
 
     public static long getInitTime() {

@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-public class Botstatus implements SlashExecutor {
+public class BotStatus implements SlashExecutor {
 
     @Override
     public void runSlash(SlashCommandInteractionEvent event) {

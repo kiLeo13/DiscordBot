@@ -35,13 +35,13 @@ public class Ping implements CommandExecutor, SlashExecutor {
     }
 
     @Override
-    public void runSlash(SlashCommandInteractionEvent e) {
+    public void runSlash(SlashCommandInteractionEvent event) {
 
         JDA api = Main.getApi();
         long apiPing = api.getRestPing().complete();
         long gatewayPing = api.getGatewayPing();
 
-        e.reply("> **Pong!**\n\n" +
+        event.reply("> **Pong!**\n\n" +
                         "🕒** | Gateway Ping**: `" + gatewayPing + "ms`\n" +
                         "📡** | API Ping**: `" + apiPing + "ms`\n")
                 .queue();

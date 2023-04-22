@@ -93,22 +93,25 @@ public class Avatar implements CommandExecutor, SlashExecutor {
         String title = "🖼 " + name;
         Color color = new Color(88, 101, 242);
 
-        // Custom stuff for Anjo
-        if (target.getIdLong() == 742729586659295283L) {
-            color = new Color(148, 0, 211);
-            title = "\\🍑 " + name;
-        }
+        switch (target.getId()) {
 
-        // Custom stuff for Myuu (main)
-        if (target.getIdLong() == 183645448509194240L) {
-            color = new Color(194, 0, 0);
-            title = "🍒 " + name;
-        }
+            // Custom stuff for Anjo
+            case "742729586659295283" -> {
+                color = new Color(148, 0, 211);
+                title = "\\🍑 " + name;
+            }
 
-        // Custom stuff for Myuu (alt)
-        if (target.getIdLong() == 727978798464630824L) {
-            color = new Color(255, 51, 243);
-            title = "🍒 " + name;
+            // Custom stuff for Myuu (main)
+            case "183645448509194240" -> {
+                color = new Color(194, 0, 0);
+                title = "🍒 " + name;
+            }
+
+            // Custom stuff for Myuu (alt)
+            case "727978798464630824" -> {
+                color = new Color(255, 51, 243);
+                title = "🍒 " + name;
+            }
         }
 
         return builder
