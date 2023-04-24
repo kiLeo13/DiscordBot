@@ -2,7 +2,7 @@ package bot.commands;
 
 import bot.data.BotConfig;
 import bot.events.CommandHandler;
-import bot.util.Bot;
+import bot.util.Tools;
 import bot.util.CommandExecutor;
 import bot.util.RegistrationRoles;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -47,7 +47,7 @@ public class Help implements CommandExecutor {
             MessageEmbed embed = getHelp(message);
 
             if (embed == null) {
-                Bot.sendGhostMessage(channel, "Nenhuma ajuda encontrada para `" + args[1] + "`. Tente inserir o prefixo do bot caso não tenha.", 10000);
+                Tools.sendGhostMessage(channel, "Nenhuma ajuda encontrada para `" + args[1] + "`. Tente inserir o prefixo do bot caso não tenha.", 10000);
                 message.delete().queue();
             } else {
                 send.addEmbeds(embed);

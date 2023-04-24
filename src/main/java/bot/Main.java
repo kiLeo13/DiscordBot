@@ -103,6 +103,7 @@ public final class Main {
         commands.addCommand("<prefix>banner", new Banner());
         commands.addCommand("<prefix>serverinfo", new ServerInfo());
         commands.addCommand("<prefix>linff", new Linff());
+        commands.addCommand("<prefix>ip", new IPLookup());
 
         commands.addCommand("<register>roles", new RegistrationRoles());
         commands.addCommand("<register>take", new RegistrationTake());

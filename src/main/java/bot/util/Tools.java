@@ -10,15 +10,23 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-public class Bot {
+public class Tools {
     private static final Timer timer = new Timer(false);
 
-    private Bot() {}
+    private Tools() {}
 
     /**
      * 
@@ -147,6 +155,43 @@ public class Bot {
         try {
             return Main.getApi().retrieveUserById(arg).complete();
         } catch (ErrorResponseException e) {
+            return null;
+        }
+    }
+
+    public static String request(String path) {
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+            .url(path)
+            .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            return response.isSuccessful()
+                ? response.body().string()
+                : null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        return null;
+    }
+
+    public static InputStream requestFile(String path) {
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+            .url(path)
+            .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful())
+                return null;
+            
+            byte[] bytes = response.body().bytes();
+
+            return new ByteArrayInputStream(bytes);
+        } catch (IOException e) {
             return null;
         }
     }

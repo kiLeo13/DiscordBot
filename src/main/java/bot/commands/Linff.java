@@ -2,7 +2,7 @@ package bot.commands;
 
 import java.util.List;
 
-import bot.util.Bot;
+import bot.util.Tools;
 import bot.util.CommandExecutor;
 import bot.util.Roles;
 import net.dv8tion.jda.api.entities.Guild;
@@ -19,16 +19,16 @@ public class Linff implements CommandExecutor {
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
         Member member = message.getMember();
-        Member linff = Bot.findMember(guild, "577787431340736533");
+        Member linff = Tools.findMember(guild, "577787431340736533");
         Role salada = guild.getRoleById(Roles.ROLE_SALADA.toId());
         List<String> swearings = List.of(
             "Filho da puta burro", "VIADINHO",
-            "BICHA", "PAU NO CU");
+            "BICHA", "PAU NO CU", "Seu bosta");
 
         if (salada == null || member == null || !member.getRoles().contains(salada)) return;
 
         if (linff == null) {
-            Bot.sendGhostMessage(channel, "Linff não foi encontrado.", 5000);
+            Tools.sendGhostMessage(channel, "Linff não foi encontrado.", 5000);
             message.delete().queue();
             return;
         }

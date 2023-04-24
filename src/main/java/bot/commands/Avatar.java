@@ -1,6 +1,6 @@
 package bot.commands;
 
-import bot.util.Bot;
+import bot.util.Tools;
 import bot.util.CommandExecutor;
 import bot.util.Messages;
 import bot.util.SlashExecutor;
@@ -31,7 +31,7 @@ public class Avatar implements CommandExecutor, SlashExecutor {
             String targetId = args[1].replaceAll("[^0-9]+", "");
 
             if (targetId.stripTrailing().equals("")) {
-                Bot.sendGhostMessage(channel, "`" + args[1] + "` não é um id válido.", 5000);
+                Tools.sendGhostMessage(channel, "`" + args[1] + "` não é um id válido.", 5000);
                 message.delete().queue();
                 return;
             }
@@ -40,7 +40,7 @@ public class Avatar implements CommandExecutor, SlashExecutor {
         } catch (ArrayIndexOutOfBoundsException e) {
             target = member;
         } catch (ErrorResponseException e) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
+            Tools.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
             message.delete().queue();
             return;
         }
@@ -49,7 +49,7 @@ public class Avatar implements CommandExecutor, SlashExecutor {
         String avatarUrl = avatarUrl(target, isFromGuild);
 
         if (avatarUrl == null && content.endsWith("--server")) {
-            Bot.sendGhostMessage(channel, "O usuário não possui um avatar específico para este servidor.", 5000);
+            Tools.sendGhostMessage(channel, "O usuário não possui um avatar específico para este servidor.", 5000);
             message.delete().queue();
             return;
         }
