@@ -29,6 +29,7 @@ src/main/java/bot/data/
 
 # Idea files
 .idea/
+.vscode/
 
 # Target directory
 target/
