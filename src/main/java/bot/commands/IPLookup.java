@@ -7,8 +7,7 @@ import com.google.gson.Gson;
 
 import bot.util.CommandExecutor;
 import bot.util.Messages;
-import bot.util.Tools;
-import net.dv8tion.jda.api.Permission;
+import bot.util.Bot;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -25,10 +24,10 @@ public class IPLookup implements CommandExecutor {
         String regex = "\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b";
         Pattern pattern = Pattern.compile(regex);
 
-        if (member == null || !member.hasPermission(Permission.MANAGE_SERVER)) return;
+        if (member == null) return;
 
         if (args.length < 2) {
-            Tools.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
+            Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
             message.delete().queue();
             return;
         }
@@ -36,16 +35,16 @@ public class IPLookup implements CommandExecutor {
         Matcher matcher = pattern.matcher(args[1]);
 
         if (!matcher.matches()) {
-            Tools.sendGhostMessage(channel, "O IP `" + args[1] + "` é inválido.", 10000);
+            Bot.sendGhostMessage(channel, "O IP `" + args[1] + "` é inválido.", 10000);
             message.delete().queue();
             return;
         }
 
-        String returned = Tools.request("http://ip-api.com/json/" + args[1]);
+        String returned = Bot.request("http://ip-api.com/json/" + args[1]);
         IP ip = deserialize(returned);
 
         if (ip == null) {
-            Tools.sendGhostMessage(channel,
+            Bot.sendGhostMessage(channel,
                 "Não foi possível encontrar a região do ip `" + args[1] + "`.",
                 10000);
             message.delete().queue();

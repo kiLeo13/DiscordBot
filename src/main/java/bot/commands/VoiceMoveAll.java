@@ -1,6 +1,6 @@
 package bot.commands;
 
-import bot.util.Tools;
+import bot.util.Bot;
 import bot.util.CommandExecutor;
 import bot.util.Messages;
 import bot.util.SlashExecutor;
@@ -22,7 +22,7 @@ public class VoiceMoveAll implements CommandExecutor, SlashExecutor {
     public void run(Message message) {
         Member member = message.getMember();
         if (member != null && member.hasPermission(Permission.MANAGE_SERVER))
-            Tools.sendGhostMessage(message.getChannel(), "*This command is now Slash only. Please, opt using `/moveall` instead.*", 15000);
+            Bot.sendGhostMessage(message.getChannel(), "*This command is now Slash only. Please, opt using `/moveall` instead.*", 15000);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package bot.commands;
 
-import bot.util.Tools;
+import bot.util.Bot;
 import bot.util.Channels;
 import bot.util.Messages;
 import bot.util.SlashExecutor;
@@ -40,7 +40,7 @@ public class ColorRoleSchedule implements SlashExecutor {
         // Guild related
         guild.addRoleToMember(target, color).queue();
         event.reply("// ---------- > INSERT A MESSAGE HERE <---------- //").setEphemeral(false).queue();
-        Tools.sendGhostMessage(guild.getTextChannelById(Channels.CHANNEL_BANK.toId()), "<@" + target.getIdLong() + "> cargo `" + color.getName() + "` foi adicioando com sucesso.", 60000);
+        Bot.sendGhostMessage(guild.getTextChannelById(Channels.CHANNEL_BANK.toId()), "<@" + target.getIdLong() + "> cargo `" + color.getName() + "` foi adicioando com sucesso.", 60000);
 
         String logMessage = logMessage("""
                 Staff: `<author-name>#<author-discriminator>` `<authorId>`

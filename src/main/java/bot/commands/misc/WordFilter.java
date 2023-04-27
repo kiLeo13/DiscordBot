@@ -25,7 +25,7 @@ public class WordFilter extends ListenerAdapter {
         StringBuilder builder = new StringBuilder();
         Member member = message.getMember();
         Guild guild = message.getGuild();
-        Role role = guild.getRoleById(StaffRoles.ROLE_STAFF_OFICINA.toId());
+        Role role = guild.getRoleById(StaffRoles.ROLE_STAFF_OFICINA.id());
 
         if (member == null) return;
 

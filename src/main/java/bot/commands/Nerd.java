@@ -1,6 +1,6 @@
 package bot.commands;
 
-import bot.util.Tools;
+import bot.util.Bot;
 
 import java.io.InputStream;
 import bot.util.CommandExecutor;
@@ -26,7 +26,7 @@ public class Nerd implements CommandExecutor {
         MessageChannelUnion channel = message.getChannel();
         String[] args = content.split(" ");
         MessageCreateBuilder send = new MessageCreateBuilder();
-        Member target = args.length >= 2 ? Tools.findMember(guild, args[1]) : member;
+        Member target = args.length >= 2 ? Bot.findMember(guild, args[1]) : member;
 
         if (salada == null || alfea == null) {
             System.out.println("Could not find role 'salada' or 'alfea'. Ignoring `nerd` command...");
@@ -35,7 +35,7 @@ public class Nerd implements CommandExecutor {
 
         if (member == null || !(member.getRoles().contains(salada) && member.getRoles().contains(alfea))) return;
 
-        InputStream stream = Tools.requestFile("https://raw.githubusercontent.com/kiLeo13/DiscordBot/main/content/images/nerd.png");
+        InputStream stream = Bot.requestFile("https://raw.githubusercontent.com/kiLeo13/DiscordBot/main/content/images/nerd.png");
 
         if (target == null)
             send.setContent("<@" + member.getIdLong() + ">");
@@ -43,7 +43,7 @@ public class Nerd implements CommandExecutor {
             send.setContent("<@" + target.getIdLong() + ">");
 
         if (stream == null) {
-            Tools.sendGhostMessage(channel, "Não foi possível executar o comando.", 10000);
+            Bot.sendGhostMessage(channel, "Não foi possível executar o comando.", 10000);
             message.delete().queue();
             return;
         }

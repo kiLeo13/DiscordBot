@@ -20,13 +20,13 @@ public class Userinfo implements CommandExecutor, SlashExecutor {
         Guild guild = message.getGuild();
         String content = message.getContentRaw();
         String[] args = content.split(" ");
-        Member target = args.length < 2 ? member : Tools.findMember(guild, args[1]);
+        Member target = args.length < 2 ? member : Bot.findMember(guild, args[1]);
         MessageCreateBuilder send = new MessageCreateBuilder();
 
         if (member == null) return;
 
         if (target == null) {
-            Tools.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
+            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
             message.delete().queue();
             return;
         }

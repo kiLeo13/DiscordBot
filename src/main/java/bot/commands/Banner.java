@@ -1,6 +1,6 @@
 package bot.commands;
 
-import bot.util.Tools;
+import bot.util.Bot;
 import bot.util.CommandExecutor;
 import bot.util.Messages;
 import bot.util.SlashExecutor;
@@ -25,10 +25,10 @@ public class Banner implements CommandExecutor, SlashExecutor {
 
         if (member == null || !member.hasPermission(Permission.MANAGE_SERVER)) return;
 
-        User target = args.length < 2 ? member.getUser() : Tools.findUser(args[1]);
+        User target = args.length < 2 ? member.getUser() : Bot.findUser(args[1]);
 
         if (target == null) {
-            Tools.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
+            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
             message.delete().queue();
             return;
         }
@@ -36,7 +36,7 @@ public class Banner implements CommandExecutor, SlashExecutor {
         String banner  = target.retrieveProfile().complete().getBannerUrl();
 
         if (banner == null) {
-            Tools.sendGhostMessage(channel, "O usuário não possui um banner ou nenhum foi encontrado.", 10000);
+            Bot.sendGhostMessage(channel, "O usuário não possui um banner ou nenhum foi encontrado.", 10000);
             message.delete().queue();
             return;
         }

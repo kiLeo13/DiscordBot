@@ -1,7 +1,7 @@
 package bot.commands;
 
 import bot.Main;
-import bot.util.Tools;
+import bot.util.Bot;
 import bot.util.SlashExecutor;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -17,7 +17,7 @@ public class Shutdown implements SlashExecutor {
         User user = event.getUser();
         event.reply("*Attempting to shut system down in 5 seconds...*").setEphemeral(true).queue();
 
-        Tools.setTimeout(() -> {
+        Bot.setTimeout(() -> {
             api.getPresence().setPresence(OnlineStatus.OFFLINE, false);
             api.shutdownNow();
             System.out.printf("""

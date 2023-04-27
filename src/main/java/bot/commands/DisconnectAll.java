@@ -62,7 +62,7 @@ public class DisconnectAll implements SlashExecutor {
         List<Member> ignored = new ArrayList<>();
 
         for (StaffRoles f : filter) {
-            Role role = guild.getRoleById(f.toId());
+            Role role = guild.getRoleById(f.id());
 
             if (role == null) throw new RoleNotFoundException(f.name() + " cannot be null");
             roles.add(role);

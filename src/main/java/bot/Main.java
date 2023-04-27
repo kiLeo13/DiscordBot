@@ -4,7 +4,8 @@ import bot.commands.Shutdown;
 import bot.commands.*;
 import bot.commands.misc.PayServer;
 import bot.commands.misc.WordFilter;
-import bot.commands.register.Buttons;
+import bot.commands.valorant.Characters;
+import bot.commands.valorant.Profiles;
 import bot.data.BotConfig;
 import bot.events.BlockLorittaExploit;
 import bot.events.CommandHandler;
@@ -79,7 +80,6 @@ public final class Main {
         api.addEventListener(new MessageReceivedGeneral());
         api.addEventListener(SlashHandler.getInstance());
         api.addEventListener(new BlockLorittaExploit());
-        api.addEventListener(new Buttons());
 
         api.addEventListener(new WordFilter());
     }
@@ -90,7 +90,6 @@ public final class Main {
         commands.addCommand("<prefix>bigo", new BigoAnnouncement());
         commands.addCommand("<prefix>ping", new Ping());
         commands.addCommand("<prefix>puta", new Puta());
-        commands.addCommand(new Disconnect(), "<prefix>dd", "<prefix>disconnect");
         commands.addCommand("<prefix>nerd", new Nerd());
         commands.addCommand("<prefix>among", new RoleAmongUs());
         commands.addCommand("<prefix>say", new Say());
@@ -104,6 +103,11 @@ public final class Main {
         commands.addCommand("<prefix>serverinfo", new ServerInfo());
         commands.addCommand("<prefix>linff", new Linff());
         commands.addCommand("<prefix>ip", new IPLookup());
+
+        commands.addCommand(new Characters(), "<prefix>valorant-agent", "<prefix>v-agent");
+        commands.addCommand(new Profiles(), "<prefix>valorant-player", "<prefix>v-player");
+
+        commands.addCommand(new Disconnect(), "<prefix>dd", "<prefix>disconnect");
 
         commands.addCommand("<register>roles", new RegistrationRoles());
         commands.addCommand("<register>take", new RegistrationTake());

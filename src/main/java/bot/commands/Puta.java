@@ -2,7 +2,7 @@ package bot.commands;
 
 import bot.data.BotFiles;
 import bot.util.Channels;
-import bot.util.Tools;
+import bot.util.Bot;
 import bot.util.CommandExecutor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -15,7 +15,7 @@ import java.awt.*;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import static bot.util.Tools.*;
+import static bot.util.Bot.*;
 
 public class Puta implements CommandExecutor {
 
@@ -31,7 +31,7 @@ public class Puta implements CommandExecutor {
 
             int random = (int) (Math.random() * blocked.size());
 
-            Tools.sendGhostMessage(message.getChannel(),
+            Bot.sendGhostMessage(message.getChannel(),
                     "<@" + message.getAuthor().getIdLong() + "> " + blocked.get(random),
                     10000);
 

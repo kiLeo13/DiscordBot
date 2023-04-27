@@ -65,24 +65,24 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         try { areRolesSetupProperly(guild); }
         catch (IllegalArgumentException | HierarchyException e) {
-            Tools.sendGhostMessage(channel, e.getMessage(), 10000);
+            Bot.sendGhostMessage(channel, e.getMessage(), 10000);
             message.delete().queue();
             return;
         }
 
         if (!isInputValid(message)) {
-            Tools.sendGhostMessage(channel, "O padrão de registro usado `" + content + "` não é válido.", 5000);
+            Bot.sendGhostMessage(channel, "O padrão de registro usado `" + content + "` não é válido.", 5000);
             message.delete().queue();
             return;
         }
 
         if (rolesExist) {
-            if (isInputExact(message)) performExact(message);
+            if (isExact(message)) performExact(message);
             else performDynamic(message);
             return;
         }
 
-        Tools.sendGhostMessage(channel, Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.message(), 5000);
+        Bot.sendGhostMessage(channel, Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.message(), 5000);
         message.delete().queue();
     }
 
@@ -147,11 +147,11 @@ public class Registration implements CommandExecutor, SlashExecutor {
         List<Role> toGiveRoles = new ArrayList<>();
         List<Role> toTakeRoles = new ArrayList<>(2);
 
-        Member target = Tools.findMember(guild, args[1]);
+        Member target = Bot.findMember(guild, args[1]);
 
         // If target member was not found
         if (target == null) {
-            Tools.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
+            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
             message.delete().queue();
             return;
         }
@@ -164,14 +164,14 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // Why would someone register themselves?
         if (target.getIdLong() == author.getIdLong()) {
-            Tools.sendGhostMessage(channel, "Você não pode registrar você mesmo.", 5000);
+            Bot.sendGhostMessage(channel, "Você não pode registrar você mesmo.", 5000);
             message.delete().queue();
             return;
         }
 
         // Why would someone register someone that is already registered?
         if (target.getRoles().contains(registered)) {
-            Tools.sendGhostMessage(channel, "O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.", 5000);
+            Bot.sendGhostMessage(channel, "O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.", 5000);
             message.delete().queue();
             return;
         }
@@ -214,9 +214,9 @@ public class Registration implements CommandExecutor, SlashExecutor {
         // Give and take the provided roles
         guild.modifyMemberRoles(target, toGiveRoles, toTakeRoles).queue();
 
-        logRegister(target, toGiveRoles, toTakeRoles, author);
+        log(target, toGiveRoles, toTakeRoles, author);
 
-        Tools.sendGhostMessage(channel,
+        Bot.sendGhostMessage(channel,
                 "<@" + author.getId() + "> você registrou com sucesso <@" + target.getIdLong() + ">.",
                 10000);
 
@@ -236,11 +236,11 @@ public class Registration implements CommandExecutor, SlashExecutor {
         List<Role> toGiveRoles = new ArrayList<>();
         List<Role> toTakeRoles = new ArrayList<>(2);
 
-        Member target = Tools.findMember(guild, args[1]);
+        Member target = Bot.findMember(guild, args[1]);
 
         // If target member was not found
         if (target == null) {
-            Tools.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
+            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
             message.delete().queue();
             return;
         }
@@ -253,14 +253,14 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // Why would someone register themselves?
         if (target.getIdLong() == author.getIdLong()) {
-            Tools.sendGhostMessage(channel, "<@" + author.getIdLong() + "> Você não pode registrar você mesmo.", 5000);
+            Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> Você não pode registrar você mesmo.", 5000);
             message.delete().queue();
             return;
         }
 
         // Why would someone register someone that is already registered?
         if (target.getRoles().contains(registered)) {
-            Tools.sendGhostMessage(channel, "<@" + author.getIdLong() + "> O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.", 5000);
+            Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.", 5000);
             message.delete().queue();
             return;
         }
@@ -272,7 +272,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // What? Are you -2 years old?
         if (ageInput < 0) {
-            Tools.sendGhostMessage(channel, "<@" + author.getIdLong() + "> você não pode inserir uma idade negativa.", 5000);
+            Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> você não pode inserir uma idade negativa.", 5000);
             message.delete().queue();
             return;
         }
@@ -305,9 +305,9 @@ public class Registration implements CommandExecutor, SlashExecutor {
         // Give and take the provided roles
         guild.modifyMemberRoles(target, toGiveRoles, toTakeRoles).queue();
 
-        logRegister(target, toGiveRoles, toTakeRoles, author);
+        log(target, toGiveRoles, toTakeRoles, author);
 
-        Tools.sendGhostMessage(channel,
+        Bot.sendGhostMessage(channel,
                 "<@" + author.getId() + "> você registrou com sucesso <@" + target.getIdLong() + ">.",
                 10000);
 
@@ -376,7 +376,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
             case "pc" -> toGiveRoles.add(pc);
         }
 
-        // Adding roles to be takien
+        // Adding roles to be taken
         if (target.getRoles().contains(notRegistered)) toTakeRoles.add(notRegistered);
         if (target.getRoles().contains(verified)) toTakeRoles.add(verified);
 
@@ -385,13 +385,13 @@ public class Registration implements CommandExecutor, SlashExecutor {
         // Give and take the provided roles
         guild.modifyMemberRoles(target, toGiveRoles, toTakeRoles).queue();
 
-        logRegister(target, toGiveRoles, toTakeRoles, author);
+        log(target, toGiveRoles, toTakeRoles, author);
 
         event.reply("Você registrou com sucesso <@" + target.getIdLong() + ">.").setEphemeral(true).queue();
         deleteLastMessageByUser(target, event.getChannel());
     }
 
-    private boolean isInputExact(Message message) {
+    private boolean isExact(Message message) {
         String content = message.getContentRaw();
         String[] args = content.split(" ");
         String ageInput = args[0].substring(3, args[0].length()-1);
@@ -461,7 +461,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         }
     }
 
-    private void logRegister(Member target, List<Role> givenRoles, List<Role> removedRoles, User author) {
+    private void log(Member target, List<Role> givenRoles, List<Role> removedRoles, User author) {
         EmbedBuilder builder = new EmbedBuilder();
         String targetName = target.getUser().getName();
         String targetDiscriminator = target.getUser().getDiscriminator();
@@ -482,7 +482,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         if (channel != null) channel.sendMessageEmbeds(builder.build()).queue();
         else System.out.println("Não foi possível salvar o registro pois nenhum chat foi encontrado.");
 
-        System.out.printf("\n%s#%s registrou o membro %s#%s\n", author.getName(), author.getDiscriminator(), targetName, targetDiscriminator);
+        Bot.log("\n%s#%s registrou o membro %s#%s\n", author.getName(), author.getDiscriminator(), targetName, targetDiscriminator);
     }
 
     private String formattedRolesToEmbed(List<Role> roles) {

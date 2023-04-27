@@ -29,7 +29,7 @@ public class RoleAmongUs implements CommandExecutor {
         if (Channels.STAFF_AJUDANTES_CHANNEL.toId() != channel.getIdLong()) return;
 
         if (roleAmongUs == null) {
-            Tools.sendGhostMessage(channel,
+            Bot.sendGhostMessage(channel,
                     Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.message(),
                     10000);
             message.delete().queue();
@@ -37,7 +37,7 @@ public class RoleAmongUs implements CommandExecutor {
         }
 
         if (args.length < 2) {
-            Tools.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 5000);
+            Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 5000);
             message.delete().queue();
             return;
         }
@@ -45,7 +45,7 @@ public class RoleAmongUs implements CommandExecutor {
         try {
             target = guild.retrieveMemberById(args[1].replaceAll("[^0-9]+", "")).complete();
         } catch (ErrorResponseException e) {
-            Tools.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
+            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
             message.delete().queue();
             return;
         }
@@ -66,8 +66,8 @@ public class RoleAmongUs implements CommandExecutor {
         Guild guild = member.getGuild();
         AtomicBoolean returned = new AtomicBoolean(false);
 
-        for (int i = 0; i < StaffRoles.GENERAL_AJUDANTES.toIds().size()-2; i++)
-            possibleRoles.add(guild.getRoleById(StaffRoles.GENERAL_AJUDANTES.toIds().get(i)));
+        for (int i = 0; i < StaffRoles.GENERAL_AJUDANTES.ids().size()-2; i++)
+            possibleRoles.add(guild.getRoleById(StaffRoles.GENERAL_AJUDANTES.ids().get(i)));
 
         possibleRoles.forEach(r -> {
             if (member.getRoles().contains(r))

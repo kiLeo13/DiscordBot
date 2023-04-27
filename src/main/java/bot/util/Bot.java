@@ -10,23 +10,22 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
-import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import java.awt.Color;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-public class Tools {
+public class Bot {
     private static final Timer timer = new Timer(false);
-
-    private Tools() {}
+    private Bot() {}
 
     /**
      * 
@@ -194,5 +193,48 @@ public class Tools {
         } catch (IOException e) {
             return null;
         }
+    }
+
+    public static void log(String str) {
+        LocalDateTime now = LocalDateTime.now();
+
+        String hour = now.getHour() < 10 ? "0" + now.getHour() : String.valueOf(now.getHour());
+        String minute = now.getMinute() < 10 ? "0" + now.getMinute() : String.valueOf(now.getMinute());
+        String second = now.getSecond() < 10 ? "0" + now.getSecond() : String.valueOf(now.getSecond());
+
+        System.out.printf("[%s:%s:%s]: %s\n", hour, minute, second, str);
+    }
+
+    public static void log(String str, Object... objects) {
+        LocalDateTime now = LocalDateTime.now();
+
+        String hour = now.getHour() < 10 ? "0" + now.getHour() : String.valueOf(now.getHour());
+        String minute = now.getMinute() < 10 ? "0" + now.getMinute() : String.valueOf(now.getMinute());
+        String second = now.getSecond() < 10 ? "0" + now.getSecond() : String.valueOf(now.getSecond());
+        
+        System.out.printf("[%s:%s:%s]: " + str + "\n", hour, minute, second, objects);
+    }
+
+    public static Color hexToRgb(String hex) {
+        try {
+            int r = Integer.parseInt(hex.substring(0, 2), 16);
+            int g = Integer.parseInt(hex.substring(2, 4), 16);
+            int b = Integer.parseInt(hex.substring(4, 6), 16);
+            int a = Integer.parseInt(hex.substring(6, 8), 16);
+
+            return new Color(r, g, b, a);
+        } catch (NumberFormatException ignore) {}
+
+        return null;
+    }
+
+    public static String reverse(String str) {
+        StringBuilder builder = new StringBuilder();
+        int begin = str.length() - 1;
+
+        for (int i = begin; i >= 0; i--)
+            builder.append(str.charAt(i));
+
+        return builder.toString();
     }
 }

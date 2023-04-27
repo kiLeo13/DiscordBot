@@ -2,7 +2,7 @@ package bot.commands;
 
 import bot.data.BotConfig;
 import bot.events.CommandHandler;
-import bot.util.Tools;
+import bot.util.Bot;
 import bot.util.CommandExecutor;
 import bot.util.RegistrationRoles;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -27,6 +27,8 @@ public class Help implements CommandExecutor {
         Guild guild = message.getGuild();
         Role required = guild.getRoleById(RegistrationRoles.ROLE_REQUIRED.id());
 
+        if (guild.getIdLong() != 1) return;
+
         if (args.length < 2) {
             channel.sendMessageEmbeds(defaultHelp()).queue();
             message.delete().queue();
@@ -47,7 +49,7 @@ public class Help implements CommandExecutor {
             MessageEmbed embed = getHelp(message);
 
             if (embed == null) {
-                Tools.sendGhostMessage(channel, "Nenhuma ajuda encontrada para `" + args[1] + "`. Tente inserir o prefixo do bot caso não tenha.", 10000);
+                Bot.sendGhostMessage(channel, "Nenhuma ajuda encontrada para `" + args[1] + "`. Tente inserir o prefixo do bot caso não tenha.", 10000);
                 message.delete().queue();
             } else {
                 send.addEmbeds(embed);
@@ -61,24 +63,15 @@ public class Help implements CommandExecutor {
 
     private MessageEmbed defaultHelp() {
         EmbedBuilder builder = new EmbedBuilder();
+        String commands = "";
 
         builder
                 .setColor(Color.CYAN)
                 .setTitle("❓ Help Assistance")
-                .addField("📝 Comandos", commandList(), true)
+                .addField("📝 Comandos", commands, true)
                 .addField("", "", true);
 
         return builder.build();
-    }
-
-    private String commandList() {
-        HashMap<String, CommandExecutor> commands = CommandHandler.getCommands();
-        StringBuilder builder = new StringBuilder();
-
-        for (String s : commands.keySet())
-            builder.append(String.format("`%s`\n", s));
-
-        return builder.toString().stripTrailing();
     }
 
     private MessageEmbed getHelp(Message message) {

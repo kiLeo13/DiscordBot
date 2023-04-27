@@ -1,6 +1,6 @@
 package bot.events.handlers;
 
-import bot.util.Tools;
+import bot.util.Bot;
 import bot.util.Channels;
 import bot.util.RegistrationRoles;
 import net.dv8tion.jda.api.Permission;
@@ -38,7 +38,7 @@ public class AgeFilter {
 
                 // Are you really 30 years old OR EVEN -1 YEAR OLD? :oooo
                 if (number > 30 || number < 0) {
-                    Tools.delete(message);
+                    Bot.delete(message);
                     return;
                 }
 
@@ -47,6 +47,6 @@ public class AgeFilter {
         }
 
         // Hmmm you're one of those people who never age, right?
-        if (!hasNumber) Tools.delete(message);
+        if (!hasNumber) Bot.delete(message);
     }
 }
