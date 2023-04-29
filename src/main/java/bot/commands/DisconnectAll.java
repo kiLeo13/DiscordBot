@@ -17,7 +17,7 @@ public class DisconnectAll implements SlashExecutor {
     private Guild guild;
 
     @Override
-    public void runSlash(SlashCommandInteractionEvent event) {
+    public void process(SlashCommandInteractionEvent event) {
 
         VoiceChannel voiceChannel = event.getOption("channel").getAsChannel().asVoiceChannel();
         String filter = event.getOption("filter") == null ? "none" : event.getOption("filter").getAsString();

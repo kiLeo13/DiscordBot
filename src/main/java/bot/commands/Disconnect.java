@@ -17,7 +17,7 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
         Member member = message.getMember();
         Guild guild = message.getGuild();
 
-        if (!Channels.COMMAND_DISCONNECT_SELF_CHANNELS.toIds().contains(channel.getIdLong())) return;
+        if (!Channels.COMMAND_DISCONNECT_SELF_CHANNELS.ids().contains(channel.getIdLong())) return;
         if (member == null) return;
 
         GuildVoiceState voiceState = member.getVoiceState();
@@ -35,9 +35,9 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
     }
 
     @Override
-    public void runSlash(SlashCommandInteractionEvent event) {
+    public void process(SlashCommandInteractionEvent event) {
 
-        List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_SELF_CHANNELS.toIds();
+        List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_SELF_CHANNELS.ids();
         if (!allowedDisconnectChannels.contains(event.getChannel().getIdLong())) return;
 
         Guild guild = event.getGuild();

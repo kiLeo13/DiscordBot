@@ -1,4 +1,4 @@
-package bot.commands.misc;
+package bot.events;
 
 import bot.util.StaffRoles;
 import net.dv8tion.jda.api.entities.Guild;
@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,7 +15,7 @@ import java.util.regex.Pattern;
 public class WordFilter extends ListenerAdapter {
 
     @SubscribeEvent
-    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+    public void onMessageReceived(MessageReceivedEvent event) {
 
         Message message = event.getMessage();
         String input = message.getContentRaw();

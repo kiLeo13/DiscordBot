@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 public class Shutdown implements SlashExecutor {
 
     @Override
-    public void runSlash(SlashCommandInteractionEvent event) {
+    public void process(SlashCommandInteractionEvent event) {
 
         JDA api = Main.getApi();
         User user = event.getUser();

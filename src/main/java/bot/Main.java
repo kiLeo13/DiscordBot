@@ -3,15 +3,11 @@ package bot;
 import bot.commands.Shutdown;
 import bot.commands.*;
 import bot.commands.misc.PayServer;
-import bot.commands.misc.WordFilter;
 import bot.commands.valorant.Characters;
 import bot.commands.valorant.Profiles;
 import bot.data.BotConfig;
-import bot.events.BlockLorittaExploit;
-import bot.events.CommandHandler;
-import bot.events.MessageReceivedGeneral;
-import bot.events.SlashHandler;
-import bot.util.ElementRoles;
+import bot.data.BotFiles;
+import bot.events.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -31,15 +27,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static bot.data.BotFiles.createYamlFiles;
-
 public final class Main {
     private static JDA api;
     private static long init;
 
     public static void main(String[] args) {
         try {
-            createYamlFiles();
+            BotFiles.createYamlFiles();
         } catch (IOException e) {
             System.out.println("Could not load YAML files.");
         }
@@ -76,11 +70,11 @@ public final class Main {
     }
 
     private static void registerEvents(JDA api) {
-        api.addEventListener(CommandHandler.getInstance());
-        api.addEventListener(new MessageReceivedGeneral());
-        api.addEventListener(SlashHandler.getInstance());
+        api.addEventListener(new AgeFilter());
         api.addEventListener(new BlockLorittaExploit());
-
+        api.addEventListener(CommandHandler.getInstance());
+        api.addEventListener(new FormattedBlocker());
+        api.addEventListener(SlashHandler.getInstance());
         api.addEventListener(new WordFilter());
     }
 
@@ -103,6 +97,7 @@ public final class Main {
         commands.addCommand("<prefix>serverinfo", new ServerInfo());
         commands.addCommand("<prefix>linff", new Linff());
         commands.addCommand("<prefix>ip", new IPLookup());
+        commands.addCommand("<prefix>format", new Format());
 
         commands.addCommand(new Characters(), "<prefix>valorant-agent", "<prefix>v-agent");
         commands.addCommand(new Profiles(), "<prefix>valorant-player", "<prefix>v-player");
@@ -171,11 +166,11 @@ public final class Main {
         /* []====================[] Color Role []====================[] */
         OptionData optionColorTarget = new OptionData(OptionType.USER, "member", "Qual membro deve receber o cargo de cor informado.", true);
         OptionData optionColorRole = new OptionData(OptionType.STRING, "color", "Qual o cargo de cor a ser dado ao membro infromado.", true)
-                .addChoice("Fire Element \uD83D\uDD25", ElementRoles.FIRE_ELEMENT.toStringId())
-                .addChoice("Earth Element \uD83C\uDF3F", ElementRoles.EARTH_ELEMENT.toStringId())
-                .addChoice("Water Element \uD83D\uDCA7", ElementRoles.WATER_ELEMENT.toStringId())
-                .addChoice("Light Element \uD83C\uDF1F", ElementRoles.LIGHT_ELEMENT.toStringId())
-                .addChoice("Air Element \uD83D\uDCA8", ElementRoles.AIR_ELEMENT.toStringId());
+                .addChoice("Fire Element \uD83D\uDD25", "946061433060347915")
+                .addChoice("Earth Element \uD83C\uDF3F", "946061781284032612")
+                .addChoice("Water Element \uD83D\uDCA7", "946062089011752960")
+                .addChoice("Light Element \uD83C\uDF1F", "946063870903074816")
+                .addChoice("Air Element \uD83D\uDCA8", "946064125916753960");
 
         commands.add(Commands.slash("color", "Dá o cargo de cor para o membro informado.")
                 .addOptions(optionColorTarget, optionColorRole)
@@ -218,7 +213,7 @@ public final class Main {
         slash.addListenerCommand("disconnectall", new DisconnectAll());
         slash.addListenerCommand("register", Registration.getInstance());
         slash.addListenerCommand("moveall", new VoiceMoveAll());
-        slash.addListenerCommand("color", new ColorRoleSchedule());
+        slash.addListenerCommand("color", new ColorRole());
         slash.addListenerCommand("shutdown", new Shutdown());
         slash.addListenerCommand("avatar", new Avatar());
         slash.addListenerCommand("banner", new Banner());
@@ -233,5 +228,8 @@ public final class Main {
         // Pay Server
         PayServer server = new PayServer(api);
         server.start();
+
+        // Color Role runnable
+        ColorRole.startCounter();
     }
 }

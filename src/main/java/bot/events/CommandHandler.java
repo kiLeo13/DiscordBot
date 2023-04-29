@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
@@ -23,7 +22,7 @@ public class CommandHandler extends ListenerAdapter {
     }
 
     @SubscribeEvent
-    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+    public void onMessageReceived(MessageReceivedEvent event) {
 
         if (event.getGuild().getIdLong() == 11111L) return;
         if (event.getAuthor().isBot()) return;

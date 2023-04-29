@@ -25,7 +25,7 @@ public class RegistrationTake implements CommandExecutor {
         MessageChannelUnion channel = message.getChannel();
         Member target;
 
-        if (channel.getIdLong() == Channels.REGISTER_CHANNEL.toId()) return;
+        if (channel.getIdLong() == Channels.REGISTER_CHANNEL.id()) return;
         if (member == null || !member.hasPermission(Permission.MANAGE_ROLES)) return;
 
         try {
@@ -61,7 +61,7 @@ public class RegistrationTake implements CommandExecutor {
         String targetDiscriminator = target.getUser().getDiscriminator();
         String staffName = registerMaker.getUser().getName();
         String staffDiscriminator = registerMaker.getUser().getDiscriminator();
-        TextChannel channel = target.getGuild().getTextChannelById(Channels.REGISTER_LOG_CHANNEL.toId());
+        TextChannel channel = target.getGuild().getTextChannelById(Channels.REGISTER_LOG_CHANNEL.id());
 
         builder
                 .setColor(Color.RED)

@@ -100,7 +100,7 @@ public class Bot {
                         .ignore(ErrorResponse.UNKNOWN_MESSAGE));
     }
 
-    public static TimerTask setTimeout(Runnable runnable, long delay) {
+    public static void setTimeout(Runnable runnable, long delay) {
         TimerTask task = new TimerTask() {
 
             @Override
@@ -110,6 +110,18 @@ public class Bot {
         };
 
         timer.schedule(task, delay);
+    }
+
+    public static TimerTask setInterval(Runnable runnable, long delay) {
+        TimerTask task = new TimerTask() {
+            
+            @Override
+            public void run() {
+                runnable.run();
+            }
+        };
+
+        timer.scheduleAtFixedRate(task, 0, delay);
         return task;
     }
 
@@ -203,16 +215,6 @@ public class Bot {
         String second = now.getSecond() < 10 ? "0" + now.getSecond() : String.valueOf(now.getSecond());
 
         System.out.printf("[%s:%s:%s]: %s\n", hour, minute, second, str);
-    }
-
-    public static void log(String str, Object... objects) {
-        LocalDateTime now = LocalDateTime.now();
-
-        String hour = now.getHour() < 10 ? "0" + now.getHour() : String.valueOf(now.getHour());
-        String minute = now.getMinute() < 10 ? "0" + now.getMinute() : String.valueOf(now.getMinute());
-        String second = now.getSecond() < 10 ? "0" + now.getSecond() : String.valueOf(now.getSecond());
-        
-        System.out.printf("[%s:%s:%s]: " + str + "\n", hour, minute, second, objects);
     }
 
     public static Color hexToRgb(String hex) {

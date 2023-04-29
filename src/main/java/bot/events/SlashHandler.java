@@ -34,7 +34,7 @@ public class SlashHandler extends ListenerAdapter {
         SlashExecutor command = commands.get(cmd);
         if (command == null) return;
 
-        command.runSlash(event);
+        command.process(event);
     }
 
     public void addListenerCommand(String name, SlashExecutor command) {

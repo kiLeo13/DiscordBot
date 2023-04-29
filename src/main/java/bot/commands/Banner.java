@@ -48,7 +48,7 @@ public class Banner implements CommandExecutor, SlashExecutor {
     }
 
     @Override
-    public void runSlash(SlashCommandInteractionEvent event) {
+    public void process(SlashCommandInteractionEvent event) {
         // If none is provided, so the target is who ran the command
         User target = event.getOption("user") == null ? event.getUser() : event.getOption("user").getAsUser();
         Member member = event.getMember();

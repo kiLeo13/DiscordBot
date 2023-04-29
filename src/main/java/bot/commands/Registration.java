@@ -59,7 +59,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         if (author.isBot() || member == null) return;
 
         // Is the channel correct?
-        if (channel.getIdLong() != Channels.REGISTER_CHANNEL.toId()) return;
+        if (channel.getIdLong() != Channels.REGISTER_CHANNEL.id()) return;
 
         if (!member.getRoles().contains(requiredRole) && !member.hasPermission(Permission.MANAGE_ROLES)) return;
 
@@ -316,7 +316,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
     // This is the slash command version
     @Override
-    public void runSlash(SlashCommandInteractionEvent event) {
+    public void process(SlashCommandInteractionEvent event) {
         // We can ignore all the warnings since these options are set as required
         User author = event.getUser();
         String genderInput = event.getOption("gender").getAsString();
@@ -468,7 +468,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         String staffName = author.getName();
         String staffDiscriminator = author.getDiscriminator();
         Guild guild = target.getGuild();
-        TextChannel channel = target.getGuild().getTextChannelById(Channels.REGISTER_LOG_CHANNEL.toId());
+        TextChannel channel = target.getGuild().getTextChannelById(Channels.REGISTER_LOG_CHANNEL.id());
 
         builder
                 .setColor(Color.GREEN)
@@ -482,7 +482,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         if (channel != null) channel.sendMessageEmbeds(builder.build()).queue();
         else System.out.println("Não foi possível salvar o registro pois nenhum chat foi encontrado.");
 
-        Bot.log("\n%s#%s registrou o membro %s#%s\n", author.getName(), author.getDiscriminator(), targetName, targetDiscriminator);
+        Bot.log(String.format("%s#%s registrou o membro %s#%s\n", author.getName(), author.getDiscriminator(), targetName, targetDiscriminator));
     }
 
     private String formattedRolesToEmbed(List<Role> roles) {

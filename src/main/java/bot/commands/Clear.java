@@ -18,6 +18,7 @@ public class Clear implements CommandExecutor {
         MessageChannelUnion channel = message.getChannel();
         Member member = message.getMember();
         String[] args = message.getContentRaw().split(" ");
+
         byte amount;
 
         if (member == null || !member.hasPermission(Permission.MESSAGE_MANAGE)) return;

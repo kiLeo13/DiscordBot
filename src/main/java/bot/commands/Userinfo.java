@@ -39,7 +39,7 @@ public class Userinfo implements CommandExecutor, SlashExecutor {
     }
 
     @Override
-    public void runSlash(SlashCommandInteractionEvent event) {
+    public void process(SlashCommandInteractionEvent event) {
 
     }
 

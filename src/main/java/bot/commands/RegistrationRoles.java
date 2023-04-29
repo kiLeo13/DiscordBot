@@ -24,7 +24,7 @@ public class RegistrationRoles implements CommandExecutor {
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
 
-        if (channel.getIdLong() == Channels.REGISTER_CHANNEL.toId()) return;
+        if (channel.getIdLong() == Channels.REGISTER_CHANNEL.id()) return;
 
         if (author.isBot()) return;
         if (member == null || !member.hasPermission(Permission.ADMINISTRATOR)) return;

@@ -26,7 +26,7 @@ public class VoiceMoveAll implements CommandExecutor, SlashExecutor {
     }
 
     @Override
-    public void runSlash(SlashCommandInteractionEvent event) {
+    public void process(SlashCommandInteractionEvent event) {
         VoiceChannel initChannel = event.getOption("init-channel").getAsChannel().asVoiceChannel();
         VoiceChannel finalChannel = event.getOption("final-channel").getAsChannel().asVoiceChannel();
         boolean override = event.getOption("should-ignore") != null && event.getOption("should-ignore").getAsBoolean();

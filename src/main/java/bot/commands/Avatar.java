@@ -62,7 +62,7 @@ public class Avatar implements CommandExecutor, SlashExecutor {
     }
 
     @Override
-    public void runSlash(SlashCommandInteractionEvent event) {
+    public void process(SlashCommandInteractionEvent event) {
         boolean isFromGuild;
         User target;
         Guild guild = event.getGuild();

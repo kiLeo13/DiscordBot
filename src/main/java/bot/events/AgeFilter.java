@@ -1,4 +1,4 @@
-package bot.events.handlers;
+package bot.events;
 
 import bot.util.Bot;
 import bot.util.Channels;
@@ -9,16 +9,20 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.hooks.SubscribeEvent;
 
 import java.util.List;
 
-public class AgeFilter {
-    private AgeFilter() {}
+public class AgeFilter extends ListenerAdapter {
 
-    public static void perform(Message message) {
+    @SubscribeEvent
+    public void onMessageReceived(MessageReceivedEvent event) {
+        
+        List<Long> filterChannels = Channels.REGISTER_AGE_FILTER_CHANNELS.ids();
 
-        List<Long> filterChannels = Channels.REGISTER_AGE_FILTER_CHANNELS.toIds();
-
+        Message message = event.getMessage();
         Member member = message.getMember();
         String[] args = message.getContentRaw().replaceAll("[^0-9 ]+", "").split(" ");
         MessageChannelUnion channel = message.getChannel();

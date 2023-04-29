@@ -39,7 +39,7 @@ public class Puta implements CommandExecutor {
             return;
         }
 
-        List<Long> allowedSwearingChannels = Channels.COMMAND_PUTA_CHANNELS.toIds();
+        List<Long> allowedSwearingChannels = Channels.COMMAND_PUTA_CHANNELS.ids();
 
         Member mentionedMember = null;
         String[] args = message.getContentRaw().split(" ");
