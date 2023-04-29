@@ -5,7 +5,7 @@ import bot.commands.*;
 import bot.commands.misc.PayServer;
 import bot.commands.valorant.Characters;
 import bot.commands.valorant.Profiles;
-import bot.data.BotConfig;
+import bot.data.BotData;
 import bot.data.BotFiles;
 import bot.events.*;
 import net.dv8tion.jda.api.JDA;
@@ -39,7 +39,7 @@ public final class Main {
         }
 
         try {
-            api = JDABuilder.createDefault(BotConfig.getToken(),
+            api = JDABuilder.createDefault(BotData.getToken(),
                             GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT,
                             GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MEMBERS,
                             GatewayIntent.GUILD_EMOJIS_AND_STICKERS, GatewayIntent.SCHEDULED_EVENTS,

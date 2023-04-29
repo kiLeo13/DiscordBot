@@ -1,7 +1,7 @@
 package bot.events;
 
 import bot.commands.Registration;
-import bot.data.BotConfig;
+import bot.data.BotData;
 import bot.util.CommandExecutor;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -30,7 +30,7 @@ public class CommandHandler extends ListenerAdapter {
         Message message = event.getMessage();
         String content = message.getContentRaw();
 
-        if (!content.startsWith(BotConfig.PREFIX) && !content.startsWith(BotConfig.PREFIX_REGISTER)) return;
+        if (!content.startsWith(BotData.PREFIX) && !content.startsWith(BotData.PREFIX_REGISTER)) return;
 
         // Run command
         runCommand(message);
@@ -56,8 +56,8 @@ public class CommandHandler extends ListenerAdapter {
     public void addCommand(String name, CommandExecutor command) {
         final HashMap<String, String> prefixes = new HashMap<>();
 
-        prefixes.put("<prefix>", BotConfig.PREFIX);
-        prefixes.put("<register>", BotConfig.PREFIX_REGISTER);
+        prefixes.put("<prefix>", BotData.PREFIX);
+        prefixes.put("<register>", BotData.PREFIX_REGISTER);
 
         for (String i : prefixes.keySet())
             name = name.replaceAll(i, prefixes.get(i));
@@ -73,7 +73,7 @@ public class CommandHandler extends ListenerAdapter {
 
     public void addCommand(CommandExecutor command, String... name) {
         for (String n : name) {
-            n = n.replaceAll("<prefix>", BotConfig.PREFIX);
+            n = n.replaceAll("<prefix>", BotData.PREFIX);
 
             if (n.stripTrailing().equals("")) throw new IllegalArgumentException("Command name cannot be empty");
             if (n.split(" ").length != 1) throw new IllegalArgumentException("Command name cannot contain multiple words");

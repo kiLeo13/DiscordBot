@@ -37,6 +37,3 @@ target/
 # Some util stuff, like channels & roles
 src/main/java/bot/util/Channels.java
 src/main/java/bot/util/RegistrationRoles.java
-
-# Some files include API keys
-src/main/java/bot/events/Twitter.java

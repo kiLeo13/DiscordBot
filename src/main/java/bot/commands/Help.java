@@ -1,6 +1,6 @@
 package bot.commands;
 
-import bot.data.BotConfig;
+import bot.data.BotData;
 import bot.events.CommandHandler;
 import bot.util.Bot;
 import bot.util.CommandExecutor;
@@ -80,10 +80,10 @@ public class Help implements CommandExecutor {
         String cmd;
         CommandExecutor command = null;
 
-        if (args[1].startsWith(BotConfig.PREFIX))
+        if (args[1].startsWith(BotData.PREFIX))
             cmd = args[1].substring(1);
 
-        else if (args[1].startsWith(BotConfig.PREFIX_REGISTER))
+        else if (args[1].startsWith(BotData.PREFIX_REGISTER))
             cmd = args[1].substring(2);
 
         else cmd = args[1];
@@ -91,8 +91,8 @@ public class Help implements CommandExecutor {
         for (String s : commands.keySet()) {
             String real = s;
 
-            if (s.startsWith(BotConfig.PREFIX)) s = s.substring(1);
-            if (s.startsWith(BotConfig.PREFIX_REGISTER)) s = s.substring(2);
+            if (s.startsWith(BotData.PREFIX)) s = s.substring(1);
+            if (s.startsWith(BotData.PREFIX_REGISTER)) s = s.substring(2);
 
             if (s.equalsIgnoreCase(cmd)) command = commands.get(real);
         }
