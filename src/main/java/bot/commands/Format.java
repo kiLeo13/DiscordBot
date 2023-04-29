@@ -49,9 +49,7 @@ public class Format implements CommandExecutor {
 
             case "emoji" -> channel.sendMessage(emoji(formatting.split(""))).queue();
         
-            default -> {
-
-            }
+            default -> channel.sendMessage("Não achei nenhuma formatação para `" + args[1] + "`.").queue();
         }
 
         message.delete().queue();
@@ -145,6 +143,10 @@ public class Format implements CommandExecutor {
                 if (!matcher.matches()) {
                     builder.append(s).append(" ");
                     continue;
+                }
+
+                if (builder.length() > Message.MAX_CONTENT_LENGTH) {
+                    return "O resultado final terá mais de `" + Message.MAX_CONTENT_LENGTH + "` caracteres por limitação do Discord eu não posso enviar mensagens maiores do que este valor.";
                 }
 
                 builder

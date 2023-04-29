@@ -97,8 +97,8 @@ public final class Main {
         commands.addCommand("<prefix>serverinfo", new ServerInfo());
         commands.addCommand("<prefix>linff", new Linff());
         commands.addCommand("<prefix>ip", new IPLookup());
-        commands.addCommand("<prefix>format", new Format());
 
+        commands.addCommand(new Format(), "<prefix>format", "<prefix>parse");
         commands.addCommand(new Characters(), "<prefix>valorant-agent", "<prefix>v-agent");
         commands.addCommand(new Profiles(), "<prefix>valorant-player", "<prefix>v-player");
 
