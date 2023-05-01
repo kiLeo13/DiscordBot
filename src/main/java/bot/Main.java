@@ -35,7 +35,7 @@ public final class Main {
         try {
             BotFiles.createYamlFiles();
         } catch (IOException e) {
-            System.out.println("Could not load YAML files.");
+            System.out.println("Could not load YAML files");
         }
 
         try {
@@ -88,7 +88,6 @@ public final class Main {
         commands.addCommand("<prefix>among", new RoleAmongUs());
         commands.addCommand("<prefix>say", new Say());
         commands.addCommand("<prefix>uptime", new Uptime());
-        commands.addCommand("<prefix>moveall", new VoiceMoveAll()); // @Deprecated
         commands.addCommand("<prefix>clear", new Clear());
         commands.addCommand("<prefix>userinfo", new Userinfo());
         commands.addCommand("<prefix>avatar", new Avatar());
@@ -97,6 +96,7 @@ public final class Main {
         commands.addCommand("<prefix>serverinfo", new ServerInfo());
         commands.addCommand("<prefix>linff", new Linff());
         commands.addCommand("<prefix>ip", new IPLookup());
+        commands.addCommand("<prefix>avatar-bot", new AvatarBot());
 
         commands.addCommand(new Format(), "<prefix>format", "<prefix>parse");
         commands.addCommand(new Characters(), "<prefix>valorant-agent", "<prefix>v-agent");

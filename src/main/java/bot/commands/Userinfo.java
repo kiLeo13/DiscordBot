@@ -50,7 +50,7 @@ public class Userinfo implements CommandExecutor, SlashExecutor {
         long joined = target.getTimeJoined().toEpochSecond();
         long boosterSince = target.getTimeBoosted() == null ? -1 : target.getTimeBoosted().toEpochSecond();
         List<Role> highest = target.getRoles();
-        Role salada = target.getGuild().getRoleById(Roles.ROLE_SALADA.toId());
+        Role salada = target.getGuild().getRoleById(Roles.ROLE_SALADA.id());
 
         // Embed stuff
         String title = "👥 " + target.getUser().getName() + "#" + target.getUser().getDiscriminator();
@@ -110,7 +110,7 @@ public class Userinfo implements CommandExecutor, SlashExecutor {
                 .addField("🌟 Entrou no Servidor", String.format("<t:%d>", joined), true)
                 .setFooter("Oficina Myuu", target.getGuild().getIconUrl());
 
-        if (boosterSince > 0) builder.addField("<:discordbooster:1094816233234378762> Booster Deste", String.format("<t:%d>", boosterSince), true);
+        if (boosterSince > 0) builder.addField("<:discordbooster:1094816233234378762> Booster Desde", String.format("<t:%d>", boosterSince), true);
 
         return builder.build();
     }

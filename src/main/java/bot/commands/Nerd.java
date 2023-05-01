@@ -21,8 +21,8 @@ public class Nerd implements CommandExecutor {
         Member member = message.getMember();
         String content = message.getContentRaw();
         Guild guild = message.getGuild();
-        Role salada = guild.getRoleById(Roles.ROLE_SALADA.toId());
-        Role alfea = guild.getRoleById(Roles.ROLE_ALFEA.toId());
+        Role salada = guild.getRoleById(Roles.ROLE_SALADA.id());
+        Role alfea = guild.getRoleById(Roles.ROLE_ALFEA.id());
         MessageChannelUnion channel = message.getChannel();
         String[] args = content.split(" ");
         MessageCreateBuilder send = new MessageCreateBuilder();

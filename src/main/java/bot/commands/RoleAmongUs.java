@@ -23,7 +23,7 @@ public class RoleAmongUs implements CommandExecutor {
         String[] args = content.split(" ");
         Guild guild = message.getGuild();
         Member target;
-        Role roleAmongUs = guild.getRoleById(Roles.ROLE_AMONG_US.toId());
+        Role roleAmongUs = guild.getRoleById(Roles.ROLE_AMONG_US.id());
 
         if (member == null || !isMemberAllowed(member)) return;
         if (Channels.STAFF_AJUDANTES_CHANNEL.id() != channel.getIdLong()) return;
@@ -66,8 +66,8 @@ public class RoleAmongUs implements CommandExecutor {
         Guild guild = member.getGuild();
         AtomicBoolean returned = new AtomicBoolean(false);
 
-        for (int i = 0; i < StaffRoles.GENERAL_AJUDANTES.ids().size()-2; i++)
-            possibleRoles.add(guild.getRoleById(StaffRoles.GENERAL_AJUDANTES.ids().get(i)));
+        for (int i = 0; i < Roles.GENERAL_AJUDANTES.ids().size()-2; i++)
+            possibleRoles.add(guild.getRoleById(Roles.GENERAL_AJUDANTES.ids().get(i)));
 
         possibleRoles.forEach(r -> {
             if (member.getRoles().contains(r))

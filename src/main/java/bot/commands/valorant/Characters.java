@@ -104,22 +104,17 @@ public class Characters implements CommandExecutor {
         return gson.fromJson(str, Agents.class).data;
     }
 
-    private static class Agents {
-        private List<Agent> data;
-    }
+    private record Agents(List<Agent> data) {}
 
-    private static class Agent {
-        private String displayName;
-        private String displayIcon;
-        private String description;
-        private String bustPortrait;
-        private String[] backgroundGradientColors;
-        private boolean isPlayableCharacter;
-        private List<Ability> abilities;
-    }
+    private record Agent(
+            String displayName,
+            String displayIcon,
+            String description,
+            String bustPortrait,
+            String[] backgroundGradientColors,
+            boolean isPlayableCharacter,
+            List<Ability> abilities
+    ) {}
 
-    private static class Ability {
-        private String displayName;
-        private String description;
-    }
+    private record Ability(String displayName, String description) {}
 }

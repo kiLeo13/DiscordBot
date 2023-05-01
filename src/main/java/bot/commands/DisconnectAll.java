@@ -1,8 +1,8 @@
 package bot.commands;
 
 import bot.util.Messages;
+import bot.util.Roles;
 import bot.util.SlashExecutor;
-import bot.util.StaffRoles;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -43,11 +43,11 @@ public class DisconnectAll implements SlashExecutor {
 
         try {
             switch (filter) {
-                case "staff" -> disconnect(voiceChannel, event, StaffRoles.ROLE_STAFF);
-                case "eventos" -> disconnect(voiceChannel, event, StaffRoles.ROLES_EVENTOS);
-                case "radio" -> disconnect(voiceChannel, event, StaffRoles.ROLES_RADIO);
+                case "staff" -> disconnect(voiceChannel, event, Roles.ROLE_STAFF);
+                case "eventos" -> disconnect(voiceChannel, event, Roles.ROLES_EVENTOS);
+                case "radio" -> disconnect(voiceChannel, event, Roles.ROLES_RADIO);
 
-                case "both" -> disconnect(voiceChannel, event, StaffRoles.ROLES_RADIO, StaffRoles.ROLES_EVENTOS);
+                case "both" -> disconnect(voiceChannel, event, Roles.ROLES_RADIO, Roles.ROLES_EVENTOS);
 
                 default -> event.reply("Nenhum filtro foi encontrado.").setEphemeral(true).queue();
             }
@@ -56,12 +56,12 @@ public class DisconnectAll implements SlashExecutor {
         }
     }
 
-    private void disconnect(VoiceChannel voiceChannel, SlashCommandInteractionEvent e, StaffRoles... filter) throws RoleNotFoundException {
+    private void disconnect(VoiceChannel voiceChannel, SlashCommandInteractionEvent e, Roles... filter) throws RoleNotFoundException {
         List<Role> roles = new ArrayList<>();
         List<Member> connected = voiceChannel.getMembers();
         List<Member> ignored = new ArrayList<>();
 
-        for (StaffRoles f : filter) {
+        for (Roles f : filter) {
             Role role = guild.getRoleById(f.id());
 
             if (role == null) throw new RoleNotFoundException(f.name() + " cannot be null");

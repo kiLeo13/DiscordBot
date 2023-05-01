@@ -1,28 +1,38 @@
 package bot.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public enum Roles {
     ROLE_AMONG_US(596784802150088704L),
     ROLE_SALADA(693973471989858714L),
-    ROLE_ALFEA(777327585293631499L);
+    ROLE_ALFEA(777327585293631499L),
+    
+    GENERAL_AJUDANTES(648444762852163588L, 740360642032173156L, 691167798474440775L, 592427681727905792L, 648408508219260928L),
 
-    long id;
-    List<Long> ids;
+    ROLE_STAFF(691178135596695593L),
+    ROLE_STAFF_OFICINA(691208263710015488L),
 
-    Roles(long id) {
-        this.id = id;
+    ROLES_RADIO(648408513319534632L, 640215067786346527L, 691167798981820447L, 740360647845478447L, 648444765079207944L),
+    ROLES_EVENTOS(648408514242543617L, 648408509985325082L, 691167800605016095L, 740360653075906610L, 648444769026048010L),
+
+    ROLE_AJUDANTES_VICE(740360642032173156L),
+    ROLE_AJUDANTES_CO_LIDER(648444762852163588L);
+
+    final List<Long> ids;
+
+    Roles(long... ids) {
+        List<Long> list = new ArrayList<>();
+        for (long l : ids)
+            list.add(l);
+        this.ids = list;
     }
 
-    Roles(List<Long> ids) {
-        this.ids = ids;
+    public long id() {
+        return this.ids.get(0);
     }
 
-    public long toId() {
-        return this.id;
-    }
-
-    public List<Long> toIds() {
+    public List<Long> ids() {
         return this.ids;
     }
 }

@@ -19,7 +19,7 @@ public class Linff implements CommandExecutor {
         Guild guild = message.getGuild();
         String content = message.getContentRaw();
         Member member = message.getMember();
-        Role salada = guild.getRoleById(Roles.ROLE_SALADA.toId());
+        Role salada = guild.getRoleById(Roles.ROLE_SALADA.id());
         String[] args = content.split(" ");
         List<String> swearings = List.of(
             "Filho da puta burro", "VIADINHO",

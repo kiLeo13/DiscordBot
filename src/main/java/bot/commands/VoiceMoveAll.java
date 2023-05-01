@@ -1,11 +1,8 @@
 package bot.commands;
 
-import bot.util.Bot;
-import bot.util.CommandExecutor;
 import bot.util.Messages;
 import bot.util.SlashExecutor;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -16,14 +13,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import java.awt.*;
 import java.util.List;
 
-public class VoiceMoveAll implements CommandExecutor, SlashExecutor {
-
-    @Override
-    public void run(Message message) {
-        Member member = message.getMember();
-        if (member != null && member.hasPermission(Permission.MANAGE_SERVER))
-            Bot.sendGhostMessage(message.getChannel(), "*This command is now Slash only. Please, opt using `/moveall` instead.*", 15000);
-    }
+public class VoiceMoveAll implements SlashExecutor {
 
     @Override
     public void process(SlashCommandInteractionEvent event) {

@@ -1,6 +1,5 @@
 package bot.events;
 
-import bot.util.StaffRoles;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -11,6 +10,8 @@ import net.dv8tion.jda.api.hooks.SubscribeEvent;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import bot.util.Roles;
 
 public class WordFilter extends ListenerAdapter {
 
@@ -24,7 +25,7 @@ public class WordFilter extends ListenerAdapter {
         StringBuilder builder = new StringBuilder();
         Member member = message.getMember();
         Guild guild = message.getGuild();
-        Role role = guild.getRoleById(StaffRoles.ROLE_STAFF_OFICINA.id());
+        Role role = guild.getRoleById(Roles.ROLE_STAFF_OFICINA.id());
 
         if (member == null) return;
 
