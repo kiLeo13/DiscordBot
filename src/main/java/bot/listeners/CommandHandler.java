@@ -1,4 +1,4 @@
-package bot.events;
+package bot.listeners;
 
 import bot.commands.Registration;
 import bot.data.BotData;
@@ -40,7 +40,7 @@ public class CommandHandler extends ListenerAdapter {
         if (commands.isEmpty()) return;
 
         CommandExecutor registration = Registration.getInstance();
-        String input = message.getContentRaw();
+        String input = message.getContentRaw().toLowerCase();
         String cmd = input.split(" ")[0];
 
         // Is a registration command?
@@ -60,7 +60,7 @@ public class CommandHandler extends ListenerAdapter {
         prefixes.put("<register>", BotData.PREFIX_REGISTER);
 
         for (String i : prefixes.keySet())
-            name = name.replaceAll(i, prefixes.get(i));
+            name = name.replaceAll(i, prefixes.get(i)).toLowerCase();
 
         if (name.stripTrailing().equals(""))
             throw new IllegalArgumentException("Command name cannot be empty");
@@ -73,7 +73,7 @@ public class CommandHandler extends ListenerAdapter {
 
     public void addCommand(CommandExecutor command, String... name) {
         for (String n : name) {
-            n = n.replaceAll("<prefix>", BotData.PREFIX);
+            n = n.replaceAll("<prefix>", BotData.PREFIX).toLowerCase();
 
             if (n.stripTrailing().equals("")) throw new IllegalArgumentException("Command name cannot be empty");
             if (n.split(" ").length != 1) throw new IllegalArgumentException("Command name cannot contain multiple words");

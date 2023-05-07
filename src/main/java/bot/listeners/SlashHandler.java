@@ -1,4 +1,4 @@
-package bot.events;
+package bot.listeners;
 
 import bot.util.SlashExecutor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

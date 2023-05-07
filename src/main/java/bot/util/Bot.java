@@ -181,7 +181,7 @@ public class Bot {
             return response.isSuccessful()
                 ? response.body().string()
                 : null;
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
         
@@ -214,7 +214,7 @@ public class Bot {
         String minute = now.getMinute() < 10 ? "0" + now.getMinute() : String.valueOf(now.getMinute());
         String second = now.getSecond() < 10 ? "0" + now.getSecond() : String.valueOf(now.getSecond());
 
-        System.out.printf("[%s:%s:%s]: %s\n", hour, minute, second, str);
+        System.out.printf("[%s.%s.%s]: %s\n", hour, minute, second, str);
     }
 
     public static Color hexToRgb(String hex) {

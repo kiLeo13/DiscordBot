@@ -1,7 +1,7 @@
 package bot.commands;
 
 import bot.data.BotData;
-import bot.events.CommandHandler;
+import bot.listeners.CommandHandler;
 import bot.util.Bot;
 import bot.util.CommandExecutor;
 import bot.util.RegistrationRoles;

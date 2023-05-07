@@ -116,7 +116,7 @@ public class Avatar implements CommandExecutor, SlashExecutor {
 
         return builder
                 .setTitle(title, url)
-                .setDescription(String.format("Avatar de `%s`", target.getNickname()))
+                .setDescription(String.format("Avatar de `%s`", target.getEffectiveName()))
                 .setColor(color) // Discord 'blue color'
                 .setImage(url)
                 .build();

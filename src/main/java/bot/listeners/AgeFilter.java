@@ -1,4 +1,4 @@
-package bot.events;
+package bot.listeners;
 
 import bot.util.Bot;
 import bot.util.Channels;

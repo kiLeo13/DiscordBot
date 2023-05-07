@@ -7,7 +7,7 @@ import bot.commands.valorant.Characters;
 import bot.commands.valorant.Profiles;
 import bot.data.BotData;
 import bot.data.BotFiles;
-import bot.events.*;
+import bot.listeners.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import java.io.IOException;
@@ -45,7 +46,8 @@ public final class Main {
                             GatewayIntent.GUILD_EMOJIS_AND_STICKERS, GatewayIntent.SCHEDULED_EVENTS,
                             GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
                     .setEventManager(new AnnotatedEventManager())
-                    .enableCache(CacheFlag.VOICE_STATE)
+                    .setMemberCachePolicy(MemberCachePolicy.ALL)
+                    .enableCache(CacheFlag.VOICE_STATE, CacheFlag.ONLINE_STATUS)
                     .build()
                     .awaitReady();
 
@@ -74,6 +76,7 @@ public final class Main {
         api.addEventListener(new BlockLorittaExploit());
         api.addEventListener(CommandHandler.getInstance());
         api.addEventListener(new FormattedBlocker());
+        api.addEventListener(new Links());
         api.addEventListener(SlashHandler.getInstance());
         api.addEventListener(new WordFilter());
     }
@@ -97,6 +100,8 @@ public final class Main {
         commands.addCommand("<prefix>linff", new Linff());
         commands.addCommand("<prefix>ip", new IPLookup());
         commands.addCommand("<prefix>avatar-bot", new AvatarBot());
+        commands.addCommand("<prefix>randomize", new Randomize());
+        commands.addCommand("<prefix>roleinfo", new RoleInfo());
 
         commands.addCommand(new Format(), "<prefix>format", "<prefix>parse");
         commands.addCommand(new Characters(), "<prefix>valorant-agent", "<prefix>v-agent");
@@ -213,7 +218,7 @@ public final class Main {
         slash.addListenerCommand("disconnectall", new DisconnectAll());
         slash.addListenerCommand("register", Registration.getInstance());
         slash.addListenerCommand("moveall", new VoiceMoveAll());
-        slash.addListenerCommand("color", new ColorRole());
+        // slash.addListenerCommand("color", new ColorRole());
         slash.addListenerCommand("shutdown", new Shutdown());
         slash.addListenerCommand("avatar", new Avatar());
         slash.addListenerCommand("banner", new Banner());
@@ -230,6 +235,6 @@ public final class Main {
         server.start();
 
         // Color Role runnable
-        ColorRole.startCounter();
+        // ColorRole.startCounter();
     }
 }

@@ -26,7 +26,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ColorRole implements SlashExecutor {
+public class ColorRole /* implements SlashExecutor */ {
+
+    /*
     public static final int REMOVAL = 60;
     private static final String FILE_PATH = "C:/Users/Leonardo/Downloads/sex.json";
     private static File file = new File(FILE_PATH);
@@ -217,4 +219,5 @@ public class ColorRole implements SlashExecutor {
 
         return newFile;
     }
+    */
 }

@@ -38,10 +38,8 @@ public class AvatarBot implements CommandExecutor {
                 String sentence = content.substring(args[0].length() + 1);
                 image = Bot.requestFile(sentence);
 
-                Icon icon;
-
                 try {
-                    icon = Icon.from(image);
+                    Icon icon = Icon.from(image);
 
                     Main.getApi().getSelfUser().getManager().setAvatar(icon).queue(
                             s -> channel.sendMessage("Imagem do bot foi alterada com sucesso.").queue(),
@@ -49,7 +47,7 @@ public class AvatarBot implements CommandExecutor {
                                 channel.sendMessage("Algo deu errado, verifique o console para saber mais sobre o erro. Erro: `" + exception.getMessage() + "`.").queue();
                                 exception.printStackTrace();
                             });
-                } catch (IOException | NullPointerException e) {
+                } catch (IOException | IllegalArgumentException e) {
                     Bot.sendGhostMessage(channel, "Algo deu errado ao procurar a imagem fornecida. Erro: `" + e.getMessage() + "`.", 10000);
                     return;
                 }

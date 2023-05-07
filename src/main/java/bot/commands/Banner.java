@@ -33,7 +33,7 @@ public class Banner implements CommandExecutor, SlashExecutor {
             return;
         }
 
-        String banner  = target.retrieveProfile().complete().getBannerUrl();
+        String banner = target.retrieveProfile().complete().getBannerUrl();
 
         if (banner == null) {
             Bot.sendGhostMessage(channel, "O usuário não possui um banner ou nenhum foi encontrado.", 10000);

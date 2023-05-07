@@ -46,9 +46,9 @@ public class ServerInfo implements CommandExecutor {
         String banner = guild.getBannerUrl() == null ? "" : guild.getBannerUrl() + "?size=2048";
 
         List<GuildChannel> channels = guild.getChannels(true);
-        List<GuildChannel> textChannels = channels.stream().filter(c -> c.getType().equals(ChannelType.TEXT)).collect(Collectors.toList());
-        List<GuildChannel> audioChannels = channels.stream().filter(c -> c.getType().equals(ChannelType.VOICE)).collect(Collectors.toList());
-        List<GuildChannel> categories = channels.stream().filter(c -> c.getType().equals(ChannelType.CATEGORY)).collect(Collectors.toList());
+        List<GuildChannel> textChannels = channels.stream().filter(c -> c.getType().equals(ChannelType.TEXT)).toList();
+        List<GuildChannel> audioChannels = channels.stream().filter(c -> c.getType().equals(ChannelType.VOICE)).toList();
+        List<GuildChannel> categories = channels.stream().filter(c -> c.getType().equals(ChannelType.CATEGORY)).toList();
         List<ThreadChannel> threads = guild.retrieveActiveThreads().complete();
 
         builder
@@ -58,7 +58,7 @@ public class ServerInfo implements CommandExecutor {
                 .addField("🌐 Server ID", "`" + guild.getOwnerIdLong() + "`", true)
                 .addField("📅 Criação", creation + " (<t:" + creationLong + ":R>", true)
                 .addField("👑 Dono", "`" + ownerName + "`", true)
-                .addField("💬 Chats (" + channels.size() + ")", String.format("""
+                .addField("💬 Canais (e Categorias) (" + channels.size() + ")", String.format("""
                         📝 Texto: `%d`
                         🔉 Áudio: `%d`
                         ⚽ Categorias: `%d`
