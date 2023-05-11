@@ -17,7 +17,6 @@ import java.util.List;
 
 public class Registration implements CommandExecutor, SlashExecutor {
     private static Registration INSTANCE;
-
     private Role requiredRole;
 
     // Final Register
@@ -171,7 +170,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // Why would someone register someone that is already registered?
         if (target.getRoles().contains(registered)) {
-            Bot.sendGhostMessage(channel, "O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.", 5000);
+            Bot.sendGhostMessage(channel, "O membro `" + target.getUser().getAsTag() + "` já está registrado.", 5000);
             message.delete().queue();
             return;
         }
@@ -260,7 +259,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // Why would someone register someone that is already registered?
         if (target.getRoles().contains(registered)) {
-            Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.", 5000);
+            Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> O membro `" + target.getUser().getAsTag() + "` já está registrado.", 5000);
             message.delete().queue();
             return;
         }
@@ -354,7 +353,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         }
 
         if (target.getRoles().contains(registered)) {
-            event.reply("O membro `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "` já está registrado.").setEphemeral(true).queue();
+            event.reply("O membro `" + target.getUser().getAsTag() + "` já está registrado.").setEphemeral(true).queue();
             return;
         }
 
@@ -463,18 +462,14 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
     private void log(Member target, List<Role> givenRoles, List<Role> removedRoles, User author) {
         EmbedBuilder builder = new EmbedBuilder();
-        String targetName = target.getUser().getName();
-        String targetDiscriminator = target.getUser().getDiscriminator();
-        String staffName = author.getName();
-        String staffDiscriminator = author.getDiscriminator();
         Guild guild = target.getGuild();
         TextChannel channel = target.getGuild().getTextChannelById(Channels.REGISTER_LOG_CHANNEL.id());
 
         builder
                 .setColor(Color.GREEN)
                 .setThumbnail(target.getEffectiveAvatarUrl())
-                .setTitle("`" + targetName + "#" + targetDiscriminator + "` foi registrado!")
-                .setDescription("Registrado por `" + staffName + "#" + staffDiscriminator + "`")
+                .setTitle("`" + target.getUser().getAsTag() + "` foi registrado!")
+                .setDescription("Registrado por `" + author.getAsTag() + "`")
                 .addField("> **Cargos Dados**", formattedRolesToEmbed(givenRoles), true)
                 .addField("> **Cargos Removidos**", formattedRolesToEmbed(removedRoles), true)
                 .setFooter("Oficina Myuu・ID: " + target.getIdLong(), guild.getIconUrl());
@@ -482,29 +477,27 @@ public class Registration implements CommandExecutor, SlashExecutor {
         if (channel != null) channel.sendMessageEmbeds(builder.build()).queue();
         else System.out.println("Não foi possível salvar o registro pois nenhum chat foi encontrado.");
 
-        Bot.log(String.format("%s#%s registrou o membro %s#%s\n", author.getName(), author.getDiscriminator(), targetName, targetDiscriminator));
+        Bot.log(String.format("%s registrou o membro %s\n", author.getAsTag(), target.getUser().getAsTag()));
     }
 
     private String formattedRolesToEmbed(List<Role> roles) {
         StringBuilder builder = new StringBuilder();
 
         for (Role r : roles) {
-            builder.append("<@&")
-                    .append(r.getIdLong())
-                    .append(">\n");
+            builder.append(String.format("<@&%s>", r.getId()));
         }
 
         return builder.toString().stripTrailing();
     }
 
     private void deleteLastMessageByUser(Member target, MessageChannelUnion channel) {
-        List<Message> history = channel.asTextChannel().getHistory().retrievePast(20).complete();
+        channel.asTextChannel().getHistory().retrievePast(20).queue(history -> {
+            for (Message m : history) {
+                if (m.getAuthor().getIdLong() != target.getIdLong()) continue;
 
-        for (Message m : history) {
-            if (m.getAuthor().getIdLong() != target.getUser().getIdLong()) continue;
-
-            m.delete().queue();
-            break;
-        }
+                m.delete().queue();
+                break;
+            }
+        });
     }
 }

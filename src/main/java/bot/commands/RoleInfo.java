@@ -25,14 +25,15 @@ public class RoleInfo implements CommandExecutor {
 
         if (member == null) return;
 
+        member.getUser().getFlags();
+
         if (args.length < 2) {
             Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
             message.delete().queue();
             return;
         }
 
-        String roleInput = args[1].replaceAll("[^0-9]+", "");
-        Role role = guild.getRoleById(roleInput);
+        Role role = Bot.findRole(guild, args[1]);
 
         if (role == null) {
             Bot.sendGhostMessage(channel, "O cargo fornecido não existe.", 10000);
@@ -63,9 +64,12 @@ public class RoleInfo implements CommandExecutor {
                             ? ""
                             : embed.getFooter().getText(), embed.getFooter().getIconUrl());
 
+            if (embed.getThumbnail() != null)
+                newEmbed.setThumbnail(embed.getThumbnail().getUrl());
+
             for (int i = 0; i < embed.getFields().size(); i++) {
                 if (i == embed.getFields().size() - 2) {
-                    newEmbed.addField("👤 Membros", String.format("Total: `%s`\nOnline: `%s`",
+                    newEmbed.addField("👥 Membros", String.format("Total: `%s`\nOnline: `%s`",
                             size < 10 ? "0" + size : size,
                             sizeOnline < 10 ? "0" + sizeOnline : sizeOnline
                     ), true);
@@ -104,7 +108,7 @@ public class RoleInfo implements CommandExecutor {
                         colorGreen < 10 ? "0" + colorGreen : String.valueOf(colorGreen),
                         colorBlue < 10 ? "0" + colorBlue : String.valueOf(colorBlue)
                 ), true)
-                .addField("👤 Membros", "Total: `...`\nOnline: `...`", true)
+                .addField("👥 Membros", "Total: `...`\nOnline: `...`", true)
                 .addField("🔒 Permissões", permissions(role), role.getPermissions().isEmpty())
                 .setFooter(guild.getName(), guild.getIconUrl());
 

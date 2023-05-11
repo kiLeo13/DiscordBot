@@ -1,10 +1,7 @@
 package bot.util;
 
 import bot.Main;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
@@ -19,12 +16,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 public class Bot {
     private static final Timer timer = new Timer(false);
+
     private Bot() {}
 
     /**
@@ -170,6 +169,15 @@ public class Bot {
         }
     }
 
+    public static Role findRole(Guild guild, String arg) {
+        if (arg == null) return null;
+        arg = arg.replaceAll("[^0-9]+", "");
+
+        if (arg.stripTrailing().equals("")) return null;
+
+        return guild.getRoleById(arg);
+    }
+
     public static String request(String path) {
         OkHttpClient client = new OkHttpClient();
 
@@ -202,19 +210,34 @@ public class Bot {
             byte[] bytes = response.body().bytes();
 
             return new ByteArrayInputStream(bytes);
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             return null;
         }
     }
 
     public static void log(String str) {
+        final HashMap<String, String> placeholders = new HashMap<>();
+
+        placeholders.put("<RESET>", "\033[0m");
+        placeholders.put("<BLACK>", "\033[0;30m");
+        placeholders.put("<RED>", "\033[0;31m");
+        placeholders.put("<GREEN>", "\033[0;32m");
+        placeholders.put("<YELLOW>", "\033[0;33m");
+        placeholders.put("<BLUE>", "\033[0;34m");
+        placeholders.put("<PURPLE>", "\033[0;35m");
+        placeholders.put("<CYAN>", "\033[0;36m");
+        placeholders.put("<WHITE>", "\033[0;37m");
+
+        for (String k : placeholders.keySet())
+            str = str.replaceAll(k, placeholders.get(k));
+
         LocalDateTime now = LocalDateTime.now();
 
         String hour = now.getHour() < 10 ? "0" + now.getHour() : String.valueOf(now.getHour());
         String minute = now.getMinute() < 10 ? "0" + now.getMinute() : String.valueOf(now.getMinute());
         String second = now.getSecond() < 10 ? "0" + now.getSecond() : String.valueOf(now.getSecond());
 
-        System.out.printf("[%s.%s.%s]: %s\n", hour, minute, second, str);
+        System.out.printf("[%s.%s.%s]: %s%s\n", hour, minute, second, str, "\033[0m");
     }
 
     public static Color hexToRgb(String hex) {
@@ -239,4 +262,4 @@ public class Bot {
 
         return builder.toString();
     }
-}
+};

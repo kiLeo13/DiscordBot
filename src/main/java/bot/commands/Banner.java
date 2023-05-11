@@ -3,17 +3,15 @@ package bot.commands;
 import bot.util.Bot;
 import bot.util.CommandExecutor;
 import bot.util.Messages;
-import bot.util.SlashExecutor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 
 import java.awt.*;
 
-public class Banner implements CommandExecutor, SlashExecutor {
+public class Banner implements CommandExecutor {
 
     @Override
     public void run(Message message) {
@@ -45,25 +43,6 @@ public class Banner implements CommandExecutor, SlashExecutor {
 
         channel.sendMessageEmbeds(embed(banner, message.getGuild(), target)).queue();
         message.delete().queue();
-    }
-
-    @Override
-    public void process(SlashCommandInteractionEvent event) {
-        // If none is provided, so the target is who ran the command
-        User target = event.getOption("user") == null ? event.getUser() : event.getOption("user").getAsUser();
-        Member member = event.getMember();
-        String banner = target.retrieveProfile().complete().getBannerUrl();
-
-        if (member == null) return;
-
-        if (banner == null) {
-            event.reply("O usuário não possui um banner ou nenhum foi encontrado.").setEphemeral(true).queue();
-            return;
-        }
-
-        banner += "?size=2048";
-
-        event.replyEmbeds(embed(banner, event.getGuild(), target)).queue();
     }
 
     private MessageEmbed embed(String url, Guild guild, User target) {
@@ -108,6 +87,7 @@ public class Banner implements CommandExecutor, SlashExecutor {
                 .setDescription(String.format("Banner de `%s`", nick))
                 .setColor(color) // Discord 'blue color'
                 .setImage(url)
+                .setFooter(guild.getName(), guild.getIconUrl())
                 .build();
     }
 }

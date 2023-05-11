@@ -8,8 +8,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
-import java.util.List;
-
 public class Clear implements CommandExecutor {
 
     @Override
@@ -41,13 +39,12 @@ public class Clear implements CommandExecutor {
             return;
         }
 
-        List<Message> history = channel.getHistory().retrievePast(amount + 1).complete();
 
         String amountStr = amount < 10 ? "0" + amount : String.valueOf(amount);
         String suffix = amount == 1 ? "mensagem" : "mensagens";
         String suffixGone = amount == 1 ? "foi" : "foram";
 
-        channel.purgeMessages(history);
+        channel.getHistory().retrievePast(amount + 1).queue(channel::purgeMessages);
         Bot.sendGhostMessage(channel, String.format("Prontinho, `%s %s` se %s 👍", amountStr, suffix, suffixGone), 5000);
     }
 }

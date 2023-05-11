@@ -1,5 +1,6 @@
 package bot.commands;
 
+import java.awt.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,9 +9,13 @@ import com.google.gson.Gson;
 import bot.util.CommandExecutor;
 import bot.util.Messages;
 import bot.util.Bot;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 public class IPLookup implements CommandExecutor {
 
@@ -51,34 +56,35 @@ public class IPLookup implements CommandExecutor {
             return;
         }
 
-        channel.sendMessage(String.format("""
-            **[📡]** <@%d> Aqui está!
+        MessageCreateBuilder send = new MessageCreateBuilder();
+        MessageEmbed embed = embed(message.getGuild(), ip);
 
-            IP: `%s`
-            Country: `%s`
-            Country Code: `%s`
-            Region: `%s`
-            City: `%s`
-            Timezone: `%s`
-            ISP: `%s`
+        send.setContent("<@" + member.getIdLong() + "> *Isto é uma aproximação que pode gerar resultados imprecisos.*");
+        send.setEmbeds(embed);
 
-            *Regiões são aproximadas e podem gerar resultados imprecisos.*
-            """,
-                member.getIdLong(),
-                ip.query,
-                ip.country,
-                ip.countryCode,
-                ip.regionName,
-                ip.city,
-                ip.timezone,
-                ip.isp)).queue();
-        
+        channel.sendMessage(send.build()).queue();
         message.delete().queue();
+    }
+
+    private MessageEmbed embed(Guild guild, IP ip) {
+        EmbedBuilder builder = new EmbedBuilder();
+
+        builder
+                .setTitle("🗺 IP Lookup")
+                .setDescription("Mostrando informações do IP: `" + ip.query + "`.")
+                .setColor(new Color(114, 222, 64))
+                .addField("🌎 País", ip.country + " (" + ip.countryCode + ")", true)
+                .addField("📌 Região", ip.regionName, true)
+                .addField("🏙 Cidade", ip.city, true)
+                .addField("🕒 Timezone", ip.timezone, true)
+                .addField("📡 Provedor", ip.isp, true)
+                .setFooter(guild.getName(), guild.getIconUrl());
+
+        return builder.build();
     }
 
     private IP deserialize(String ip) {
         Gson gson = new Gson();
-
         IP value = gson.fromJson(ip, IP.class);
 
         if (!value.status.equals("success"))
@@ -87,14 +93,14 @@ public class IPLookup implements CommandExecutor {
         return value;
     }
 
-    private static final class IP {
-        private String query;
-        private String status;
-        private String country;
-        private String countryCode;
-        private String regionName;
-        private String city;
-        private String timezone;
-        private String isp;
-    }
+    private record IP(
+            String query,
+            String status,
+            String country,
+            String countryCode,
+            String regionName,
+            String city,
+            String timezone,
+            String isp
+    ) {}
 }

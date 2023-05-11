@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 
 import java.awt.*;
@@ -18,38 +17,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class PayServer extends Thread {
-    private final User myuu;
+import static bot.util.Bot.setInterval;
+
+public class PayServer {
     private int day;
     private int hour;
     private static final List<Integer> hours = List.of(12, 15, 17, 20);
 
     public PayServer(JDA api) {
-        try {
-            myuu = api.retrieveUserById(596939790532739075L).complete();
-        } catch (ErrorResponseException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void run() {
-        while (true) {
+        api.retrieveUserById("183645448509194240").queue(myuu -> setInterval(() -> {
             updateDate();
 
             if (day == 20 && hours.contains(hour)) {
-                inform(myuu, """
-                        Hoje é dia `<date>`
-                        
-                        Por favor, pague a bosta do servidor para que eu não morra.
-                        
-                        Link: <<link>>
-                        """);
+                inform(myuu);
             }
-
-            try { Thread.sleep(3600 * 1000); }
-            catch (InterruptedException e) { break; }
-        }
+        }, 3600 * 1000));
     }
 
     private void updateDate() {
@@ -57,7 +39,14 @@ public class PayServer extends Thread {
         hour = LocalDateTime.now().getHour();
     }
 
-    private void inform(User user, String content) {
+    private void inform(User user) {
+        String content = """        
+                Hoje é dia `<date>`
+                        
+                Por favor, pague a bosta do servidor para que eu não morra.
+                        
+                Link: <<link>>
+                """;
         final HashMap<String, String> placeholders = new HashMap<>();
 
         LocalDateTime date = LocalDateTime.now();
@@ -81,26 +70,20 @@ public class PayServer extends Thread {
                 .flatMap(channel -> channel.sendMessageEmbeds(finalContent))
                 .delay(5, TimeUnit.HOURS)
                 .flatMap(Message::delete)
-                .queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE));
+                .queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE, ErrorResponse.CANNOT_SEND_TO_USER));
     }
 
     private MessageEmbed getReminderEmbed(String content) throws IllegalAccessException {
         EmbedBuilder builder = new EmbedBuilder();
-        Guild oficina = Main.getApi().getGuildById(582430782577049600L);
+        Guild guild = Main.getApi().getGuildById(582430782577049600L);
 
-        if (oficina == null) throw new IllegalAccessException("Oficina cannot be null");
-
-        String banner = oficina.getBannerUrl() == null ? "" : oficina.getBannerUrl();
-
-        if (!banner.equals(""))
-            banner += "?size=2048";
+        if (guild == null) throw new IllegalAccessException("Oficina cannot be null");
 
         builder.setTitle("Pagar Servidor DO BOT")
                 .setColor(Color.PINK)
                 .setThumbnail(Main.getApi().getSelfUser().getAvatarUrl())
                 .addField("> Assunto", content, false)
-                .setImage(banner)
-                .setFooter("Oficina Myuu", oficina.getIconUrl());
+                .setFooter(guild.getName(), guild.getIconUrl());
 
         return builder.build();
     }

@@ -26,12 +26,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ColorRole /* implements SlashExecutor */ {
+public class ColorRole implements SlashExecutor {
 
-    /*
     public static final int REMOVAL = 60;
-    private static final String FILE_PATH = "C:/Users/Leonardo/Downloads/sex.json";
-    private static File file = new File(FILE_PATH);
+    private static final File file = new File("resources", "colors.json");
     private static final Gson gson = new GsonBuilder()
             .enableComplexMapKeySerialization()
             .setPrettyPrinting()
@@ -49,8 +47,6 @@ public class ColorRole /* implements SlashExecutor */ {
         Member target = event.getOption("member").getAsMember();
         Role color = guild.getRoleById(event.getOption("color").getAsString());
 
-        if (guild.getIdLong() != 1) return;
-
         if (member == null) return;
 
         if (target == null) {
@@ -63,16 +59,12 @@ public class ColorRole /* implements SlashExecutor */ {
             return;
         }
 
-        // If the file does not exist, one is gonna be created
-        file = renderFile();
-
         // Guild related
         guild.addRoleToMember(target, color).queue();
         store(target, color);
 
         event.reply("Cargo `" + color.getName() + "` foi adicionado à `" + target.getEffectiveName() + "`.").setEphemeral(false).setEphemeral(true).queue();
-
-        Bot.sendGhostMessage(guild.getTextChannelById(Channels.CHANNEL_BANK.id()), "<@" + target.getIdLong() + "> Você recebeu o cargo `" + color.getName() + "` com sucesso!", 60000);
+        Bot.sendGhostMessage(guild.getTextChannelById(Channels.CHANNEL_BANK.id()), "<@" + target.getIdLong() + "> Você recebeu o cargo `" + color.getName() + "` com sucesso!", 300000);
 
         logAdd(member, target, color, guild);
     }
@@ -86,16 +78,16 @@ public class ColorRole /* implements SlashExecutor */ {
         TextChannel channel = guild.getTextChannelById(Channels.LOG_COLOR_ROLE_COMMAND_CHANNEL.id());
 
         builder
-            .setTitle("Membro: `" + target.getEffectiveName() + "#" + target.getUser().getDiscriminator() + "`!")
+            .setTitle("Membro: `" + target.getUser().getAsTag() + "`!")
             .setThumbnail(target.getUser().getAvatarUrl())
             .setColor(color.getColor())
             .setDescription("Cargos de cor são removidos após `" + REMOVAL + "` dias.")
             .addField("🏷 Cargo", "<@&" + color.getIdLong() + ">", true)
-            .addField("👑 Staff", "`" + author.getUser().getName() + "#" + author.getUser().getDiscriminator() + "`", true)
+            .addField("👑 Staff", "`" + author.getUser().getAsTag() + "`", true)
             .addField("💻 Target ID", "`" + target.getIdLong() + "`", true)
             .addField("📅 Adicionado", "`" + date.format(now) + " às " + time.format(now) + "`", true)
             .addField("📅 Será removido", "`" + date.format(now.plusDays(REMOVAL)) + " às " + time.format(now.plusDays(REMOVAL)) + "`", true)
-            .setFooter("Oficina Myuu", guild.getIconUrl());
+            .setFooter(guild.getName(), guild.getIconUrl());
 
         if (channel != null) channel.sendMessageEmbeds(builder.build()).queue();
     }
@@ -114,13 +106,13 @@ public class ColorRole /* implements SlashExecutor */ {
 
         guild.retrieveMemberById(memberId).queue(m -> {
             builder
-                    .setTitle("`" + m.getEffectiveName() + "#" + m.getUser().getDiscriminator() + "`")
+                    .setTitle("`" + m.getUser().getAsTag() + "`")
                     .setThumbnail(m.getUser().getAvatarUrl())
                     .setColor(Color.RED)
                     .setDescription("Cargo de cor foi removido.")
                     .addField("🏷 Cargo", "<@&" + role.getIdLong() + ">", true)
                     .addField("💻 Target ID", "`" + m.getId() + "`", true)
-                    .setFooter("Oficina Myuu", guild.getIconUrl());
+                    .setFooter(guild.getName(), guild.getIconUrl());
 
             if (log != null) log.sendMessageEmbeds(builder.build()).queue();
             if (bank != null) bank.sendMessage("<@" + m.getIdLong() + "> `" + REMOVAL + "` dias se passaram, cargo `" + role.getName() + "` foi removido!").queue();
@@ -140,7 +132,6 @@ public class ColorRole /* implements SlashExecutor */ {
         );
 
         String json = gson.toJson(persons);
-
         write(json);
     }
 
@@ -202,7 +193,7 @@ public class ColorRole /* implements SlashExecutor */ {
                         guild.removeRoleFromMember(m, role).queue();
 
                         logRemove(data.guildId, s, data.roleId);
-                        Bot.log(m.getUser().getName() + "#" + m.getUser().getDiscriminator() + " teve o cargo de cor " + role.getName() + " removido.");
+                        Bot.log(m.getUser().getAsTag() + " teve o cargo de cor " + role.getName() + " removido.");
                     });
                 }
             }
@@ -210,14 +201,4 @@ public class ColorRole /* implements SlashExecutor */ {
             ColorRole.store(toWrite);
         }, 60000);
     }
-
-    private File renderFile() {
-        File newFile = new File(FILE_PATH);
-
-        try { newFile.createNewFile(); }
-        catch (IOException e) { e.printStackTrace(); }
-
-        return newFile;
-    }
-    */
 }

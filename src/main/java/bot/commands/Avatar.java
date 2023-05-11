@@ -3,17 +3,17 @@ package bot.commands;
 import bot.util.Bot;
 import bot.util.CommandExecutor;
 import bot.util.Messages;
-import bot.util.SlashExecutor;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 import java.awt.*;
 
-public class Avatar implements CommandExecutor, SlashExecutor {
+public class Avatar implements CommandExecutor {
 
     @Override
     public void run(Message message) {
@@ -22,24 +22,12 @@ public class Avatar implements CommandExecutor, SlashExecutor {
         Member member = message.getMember();
         String content = message.getContentRaw();
         String[] args = content.split(" ");
-        Member target;
+        Member target = args.length < 2 ? member : Bot.findMember(message.getGuild(), args[1]);
         MessageCreateBuilder send = new MessageCreateBuilder();
 
         if (member == null) return;
 
-        try {
-            String targetId = args[1].replaceAll("[^0-9]+", "");
-
-            if (targetId.stripTrailing().equals("")) {
-                Bot.sendGhostMessage(channel, "`" + args[1] + "` não é um id válido.", 5000);
-                message.delete().queue();
-                return;
-            }
-
-            target = message.getGuild().retrieveMemberById(targetId).complete();
-        } catch (ArrayIndexOutOfBoundsException e) {
-            target = member;
-        } catch (ErrorResponseException e) {
+        if (target == null) {
             Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
             message.delete().queue();
             return;
@@ -61,32 +49,9 @@ public class Avatar implements CommandExecutor, SlashExecutor {
         message.delete().queue();
     }
 
-    @Override
-    public void process(SlashCommandInteractionEvent event) {
-        boolean isFromGuild;
-        User target;
-        Guild guild = event.getGuild();
-
-        try { isFromGuild = event.getOption("from-guild").getAsString().equals("guild"); }
-        catch (NullPointerException e) { isFromGuild = false; }
-
-        try { target = event.getOption("user").getAsUser(); }
-        catch (NullPointerException e) {
-            target = event.getUser();
-        }
-
-        if (isFromGuild && guild.retrieveMemberById(target.getIdLong()).complete().getAvatarUrl() == null) {
-            event.reply("O usuário não possui um avatar específico para este servidor.").setEphemeral(true).queue();
-            return;
-        }
-
-        String avatarUrl = avatarUrl(guild.retrieveMemberById(target.getIdLong()).complete(), isFromGuild);
-
-        event.replyEmbeds(embed(avatarUrl, guild.retrieveMemberById(target.getIdLong()).complete())).setEphemeral(false).queue();
-    }
-
     private MessageEmbed embed(String url, Member target) {
         final EmbedBuilder builder = new EmbedBuilder();
+        Guild guild = target.getGuild();
         String name = target.getUser().getName();
 
         // Embed related
@@ -119,6 +84,7 @@ public class Avatar implements CommandExecutor, SlashExecutor {
                 .setDescription(String.format("Avatar de `%s`", target.getEffectiveName()))
                 .setColor(color) // Discord 'blue color'
                 .setImage(url)
+                .setFooter(guild.getName(), guild.getIconUrl())
                 .build();
     }
 

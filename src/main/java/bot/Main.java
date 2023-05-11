@@ -35,8 +35,9 @@ public final class Main {
     public static void main(String[] args) {
         try {
             BotFiles.createYamlFiles();
+            BotFiles.createJSONFiles();
         } catch (IOException e) {
-            System.out.println("Could not load YAML files");
+            e.printStackTrace();
         }
 
         try {
@@ -75,7 +76,6 @@ public final class Main {
         api.addEventListener(new AgeFilter());
         api.addEventListener(new BlockLorittaExploit());
         api.addEventListener(CommandHandler.getInstance());
-        api.addEventListener(new FormattedBlocker());
         api.addEventListener(new Links());
         api.addEventListener(SlashHandler.getInstance());
         api.addEventListener(new WordFilter());
@@ -102,6 +102,7 @@ public final class Main {
         commands.addCommand("<prefix>avatar-bot", new AvatarBot());
         commands.addCommand("<prefix>randomize", new Randomize());
         commands.addCommand("<prefix>roleinfo", new RoleInfo());
+        commands.addCommand("<prefix>p-help", new PrivilegedHelp());
 
         commands.addCommand(new Format(), "<prefix>format", "<prefix>parse");
         commands.addCommand(new Characters(), "<prefix>valorant-agent", "<prefix>v-agent");
@@ -185,22 +186,6 @@ public final class Main {
         commands.add(Commands.slash("shutdown", "Desliga o bot em caso de emergência.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
-        /* []====================[] Avatar []====================[] */
-        OptionData targetAvatar = new OptionData(OptionType.USER, "user", "O avatar do usuário a ser enviado.", false);
-        OptionData avatarGuild = new OptionData(OptionType.STRING, "from-guild", "O avatar a ser mostrado é o que está no servidor ou no perfil do usuário?", false)
-                .addChoice("Do Servidor 🌎", "guild")
-                .addChoice("Do Usuário 👥", "user");
-
-        commands.add(Commands.slash("avatar", "Mostra o avatar do usuário.")
-                .addOptions(targetAvatar, avatarGuild));
-
-        /* []====================[] Banner []====================[] */
-        OptionData targetBanner = new OptionData(OptionType.USER, "user", "O banner do usuário a ser enviado.", false);
-
-        commands.add(Commands.slash("banner", "Mostra o banner do usuário.")
-                .addOptions(targetBanner)
-                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
-
         /* []====================[] Bot Status []====================[] */
         OptionData activityOption = new OptionData(OptionType.STRING, "link", "O link da live.");
         OptionData activityName = new OptionData(OptionType.STRING, "name", "Define o nome da live para aparecer no perfil.");
@@ -218,10 +203,8 @@ public final class Main {
         slash.addListenerCommand("disconnectall", new DisconnectAll());
         slash.addListenerCommand("register", Registration.getInstance());
         slash.addListenerCommand("moveall", new VoiceMoveAll());
-        // slash.addListenerCommand("color", new ColorRole());
+        slash.addListenerCommand("color", new ColorRole());
         slash.addListenerCommand("shutdown", new Shutdown());
-        slash.addListenerCommand("avatar", new Avatar());
-        slash.addListenerCommand("banner", new Banner());
         slash.addListenerCommand("stream", new BotStatus());
     }
 
@@ -231,10 +214,9 @@ public final class Main {
 
     private static void runRunnables(JDA api) {
         // Pay Server
-        PayServer server = new PayServer(api);
-        server.start();
+        new PayServer(api);
 
         // Color Role runnable
-        // ColorRole.startCounter();
+        ColorRole.startCounter();
     }
 }

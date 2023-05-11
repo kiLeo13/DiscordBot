@@ -13,7 +13,6 @@ import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ServerInfo implements CommandExecutor {
 
@@ -65,7 +64,7 @@ public class ServerInfo implements CommandExecutor {
                         🎈 Threads: `%d`
                         """, textChannels.size(), audioChannels.size(), categories.size(), threads.size()), true)
                 .setImage(banner)
-                .setFooter("Oficina Myuu ®", guild.getIconUrl());
+                .setFooter(guild.getName(), guild.getIconUrl());
 
         builder.addField("👥 Membros (" + guild.getMemberCount() + ")", "", false);
 

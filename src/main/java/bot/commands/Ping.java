@@ -23,7 +23,7 @@ public class Ping implements CommandExecutor, SlashExecutor {
         long apiPing = api.getRestPing().complete();
         long gatewayPing = api.getGatewayPing();
 
-        if (member == null || !member.hasPermission(Permission.MESSAGE_MANAGE)) return;
+        if (member == null || !member.hasPermission(Permission.MANAGE_SERVER)) return;
         if (author.isBot()) return;
 
         message.delete().queue();
