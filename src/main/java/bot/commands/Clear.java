@@ -5,7 +5,6 @@ import bot.util.CommandExecutor;
 import bot.util.CommandPermission;
 import bot.util.Messages;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
@@ -16,7 +15,6 @@ public class Clear implements CommandExecutor {
     public void run(Message message) {
 
         MessageChannelUnion channel = message.getChannel();
-        Member member = message.getMember();
         String[] args = message.getContentRaw().split(" ");
 
         byte amount;
@@ -35,7 +33,6 @@ public class Clear implements CommandExecutor {
 
         if (amount < 1 || amount > 100) {
             Bot.sendGhostMessage(channel, "A quantidade de mensagens a serem apagadas deve estar entre `1 e 100`.\n*Será possível até __1000__ em breve (ou quando o Leo13 parar de procrastinar e adicionar essa função extra em mim)*", 10000);
-            Bot.deleteAfter(message, 10500);
             return;
         }
 

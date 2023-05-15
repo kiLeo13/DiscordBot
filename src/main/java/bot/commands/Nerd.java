@@ -51,8 +51,6 @@ public class Nerd implements CommandExecutor {
         }
 
         send.setFiles(FileUpload.fromData(stream, "nerd.png"));
-
         channel.sendMessage(send.build()).queue();
-        message.delete().queue();
     }
 }

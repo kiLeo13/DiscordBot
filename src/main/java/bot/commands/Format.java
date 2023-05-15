@@ -24,7 +24,6 @@ public class Format implements CommandExecutor {
 
         if (args.length < 2) {
             channel.sendMessage("Argumentos insuficientes!\nUse: `.format [camel/CAMEL | reverse | time | emoji] <text>`").queue();
-            message.delete().queue();
             return;
         }
 
@@ -32,7 +31,6 @@ public class Format implements CommandExecutor {
 
         if (formatting.length() > Message.MAX_CONTENT_LENGTH) {
             Bot.sendGhostMessage(channel, "O resultado final terá mais de `" + Message.MAX_CONTENT_LENGTH + "` caracteres por limitação do Discord eu não posso enviar mensagens maiores do que este valor.", 20000);
-            message.delete().queue();
             return;
         }
 
@@ -49,8 +47,6 @@ public class Format implements CommandExecutor {
         
             default -> channel.sendMessage("Não achei nenhuma formatação para `" + args[1] + "`.").queue();
         }
-
-        message.delete().queue();
     }
 
     private String camel(String[] array, boolean firstUppercase) {

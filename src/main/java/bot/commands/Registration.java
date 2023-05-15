@@ -65,13 +65,11 @@ public class Registration implements CommandExecutor, SlashExecutor {
         try { areRolesSetupProperly(guild); }
         catch (IllegalArgumentException | HierarchyException e) {
             Bot.sendGhostMessage(channel, e.getMessage(), 10000);
-            message.delete().queue();
             return;
         }
 
         if (!isInputValid(message)) {
             Bot.sendGhostMessage(channel, "O padrão de registro usado `" + content + "` não é válido.", 5000);
-            message.delete().queue();
             return;
         }
 
@@ -82,7 +80,6 @@ public class Registration implements CommandExecutor, SlashExecutor {
         }
 
         Bot.sendGhostMessage(channel, Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.message(), 5000);
-        message.delete().queue();
     }
 
     @Override
@@ -151,27 +148,23 @@ public class Registration implements CommandExecutor, SlashExecutor {
         // If target member was not found
         if (target == null) {
             Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
-            message.delete().queue();
             return;
         }
 
         // Why would someone register a bot?
         if (target.getUser().isBot()) {
-            message.delete().queue();
             return;
         }
 
         // Why would someone register themselves?
         if (target.getIdLong() == author.getIdLong()) {
             Bot.sendGhostMessage(channel, "Você não pode registrar você mesmo.", 5000);
-            message.delete().queue();
             return;
         }
 
         // Why would someone register someone that is already registered?
         if (target.getRoles().contains(registered)) {
             Bot.sendGhostMessage(channel, "O membro `" + target.getUser().getAsTag() + "` já está registrado.", 5000);
-            message.delete().queue();
             return;
         }
 
@@ -208,7 +201,6 @@ public class Registration implements CommandExecutor, SlashExecutor {
         if (target.getRoles().contains(verified)) toTakeRoles.add(verified);
 
         toGiveRoles.add(registered);
-        message.delete().queue();
 
         // Give and take the provided roles
         guild.modifyMemberRoles(target, toGiveRoles, toTakeRoles).queue();
@@ -240,27 +232,23 @@ public class Registration implements CommandExecutor, SlashExecutor {
         // If target member was not found
         if (target == null) {
             Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
-            message.delete().queue();
             return;
         }
 
         // Why would someone register a bot?
         if (target.getUser().isBot()) {
-            message.delete().queue();
             return;
         }
 
         // Why would someone register themselves?
         if (target.getIdLong() == author.getIdLong()) {
             Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> Você não pode registrar você mesmo.", 5000);
-            message.delete().queue();
             return;
         }
 
         // Why would someone register someone that is already registered?
         if (target.getRoles().contains(registered)) {
             Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> O membro `" + target.getUser().getAsTag() + "` já está registrado.", 5000);
-            message.delete().queue();
             return;
         }
 
@@ -272,7 +260,6 @@ public class Registration implements CommandExecutor, SlashExecutor {
         // What? Are you -2 years old?
         if (ageInput < 0) {
             Bot.sendGhostMessage(channel, "<@" + author.getIdLong() + "> você não pode inserir uma idade negativa.", 5000);
-            message.delete().queue();
             return;
         }
 
@@ -299,7 +286,6 @@ public class Registration implements CommandExecutor, SlashExecutor {
         if (target.getRoles().contains(verified)) toTakeRoles.add(verified);
 
         toGiveRoles.add(registered);
-        message.delete().queue();
 
         // Give and take the provided roles
         guild.modifyMemberRoles(target, toGiveRoles, toTakeRoles).queue();

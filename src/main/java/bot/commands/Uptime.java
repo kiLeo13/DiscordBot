@@ -2,8 +2,8 @@ package bot.commands;
 
 import bot.Main;
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -13,36 +13,29 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
+@CommandPermission(permissions = Permission.MANAGE_SERVER)
 public class Uptime implements CommandExecutor {
-    private static byte timeZone;
+    private static final byte timeZone = -3;
 
     @Override
     public void run(Message message) {
 
-        timeZone = -3;
-
         User author = message.getAuthor();
-        Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
         String response = formatted("""
                 🕒** | Uptime:** `<uptime>`
-                ⏰** | Desde:** `<init-date> às <init-time> (<time-zone>)`
+                ⏰** | Desde:** `<init-date> às <init-time> (GMT -3)`
                 """);
 
-        if (author.isBot()) return;
-        if (member == null || !member.hasPermission(Permission.MANAGE_SERVER)) return;
-
-        channel.sendMessage("⌛｜<@" + author.getIdLong() + "> **Bot Uptime:**\n\n" + response).queue();
-        message.delete().queue();
+        channel.sendMessage("⌛｜<@" + author.getId() + "> **Bot Uptime:**\n\n" + response).queue();
     }
 
-    private static String formatted(String str) {
+    private String formatted(String str) {
         HashMap<String, String> placeholders = new HashMap<>();
 
         placeholders.put("<uptime>", getFormattedUptime());
         placeholders.put("<init-date>", getReadyMoment(true));
         placeholders.put("<init-time>", getReadyMoment(false));
-        placeholders.put("<time-zone>", formattedTimeZone());
 
         for (String p : placeholders.keySet())
             str = str.replaceAll(p, placeholders.get(p));
@@ -50,7 +43,7 @@ public class Uptime implements CommandExecutor {
         return str;
     }
 
-    private static String getFormattedUptime() {
+    private String getFormattedUptime() {
         long now = System.currentTimeMillis() / 1000;
         long init = Main.getInitTime() / 1000;
         long uptime = now - init;
@@ -85,7 +78,7 @@ public class Uptime implements CommandExecutor {
                 seconds + secondsSuffix;
     }
 
-    private static String getReadyMoment(boolean returnDate) {
+    private String getReadyMoment(boolean returnDate) {
         long init = Main.getInitTime() / 1000;
         LocalDateTime time = LocalDateTime.ofEpochSecond(init, 0, ZoneOffset.UTC).plusHours(timeZone);
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -95,11 +88,5 @@ public class Uptime implements CommandExecutor {
         return returnDate
                 ? dateFormatter.format(time)
                 : timeFormatter.format(time);
-    }
-
-    private static String formattedTimeZone() {
-        return timeZone == 0
-                ? "UTC"
-                : "GMT " + timeZone;
     }
 }

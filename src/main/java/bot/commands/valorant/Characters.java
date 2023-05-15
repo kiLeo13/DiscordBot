@@ -29,7 +29,6 @@ public class Characters implements CommandExecutor {
 
         if (args.length < 2) {
             channel.sendMessage(Messages.ERROR_TOO_FEW_ARGUMENTS.message()).queue();
-            message.delete().queue();
             return;
         }
 
@@ -41,7 +40,6 @@ public class Characters implements CommandExecutor {
         // Does the agent exist?
         if (agent == null) {
             Bot.sendGhostMessage(channel, "Agent não encontrado na API.", 10000);
-            message.delete().queue();
             return;
         }
 
@@ -51,7 +49,6 @@ public class Characters implements CommandExecutor {
         send.setContent("<@" + member.getIdLong() + ">");
 
         channel.sendMessage(send.build()).queue();
-        message.delete().queue();
     }
 
     private MessageEmbed embed(Agent agent, boolean hasDescription) {

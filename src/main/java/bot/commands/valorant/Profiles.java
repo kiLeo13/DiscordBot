@@ -32,7 +32,6 @@ public class Profiles implements CommandExecutor {
 
         if (args.length < 2) {
             Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
-            message.delete().queue();
             return;
         }
 
@@ -49,7 +48,6 @@ public class Profiles implements CommandExecutor {
 
         if (player == null) {
             Bot.sendGhostMessage(channel, "Usuário `" + name(args) + "#" + tag(args) + "` não foi encontrado.", 10000);
-            message.delete().queue();
             return;
         }
 
@@ -58,7 +56,6 @@ public class Profiles implements CommandExecutor {
         send.setEmbeds(embed(player, guild));
 
         channel.sendMessage(send.build()).queue();
-        message.delete().queue();
     }
     
     // This will return the exact input tag

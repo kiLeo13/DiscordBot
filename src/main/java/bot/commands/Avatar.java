@@ -29,7 +29,6 @@ public class Avatar implements CommandExecutor {
 
         if (target == null) {
             Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
-            message.delete().queue();
             return;
         }
 
@@ -38,7 +37,6 @@ public class Avatar implements CommandExecutor {
 
         if (avatarUrl == null && content.endsWith("--server")) {
             Bot.sendGhostMessage(channel, "O usuário não possui um avatar específico para este servidor.", 5000);
-            message.delete().queue();
             return;
         }
 
@@ -46,7 +44,6 @@ public class Avatar implements CommandExecutor {
         send.setContent(String.format("<@%d>", member.getIdLong()));
 
         channel.sendMessage(send.build()).queue();
-        message.delete().queue();
     }
 
     private MessageEmbed embed(String url, Member target) {

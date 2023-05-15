@@ -88,7 +88,7 @@ public class Bot {
 
     /**
      *
-     * Useful for deleting a message you are not sure if still exists without throwing an exception
+     * Useful for deleting a message you are not sure if still exists without throwing an exception.
      *
      * @param message The message to be deleted
      *

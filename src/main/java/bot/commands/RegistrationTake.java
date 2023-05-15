@@ -12,6 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@CommandPermission(permissions = Permission.MANAGE_ROLES)
 public class RegistrationTake implements CommandExecutor {
 
     @Override
@@ -23,15 +24,9 @@ public class RegistrationTake implements CommandExecutor {
         String[] args = content.split(" ");
         Guild guild = message.getGuild();
         MessageChannelUnion channel = message.getChannel();
-        Member target;
+        Member target = args.length < 2 ? null : Bot.findMember(guild, args[1]);
 
         if (channel.getIdLong() == Channels.REGISTER_CHANNEL.id()) return;
-        if (member == null || !member.hasPermission(Permission.MANAGE_ROLES)) return;
-
-        try {
-            String targetRegex = args[1].replaceAll("[^0-9]+", "");
-            target = guild.retrieveMemberById(targetRegex).complete();
-        } catch (IndexOutOfBoundsException e) { target = null; }
 
         if (target == null) {
             Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
@@ -45,17 +40,15 @@ public class RegistrationTake implements CommandExecutor {
         if (target.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_NOT_REGISTERED.id()))
                 && !target.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_REGISTERED.id()))) {
             channel.sendMessage("<@" + author.getIdLong() + "> o membro <@" + target.getIdLong() + "> não está registrado.").queue();
-            message.delete().queue();
             return;
         }
 
         guild.modifyMemberRoles(target, toGiveRoles, toRemoveRoles).queue();
-        message.delete().queue();
         channel.sendMessage("<@" + author.getIdLong() + "> registro de <@" + target.getIdLong() + "> foi removido com sucesso!").queue();
         logRegister(target, toGiveRoles, toRemoveRoles, member);
     }
 
-    private static void logRegister(Member target, List<Role> givenRoles, List<Role> removedRoles, Member registerMaker) {
+    private void logRegister(Member target, List<Role> givenRoles, List<Role> removedRoles, Member registerMaker) {
         EmbedBuilder builder = new EmbedBuilder();
         String targetName = target.getUser().getName();
         String targetDiscriminator = target.getUser().getDiscriminator();
@@ -76,7 +69,7 @@ public class RegistrationTake implements CommandExecutor {
         else System.out.println("Não foi possível salvar o registro pois nenhum chat foi encontrado.");
     }
 
-    private static String getFormattedRolesToEmbed(List<Role> roles) {
+    private String getFormattedRolesToEmbed(List<Role> roles) {
         StringBuilder builder = new StringBuilder();
 
         for (Role r : roles) {
@@ -88,7 +81,7 @@ public class RegistrationTake implements CommandExecutor {
         return builder.toString().stripTrailing();
     }
 
-    private static List<Role> toRemove(Member target) {
+    private List<Role> toRemove(Member target) {
         Guild guild = target.getGuild();
         RegistrationRoles[] roles = RegistrationRoles.values();
         List<Role> finalRoles = new ArrayList<>();
@@ -103,7 +96,7 @@ public class RegistrationTake implements CommandExecutor {
         return finalRoles;
     }
 
-    private static List<Role> toGive(Guild guild) {
+    private List<Role> toGive(Guild guild) {
         RegistrationRoles[] roles = RegistrationRoles.values();
         List<Role> finalRoles = new ArrayList<>();
 

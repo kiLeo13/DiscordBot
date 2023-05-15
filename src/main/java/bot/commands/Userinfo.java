@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import java.awt.*;
 import java.util.List;
 
+@CommandPermission()
 public class Userinfo implements CommandExecutor {
 
     @Override
@@ -22,19 +23,15 @@ public class Userinfo implements CommandExecutor {
         Member target = args.length < 2 ? member : Bot.findMember(guild, args[1]);
         MessageCreateBuilder send = new MessageCreateBuilder();
 
-        if (member == null) return;
-
         if (target == null) {
             Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
-            message.delete().queue();
             return;
         }
 
-        send.setContent("<@" + member.getIdLong() + ">");
+        send.setContent("<@" + member.getId() + ">");
         send.addEmbeds(embed(target));
 
         channel.sendMessage(send.build()).queue();
-        message.delete().queue();
     }
 
     private MessageEmbed embed(Member target) {

@@ -4,6 +4,7 @@ import bot.data.BotFiles;
 import bot.util.Channels;
 import bot.util.Bot;
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -15,8 +16,7 @@ import java.awt.*;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import static bot.util.Bot.*;
-
+@CommandPermission()
 public class Puta implements CommandExecutor {
 
     @Override
@@ -35,7 +35,6 @@ public class Puta implements CommandExecutor {
                     "<@" + message.getAuthor().getIdLong() + "> " + blocked.get(random),
                     10000);
 
-            message.delete().queue();
             return;
         }
 
@@ -57,25 +56,23 @@ public class Puta implements CommandExecutor {
 
             if (args.length >= 2) mentionedMember = message.getMentions().getMembers().get(0);
         } catch (FileNotFoundException e) {
-            sendGhostMessage(channel,
+            Bot.sendGhostMessage(channel,
                     "Arquivo `swearings.yml` não foi encontrado.",
                     10000);
             System.out.println("Arquivo 'swearings.yml' não foi encontrado, ignorando comando...");
             return;
         } catch (IndexOutOfBoundsException e) {
-            sendGhostReply(message, "Membro `" + args[1] + "` não encontrado.", 5000);
-            deleteAfter(message, 6000);
+            Bot.sendGhostReply(message, "Membro `" + args[1] + "` não encontrado.", 5000);
             return;
         }
 
         int random = (int) Math.floor(Math.random() * swearingList.size());
         String swearSentence = swearingList.get(random);
 
-        if (mentionedMember == null) message.reply(swearSentence).queue();
-        else {
+        if (mentionedMember == null)
+            message.reply(swearSentence).queue();
+        else
             channel.sendMessage(mention(mentionedMember) + " " + swearSentence).queue();
-            message.delete().queue();
-        }
     }
 
     @Override

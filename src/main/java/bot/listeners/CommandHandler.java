@@ -2,6 +2,7 @@ package bot.listeners;
 
 import bot.commands.Registration;
 import bot.data.BotData;
+import bot.util.Bot;
 import bot.util.CommandExecutor;
 import bot.util.CommandPermission;
 import bot.util.MessageDeletion;
@@ -70,7 +71,7 @@ public class CommandHandler extends ListenerAdapter {
                 boolean deletion = command.getClass().getAnnotation(MessageDeletion.class).value();
 
                 if (deletion)
-                    message.delete().queue();
+                    Bot.delete(message);
                 break;
             }
         }

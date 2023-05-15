@@ -2,58 +2,53 @@ package bot.commands;
 
 import bot.util.Channels;
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.exceptions.ErrorHandler;
-import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 import java.awt.*;
-import java.util.concurrent.TimeUnit;
 
+@CommandPermission(permissions = Permission.ADMINISTRATOR)
 public class RegistrationRoles implements CommandExecutor {
-    private static final EmbedBuilder embedBuilder = new EmbedBuilder();
 
     @Override
     public void run(Message message) {
-        setupEmbed(message.getGuild());
 
-        MessageEmbed messageEmbed = embedBuilder.build();
         User author = message.getAuthor();
-        Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
+        Guild guild = message.getGuild();
+        MessageCreateBuilder send = new MessageCreateBuilder();
 
         if (channel.getIdLong() == Channels.REGISTER_CHANNEL.id()) return;
 
-        if (author.isBot()) return;
-        if (member == null || !member.hasPermission(Permission.ADMINISTRATOR)) return;
+        send.setEmbeds(embed(guild));
+        send.setContent("<@" + author.getId() + ">");
 
-        Message embedSent;
-
-        embedSent = channel.sendMessage("Obtendo informações...").complete();
-        embedSent.editMessage("<@" + author.getIdLong() + "> Aqui estão!")
-                .setEmbeds(messageEmbed)
-                .queueAfter(500, TimeUnit.MILLISECONDS, null, new ErrorHandler()
-                        .ignore(ErrorResponse.UNKNOWN_MESSAGE));
-
-        message.delete().queue();
+        channel.sendMessage(send.build()).queue();
     }
 
-    private static void setupEmbed(Guild guild) {
-        embedBuilder.setTitle("Registration Roles:");
-        embedBuilder.setColor(Color.GREEN);
-        embedBuilder.setDescription("Aqui estão os ENUMS dos cargos e seus nomes.");
-        embedBuilder.setThumbnail("https://cdn.discordapp.com/attachments/631974560605929493/1086539928596398110/image.png");
-        embedBuilder.setFooter("Oficina Myuu", "https://cdn.discordapp.com/attachments/631974560605929493/1086540588788228117/a_d51df27b11a16bbfaf5ce83acfeebfd8.png");
+    private MessageEmbed embed(Guild guild) {
+        final EmbedBuilder builder = new EmbedBuilder();
+
+        builder
+                .setTitle("Registration Roles:")
+                .setColor(Color.GREEN)
+                .setDescription("Aqui estão os ENUMS dos cargos e seus nomes.")
+                .setThumbnail("https://cdn.discordapp.com/attachments/631974560605929493/1086539928596398110/image.png")
+                .setFooter("Oficina Myuu", "https://cdn.discordapp.com/attachments/631974560605929493/1086540588788228117/a_d51df27b11a16bbfaf5ce83acfeebfd8.png");
 
         bot.util.RegistrationRoles[] roles = bot.util.RegistrationRoles.values();
 
         for (bot.util.RegistrationRoles r : roles) {
             Role targetRole = guild.getRoleById(r.id());
 
-            if (targetRole == null) embedBuilder.addField("> `" + r.name() + "`", "`⚠ Not Found`", false);
-            else embedBuilder.addField("> `" + r.name() + "`", "<@&" + targetRole.getIdLong() + ">", false);
+            if (targetRole == null) builder.addField("> `" + r.name() + "`", "`⚠ Not Found`", false);
+            else builder.addField("> `" + r.name() + "`", "<@&" + targetRole.getIdLong() + ">", false);
         }
+
+        return builder.build();
     }
 }

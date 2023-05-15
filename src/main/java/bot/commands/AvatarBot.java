@@ -56,13 +56,11 @@ public class AvatarBot implements CommandExecutor {
 
             }
 
-            message.delete().queue();
             return;
         }
 
         if (!isFileValid(attachments.get(0).getFileName())) {
             Bot.sendGhostMessage(channel, "O tipo de arquivo fornecido é inválido. Por favor, forneça: `[.png | .jpg | .webp]`.", 15000);
-            message.delete().queue();
             return;
         }
 
@@ -81,8 +79,6 @@ public class AvatarBot implements CommandExecutor {
         } catch (NullPointerException e) {
             Bot.sendGhostMessage(channel, "Imagem não foi encontrada.", 10000);
         }
-
-        message.delete().queue();
     }
 
     private boolean isFileValid(String str) {

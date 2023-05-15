@@ -33,7 +33,6 @@ public class IPLookup implements CommandExecutor {
 
         if (args.length < 2) {
             Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
-            message.delete().queue();
             return;
         }
 
@@ -41,7 +40,6 @@ public class IPLookup implements CommandExecutor {
 
         if (!matcher.matches()) {
             Bot.sendGhostMessage(channel, "O IP `" + args[1] + "` é inválido.", 10000);
-            message.delete().queue();
             return;
         }
 
@@ -52,7 +50,6 @@ public class IPLookup implements CommandExecutor {
             Bot.sendGhostMessage(channel,
                 "Não foi possível encontrar a região do ip `" + args[1] + "`.",
                 10000);
-            message.delete().queue();
             return;
         }
 
@@ -63,7 +60,6 @@ public class IPLookup implements CommandExecutor {
         send.setEmbeds(embed);
 
         channel.sendMessage(send.build()).queue();
-        message.delete().queue();
     }
 
     private MessageEmbed embed(Guild guild, IP ip) {

@@ -27,7 +27,6 @@ public class Banner implements CommandExecutor {
 
         if (target == null) {
             Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
-            message.delete().queue();
             return;
         }
 
@@ -35,14 +34,12 @@ public class Banner implements CommandExecutor {
 
         if (banner == null) {
             Bot.sendGhostMessage(channel, "O usuário não possui um banner ou nenhum foi encontrado.", 10000);
-            message.delete().queue();
             return;
         }
 
         banner += "?size=2048";
 
         channel.sendMessageEmbeds(embed(banner, message.getGuild(), target)).queue();
-        message.delete().queue();
     }
 
     private MessageEmbed embed(String url, Guild guild, User target) {

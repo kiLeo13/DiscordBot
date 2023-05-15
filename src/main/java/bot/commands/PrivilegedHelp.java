@@ -1,6 +1,7 @@
 package bot.commands;
 
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -9,6 +10,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 import java.awt.*;
 
+@CommandPermission(permissions = Permission.MANAGE_SERVER)
 public class PrivilegedHelp implements CommandExecutor {
 
     @Override
@@ -18,8 +20,6 @@ public class PrivilegedHelp implements CommandExecutor {
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
         Role booster = guild.getBoostRole();
-
-        if (member == null || !member.hasPermission(Permission.MANAGE_SERVER )) return;
 
         MessageCreateBuilder send = new MessageCreateBuilder();
         MessageEmbed embed = new EmbedBuilder()
@@ -110,9 +110,8 @@ public class PrivilegedHelp implements CommandExecutor {
                 .build();
 
         send.setEmbeds(embed);
-        send.setContent("<@" + member.getIdLong() + ">");
+        send.setContent("<@" + member.getId() + ">");
 
         channel.sendMessage(send.build()).queue();
-        message.delete().queue();
     }
 }

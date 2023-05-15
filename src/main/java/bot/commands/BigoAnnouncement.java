@@ -3,9 +3,7 @@ package bot.commands;
 import bot.util.CommandExecutor;
 import bot.util.CommandPermission;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
 import java.util.HashMap;
@@ -15,8 +13,7 @@ public class BigoAnnouncement implements CommandExecutor {
 
     @Override
     public void run(Message message) {
-        User author = message.getAuthor();
-        Member member = message.getMember();
+
         MessageChannelUnion channel = message.getChannel();
         String announcement = getAnnouncement("""
                 Vão lá conferir a live do <streamer>!
@@ -24,9 +21,6 @@ public class BigoAnnouncement implements CommandExecutor {
                 <link>
                 """);
 
-        if (author.isBot() || member == null) return;
-
-        message.delete().queue();
         channel.sendMessage(announcement).queue();
     }
 

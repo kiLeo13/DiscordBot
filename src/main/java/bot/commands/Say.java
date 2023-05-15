@@ -2,10 +2,9 @@ package bot.commands;
 
 import bot.util.Bot;
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
@@ -15,13 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+@CommandPermission(permissions = Permission.MANAGE_SERVER)
 public class Say implements CommandExecutor {
 
     @Override
     public void run(Message message) {
 
-        User author = message.getAuthor();
-        Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
         String content = message.getContentRaw();
         List<Message.Attachment> attachments = message.getAttachments();
@@ -30,9 +28,6 @@ public class Say implements CommandExecutor {
         String[] args = content.split(" ");
 
         Message replyiedMessage = message.getReferencedMessage();
-
-        if (member == null || !member.hasPermission(Permission.MANAGE_SERVER)) return;
-        if (author.isBot()) return;
 
         List<InputStream> streams = new ArrayList<>();
         List<String> fileNames = new ArrayList<>();
@@ -56,12 +51,10 @@ public class Say implements CommandExecutor {
         // If the message to be sent is empty, tell them about it
         if (builder.isEmpty()) {
             Bot.sendGhostMessage(channel, "A mensagem a ser enviada não pode estar vazia.", 10000);
-            message.delete().queue();
             return;
         }
 
         if (replyiedMessage == null) channel.sendMessage(builder.build()).queue();
         else replyiedMessage.reply(builder.build()).queue();
-        message.delete().queue();
     }
 }

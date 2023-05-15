@@ -1,26 +1,24 @@
 package bot.commands;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import bot.util.Bot;
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
 import bot.util.Messages;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@CommandPermission()
 public class Randomize implements CommandExecutor {
 
     @Override
     public void run(Message message) {
-        
-        Member member = message.getMember();
+
         String content = message.getContentRaw();
         String[] args = content.split(" ");
         MessageChannelUnion channel = message.getChannel();
-
-        if (member == null) return;
 
         if (args.length < 3) {
             Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
@@ -35,8 +33,6 @@ public class Randomize implements CommandExecutor {
 
             default -> channel.sendMessage("Nenhuma ").queue();
         }
-
-        message.delete().queue();
     }
 
     private String doubleNum(String str, boolean hasDecimal) {

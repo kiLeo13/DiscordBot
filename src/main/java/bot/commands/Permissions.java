@@ -29,13 +29,11 @@ public class Permissions implements CommandExecutor {
         
         if (args.length < 2) {
             Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
-            message.delete().queue();
             return;
         }
 
         if (target == null) {
             Bot.sendGhostMessage(channel, "Membro não encontrado. Caso esteja procurando por informações de um cargo, use `.roleinfo <role>.`", 10000);
-            message.delete().queue();
             return;
         }
 
@@ -46,7 +44,6 @@ public class Permissions implements CommandExecutor {
         send.setEmbeds(embed);
 
         channel.sendMessage(send.build()).queue();
-        message.delete().queue();
     }
 
     private MessageEmbed embed(Member target) {

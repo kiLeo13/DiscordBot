@@ -16,19 +16,19 @@ public class Shutdown implements SlashExecutor {
         JDA api = Main.getApi();
         User user = event.getUser();
         event.reply("*Attempting to shut system down in 5 seconds...*").setEphemeral(true).queue();
+        api.getPresence().setPresence(OnlineStatus.OFFLINE, false);
 
         Bot.setTimeout(() -> {
-            api.getPresence().setPresence(OnlineStatus.OFFLINE, false);
             api.shutdownNow();
             System.out.printf("""
-                    
                     ==============================
                     
                     ⚠ Bot has gone offline!
-                    Requested by: [ %s#%s ]
+                    Requested by: [ %s ]
                     
                     ==============================
-                    """, user.getName(), user.getDiscriminator());
+                    
+                    """, user.getAsTag());
         }, 5000);
     }
 }

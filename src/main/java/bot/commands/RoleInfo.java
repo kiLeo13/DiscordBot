@@ -29,7 +29,6 @@ public class RoleInfo implements CommandExecutor {
 
         if (args.length < 2) {
             Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
-            message.delete().queue();
             return;
         }
 
@@ -37,7 +36,6 @@ public class RoleInfo implements CommandExecutor {
 
         if (role == null) {
             Bot.sendGhostMessage(channel, "O cargo fornecido não existe.", 10000);
-            message.delete().queue();
             return;
         }
 
@@ -48,7 +46,6 @@ public class RoleInfo implements CommandExecutor {
         builder.setContent("<@" + member.getIdLong() + ">");
 
         Message sent = channel.sendMessage(builder.build()).complete();
-        message.delete().queue(null, null);
 
         guild.findMembersWithRoles(role).onSuccess(m -> {
             int size = m.size();
@@ -133,7 +130,6 @@ public class RoleInfo implements CommandExecutor {
         }
 
         builder.append(".\n```");
-
         return builder.toString();
     }
 }

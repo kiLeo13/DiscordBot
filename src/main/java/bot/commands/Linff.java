@@ -34,7 +34,5 @@ public class Linff implements CommandExecutor {
             channel.sendMessage(String.format("<@577787431340736533> %s", swearings.get(random))).queue();
         else
             channel.sendMessage("<@577787431340736533>" + content.substring(args[0].length())).queue();
-        
-        message.delete().queue();
     }
 }
