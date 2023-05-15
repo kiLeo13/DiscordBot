@@ -61,14 +61,18 @@ public class CommandHandler extends ListenerAdapter {
         Permission[] permissions = command.getClass().getAnnotation(CommandPermission.class).permissions();
         EnumSet<Permission> memberPermissions = member.getPermissions();
 
-        if (permissions.length == 0)
+        if (permissions.length == 0) {
             command.run(message);
+            return;
+        }
 
         for (Permission p : permissions) {
             if (memberPermissions.contains(p)) {
-                runCommand(message);
+                command.run(message);
 
-                boolean deletion = command.getClass().getAnnotation(MessageDeletion.class).value();
+                // Should it be automatically deleted?
+                MessageDeletion annotation = command.getClass().getAnnotation(MessageDeletion.class);
+                boolean deletion = annotation == null || annotation.value();
 
                 if (deletion)
                     Bot.delete(message);

@@ -2,6 +2,7 @@ package bot.commands;
 
 import bot.util.Bot;
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
 import bot.util.Messages;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 import java.util.List;
 
+@CommandPermission()
 public class RoleInfo implements CommandExecutor {
 
     @Override
@@ -22,8 +24,6 @@ public class RoleInfo implements CommandExecutor {
         String[] args = content.split(" ");
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
-
-        if (member == null) return;
 
         member.getUser().getFlags();
 
@@ -51,7 +51,7 @@ public class RoleInfo implements CommandExecutor {
             int size = m.size();
             int sizeOnline = m.stream().filter(mem -> !mem.getOnlineStatus().equals(OnlineStatus.OFFLINE)).toList().size();
 
-            EmbedBuilder newEmbed = new EmbedBuilder();
+            final EmbedBuilder newEmbed = new EmbedBuilder();
 
             newEmbed
                     .setTitle(embed.getTitle())
@@ -97,7 +97,7 @@ public class RoleInfo implements CommandExecutor {
                 .addField("📅 Criação", "<t:" + creation + ">\n<t:" + creation + ":R>", true)
                 .addField("💻 Role ID", "`" + role.getIdLong() + "`", true)
                 .addField("🤖 Integração", role.isManaged() ? "`Sim`" : "`Não`", true)
-                .addField("🔕 Mencionável", role.isMentionable() ? "`Sim`" : "`Não`", true)
+                .addField(role.isMentionable() ? "🔔" : "🔕" + " Mencionável", role.isMentionable() ? "`Sim`" : "`Não`", true)
                 .addField("📃 Mostrar Separadamente", role.isHoisted() ? "`Sim`" : "`Não`", true)
                 .addField("🎨 Cor", String.format("HEX: `%s`\nRGB: `%s, %s, %s`",
                         color,

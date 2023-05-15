@@ -36,12 +36,14 @@ public class Clear implements CommandExecutor {
             return;
         }
 
-
-        String amountStr = amount < 10 ? "0" + amount : String.valueOf(amount);
-        String suffix = amount == 1 ? "mensagem" : "mensagens";
-        String suffixGone = amount == 1 ? "foi" : "foram";
-
-        channel.getHistory().retrievePast(amount + 1).queue(channel::purgeMessages);
-        Bot.sendGhostMessage(channel, String.format("Prontinho, `%s %s` se %s 👍", amountStr, suffix, suffixGone), 5000);
+        channel.getHistory().retrievePast(amount + 1).queue(msgs -> {
+            channel.purgeMessages(msgs);
+            Bot.sendGhostMessage(channel, String.format(
+                    "Prontinho, `%s %s` %s 👍",
+                    amount < 10 ? "0" + amount : amount,
+                    amount < 10 ? "mensagem" : "mensagens",
+                    amount < 10 ? "foi apagada" : "foram apagadas"
+            ), 5000);
+        });
     }
 }
