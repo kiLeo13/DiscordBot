@@ -1,14 +1,21 @@
 package bot.listeners;
 
+import bot.commands.Permissions;
 import bot.commands.Registration;
 import bot.data.BotData;
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 
 public class CommandHandler extends ListenerAdapter {
     private static final HashMap<String, CommandExecutor> commands = new HashMap<>();
@@ -24,11 +31,11 @@ public class CommandHandler extends ListenerAdapter {
     @SubscribeEvent
     public void onMessageReceived(MessageReceivedEvent event) {
 
-        if (event.getGuild().getIdLong() == 11111L) return;
-        if (event.getAuthor().isBot()) return;
-
         Message message = event.getMessage();
+        Member member = message.getMember();
         String content = message.getContentRaw();
+
+        if (member == null || member.getUser().isBot()) return;
 
         if (!content.startsWith(BotData.PREFIX) && !content.startsWith(BotData.PREFIX_REGISTER)) return;
 
@@ -40,6 +47,7 @@ public class CommandHandler extends ListenerAdapter {
         if (commands.isEmpty()) return;
 
         CommandExecutor registration = Registration.getInstance();
+        Member member = message.getMember();
         String input = message.getContentRaw().toLowerCase();
         String cmd = input.split(" ")[0];
 
@@ -50,10 +58,25 @@ public class CommandHandler extends ListenerAdapter {
         CommandExecutor command = commands.get(cmd);
         if (command == null) return;
 
-        command.run(message);
+        // This will check if they have the required permission
+        Permission[] permissions = command.getClass().getAnnotation(CommandPermission.class).permissions();
+        EnumSet<Permission> memberPermissions = member.getPermissions();
+
+        if (permissions.length == 0)
+            command.run(message);
+
+        for (Permission p : permissions) {
+            if (memberPermissions.contains(p)) {
+                runCommand(message);
+                break;
+            }
+        }
     }
 
     public void addCommand(String name, CommandExecutor command) {
+        if (!command.getClass().isAnnotationPresent(CommandPermission.class))
+            throw new IllegalArgumentException("Class " + command.getClass().getName() + " is not annotated with 'CommandPermission'");
+
         final HashMap<String, String> prefixes = new HashMap<>();
 
         prefixes.put("<prefix>", BotData.PREFIX);
@@ -72,6 +95,9 @@ public class CommandHandler extends ListenerAdapter {
     }
 
     public void addCommand(CommandExecutor command, String... name) {
+        if (!command.getClass().isAnnotationPresent(CommandPermission.class))
+            throw new IllegalArgumentException("Class " + command.getClass().getName() + " is not annotated with 'CommandPermission'");
+
         for (String n : name) {
             n = n.replaceAll("<prefix>", BotData.PREFIX).toLowerCase();
 

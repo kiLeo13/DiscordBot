@@ -28,11 +28,10 @@ public class Linff implements CommandExecutor {
         if (salada == null || member == null || !member.getRoles().contains(salada)) return;
         int random = (int) Math.floor(Math.random() * swearings.size());
 
-        if (args.length == 1) {
+        if (args.length == 1)
             channel.sendMessage(String.format("<@577787431340736533> %s", swearings.get(random))).queue();
-        } else {
+        else
             channel.sendMessage("<@577787431340736533>" + content.substring(args[0].length())).queue();
-        }
         
         message.delete().queue();
     }
