@@ -15,28 +15,20 @@ public class BotStatus implements SlashExecutor {
     @Override
     public void process(SlashCommandInteractionEvent event) {
 
-        String input;
-        String name;
+        String input = event.getOption("link") == null ? null : event.getOption("link").getAsString();
+        String name = event.getOption("name") == null ? null : event.getOption("name").getAsString();
         JDA api = Main.getApi();
         LocalDateTime now = LocalDateTime.now();
+        Member member = event.getMember();
 
         String hour = now.getHour() < 10 ? "0" + now.getHour() : String.valueOf(now.getHour());
         String minute = now.getMinute() < 10 ? "0" + now.getMinute() : String.valueOf(now.getMinute());
         String second = now.getSecond() < 10 ? "0" + now.getSecond() : String.valueOf(now.getSecond());
 
-        Member member = event.getMember();
-
-        try {
-            input = event.getOption("link").getAsString();
-            name = event.getOption("name") == null ? null : event.getOption("name").getAsString();
-        } catch (NullPointerException e) {
-            input = null;
-            name = null;
-        }
-
         if (input == null || name == null || input.equals("none") || name.equals("none")) {
             event.reply("Resetando status do bot.").setEphemeral(true).queue();
             api.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Oficina"), false);
+
             System.out.printf("[%s:%s:%s]: %s resetou a ativdade do bot\n", hour, minute, second, member.getUser().getName());
             return;
         }

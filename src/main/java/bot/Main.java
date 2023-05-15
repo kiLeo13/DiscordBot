@@ -103,6 +103,7 @@ public final class Main {
         commands.addCommand("<prefix>randomize", new Randomize());
         commands.addCommand("<prefix>roleinfo", new RoleInfo());
         commands.addCommand("<prefix>p-help", new PrivilegedHelp());
+        commands.addCommand("<prefix>permissions", new Permissions());
 
         commands.addCommand(new Format(), "<prefix>format", "<prefix>parse");
         commands.addCommand(new Characters(), "<prefix>valorant-agent", "<prefix>v-agent");
@@ -120,10 +121,6 @@ public final class Main {
 
         /* []====================[] Disconnect []====================[] */
         commands.add(Commands.slash("disconnect", "Desconecta o usuário do canal de voz atual."));
-
-        /* []====================[] Ping []====================[] */
-        commands.add(Commands.slash("ping", "Sends you the ping.")
-                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
         /* []====================[] Disconnect All []====================[] */
         OptionData disonnectAllChannels = new OptionData(OptionType.CHANNEL, "channel", "Decide de qual canal os membros devem ser desconectados.", true)
@@ -199,7 +196,6 @@ public final class Main {
 
         // Internally register all the slash commands
         slash.addListenerCommand("disconnect", new Disconnect());
-        slash.addListenerCommand("ping", new Ping());
         slash.addListenerCommand("disconnectall", new DisconnectAll());
         slash.addListenerCommand("register", Registration.getInstance());
         slash.addListenerCommand("moveall", new VoiceMoveAll());

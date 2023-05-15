@@ -2,6 +2,7 @@ package bot.commands;
 
 import bot.util.Bot;
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
 import bot.util.Messages;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -11,6 +12,7 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 
 import java.awt.*;
 
+@CommandPermission(permissions = Permission.MANAGE_SERVER)
 public class Banner implements CommandExecutor {
 
     @Override
@@ -20,8 +22,6 @@ public class Banner implements CommandExecutor {
         String content = message.getContentRaw();
         String[] args = content.split(" ");
         MessageChannelUnion channel = message.getChannel();
-
-        if (member == null || !member.hasPermission(Permission.MANAGE_SERVER)) return;
 
         User target = args.length < 2 ? member.getUser() : Bot.findUser(args[1]);
 

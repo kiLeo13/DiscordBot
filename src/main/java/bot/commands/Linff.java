@@ -3,6 +3,7 @@ package bot.commands;
 import java.util.List;
 
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
 import bot.util.Roles;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -10,6 +11,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
+@CommandPermission()
 public class Linff implements CommandExecutor {
 
     @Override
@@ -25,7 +27,7 @@ public class Linff implements CommandExecutor {
             "Filho da puta burro", "VIADINHO",
             "BICHA", "PAU NO CU", "Seu bosta");
 
-        if (salada == null || member == null || !member.getRoles().contains(salada)) return;
+        if (salada == null || !member.getRoles().contains(salada)) return;
         int random = (int) Math.floor(Math.random() * swearings.size());
 
         if (args.length == 1)

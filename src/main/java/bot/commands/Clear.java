@@ -2,12 +2,14 @@ package bot.commands;
 
 import bot.util.Bot;
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
 import bot.util.Messages;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
+@CommandPermission(permissions = Permission.MESSAGE_MANAGE)
 public class Clear implements CommandExecutor {
 
     @Override
@@ -18,8 +20,6 @@ public class Clear implements CommandExecutor {
         String[] args = message.getContentRaw().split(" ");
 
         byte amount;
-
-        if (member == null || !member.hasPermission(Permission.MESSAGE_MANAGE)) return;
 
         if (args.length < 2) {
             Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);

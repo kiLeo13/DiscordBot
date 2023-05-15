@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 import java.util.List;
 
+@CommandPermission()
 public class Disconnect implements CommandExecutor, SlashExecutor {
 
     @Override
@@ -18,7 +19,6 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
         Guild guild = message.getGuild();
 
         if (!Channels.COMMAND_DISCONNECT_SELF_CHANNELS.ids().contains(channel.getIdLong())) return;
-        if (member == null) return;
 
         GuildVoiceState voiceState = member.getVoiceState();
 

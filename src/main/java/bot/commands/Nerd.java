@@ -4,6 +4,7 @@ import bot.util.Bot;
 
 import java.io.InputStream;
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
 import bot.util.Roles;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -13,6 +14,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
+@CommandPermission()
 public class Nerd implements CommandExecutor {
 
     @Override
@@ -33,7 +35,7 @@ public class Nerd implements CommandExecutor {
             return;
         }
 
-        if (member == null || !(member.getRoles().contains(salada) && member.getRoles().contains(alfea))) return;
+        if (!(member.getRoles().contains(salada) && member.getRoles().contains(alfea))) return;
 
         InputStream stream = Bot.requestFile("https://raw.githubusercontent.com/kiLeo13/DiscordBot/main/content/images/nerd.png");
 

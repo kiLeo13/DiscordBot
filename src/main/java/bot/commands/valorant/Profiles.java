@@ -1,6 +1,8 @@
 package bot.commands.valorant;
 
 import java.awt.Color;
+
+import bot.util.CommandPermission;
 import com.google.gson.Gson;
 
 import bot.util.Bot;
@@ -14,6 +16,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
+@CommandPermission()
 public class Profiles implements CommandExecutor {
     private long lastUsed;
 
@@ -26,8 +29,6 @@ public class Profiles implements CommandExecutor {
         Guild guild = message.getGuild();
         String[] args = content.split(" ");
         long now = System.currentTimeMillis();
-
-        if (member == null) return;
 
         if (args.length < 2) {
             Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);

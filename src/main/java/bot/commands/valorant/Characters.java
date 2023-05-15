@@ -3,6 +3,7 @@ package bot.commands.valorant;
 import java.awt.Color;
 import java.util.List;
 
+import bot.util.CommandPermission;
 import com.google.gson.Gson;
 
 import bot.util.Bot;
@@ -15,6 +16,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
+@CommandPermission()
 public class Characters implements CommandExecutor {
 
     @Override
@@ -24,8 +26,6 @@ public class Characters implements CommandExecutor {
         MessageChannelUnion channel = message.getChannel();
         String content = message.getContentRaw();
         String[] args = content.split(" ");
-        
-        if (member == null) return;
 
         if (args.length < 2) {
             channel.sendMessage(Messages.ERROR_TOO_FEW_ARGUMENTS.message()).queue();

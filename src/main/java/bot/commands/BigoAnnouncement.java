@@ -1,6 +1,7 @@
 package bot.commands;
 
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -9,6 +10,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
 import java.util.HashMap;
 
+@CommandPermission(permissions = Permission.MANAGE_SERVER)
 public class BigoAnnouncement implements CommandExecutor {
 
     @Override
@@ -23,7 +25,6 @@ public class BigoAnnouncement implements CommandExecutor {
                 """);
 
         if (author.isBot() || member == null) return;
-        if (!member.hasPermission(Permission.MESSAGE_MANAGE) && member.getIdLong() != 974159685764649010L) return;
 
         message.delete().queue();
         channel.sendMessage(announcement).queue();

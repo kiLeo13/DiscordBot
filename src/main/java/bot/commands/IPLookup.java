@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import bot.util.CommandPermission;
 import com.google.gson.Gson;
 
 import bot.util.CommandExecutor;
@@ -17,6 +18,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
+@CommandPermission()
 public class IPLookup implements CommandExecutor {
 
     @Override
@@ -28,8 +30,6 @@ public class IPLookup implements CommandExecutor {
         String[] args = content.split(" ");
         String regex = "\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b";
         Pattern pattern = Pattern.compile(regex);
-
-        if (member == null) return;
 
         if (args.length < 2) {
             Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);

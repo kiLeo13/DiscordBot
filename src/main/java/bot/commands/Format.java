@@ -8,21 +8,19 @@ import java.util.regex.Pattern;
 
 import bot.util.Bot;
 import bot.util.CommandExecutor;
-import net.dv8tion.jda.api.entities.Member;
+import bot.util.CommandPermission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
+@CommandPermission()
 public class Format implements CommandExecutor {
 
     @Override
     public void run(Message message) {
-        
-        Member member = message.getMember();
+
         String content = message.getContentRaw();
         String[] args = content.split(" ");
         MessageChannelUnion channel = message.getChannel();
-
-        if (member == null) return;
 
         if (args.length < 2) {
             channel.sendMessage("Argumentos insuficientes!\nUse: `.format [camel/CAMEL | reverse | time | emoji] <text>`").queue();

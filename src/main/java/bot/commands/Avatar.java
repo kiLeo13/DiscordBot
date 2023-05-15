@@ -2,6 +2,7 @@ package bot.commands;
 
 import bot.util.Bot;
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
 import bot.util.Messages;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -13,6 +14,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 import java.awt.*;
 
+@CommandPermission()
 public class Avatar implements CommandExecutor {
 
     @Override
@@ -24,8 +26,6 @@ public class Avatar implements CommandExecutor {
         String[] args = content.split(" ");
         Member target = args.length < 2 ? member : Bot.findMember(message.getGuild(), args[1]);
         MessageCreateBuilder send = new MessageCreateBuilder();
-
-        if (member == null) return;
 
         if (target == null) {
             Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);

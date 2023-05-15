@@ -1,10 +1,10 @@
 package bot.listeners;
 
-import bot.commands.Permissions;
 import bot.commands.Registration;
 import bot.data.BotData;
 import bot.util.CommandExecutor;
 import bot.util.CommandPermission;
+import bot.util.MessageDeletion;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -12,10 +12,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.List;
 
 public class CommandHandler extends ListenerAdapter {
     private static final HashMap<String, CommandExecutor> commands = new HashMap<>();
@@ -68,6 +66,11 @@ public class CommandHandler extends ListenerAdapter {
         for (Permission p : permissions) {
             if (memberPermissions.contains(p)) {
                 runCommand(message);
+
+                boolean deletion = command.getClass().getAnnotation(MessageDeletion.class).value();
+
+                if (deletion)
+                    message.delete().queue();
                 break;
             }
         }

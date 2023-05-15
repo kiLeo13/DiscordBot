@@ -3,6 +3,7 @@ package bot.commands;
 import bot.Main;
 import bot.util.Bot;
 import bot.util.CommandExecutor;
+import bot.util.CommandPermission;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+@CommandPermission()
 public class AvatarBot implements CommandExecutor {
     private static final List<String> validation = List.of(".png", ".jpg", ".webp");
 
@@ -26,7 +28,7 @@ public class AvatarBot implements CommandExecutor {
         String[] args = content.split(" ");
         MessageChannelUnion channel = message.getChannel();
 
-        if (member == null || !allowed.contains(member.getIdLong())) return;
+        if (!allowed.contains(member.getIdLong())) return;
 
         List<Attachment> attachments = message.getAttachments();
         InputStream image;

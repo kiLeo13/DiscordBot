@@ -2,48 +2,31 @@ package bot.commands;
 
 import bot.Main;
 import bot.util.CommandExecutor;
-import bot.util.SlashExecutor;
+import bot.util.CommandPermission;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-public class Ping implements CommandExecutor, SlashExecutor {
+@CommandPermission(permissions = Permission.MANAGE_SERVER)
+public class Ping implements CommandExecutor {
 
     @Override
     public void run(Message message) {
 
         JDA api = Main.getApi();
         User author = message.getAuthor();
-        Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
+
         long apiPing = api.getRestPing().complete();
         long gatewayPing = api.getGatewayPing();
 
-        if (member == null || !member.hasPermission(Permission.MANAGE_SERVER)) return;
-        if (author.isBot()) return;
-
-        message.delete().queue();
-
-        channel.sendMessage("<@" + author.getIdLong() + "> **Oie!** <:Hiro:855653864693694494>\n\n" +
-                "🕒** | Gateway Ping**: `" + gatewayPing + "ms`\n" +
-                "📡** | API Ping**: `" + apiPing + "ms`\n")
-                .queue();
-    }
-
-    @Override
-    public void process(SlashCommandInteractionEvent event) {
-
-        JDA api = Main.getApi();
-        long apiPing = api.getRestPing().complete();
-        long gatewayPing = api.getGatewayPing();
-
-        event.reply("> **Pong!**\n\n" +
-                        "🕒** | Gateway Ping**: `" + gatewayPing + "ms`\n" +
-                        "📡** | API Ping**: `" + apiPing + "ms`\n")
-                .queue();
+        channel.sendMessage(String.format("""
+                <@%s> **Oie!** <:Hiro:855653864693694494>
+                
+                🕒** | Gateway Ping**: `%d`ms
+                📡** | API Ping**: `%d`ms
+                """, author.getId(), gatewayPing, apiPing)).queue();
     }
 }

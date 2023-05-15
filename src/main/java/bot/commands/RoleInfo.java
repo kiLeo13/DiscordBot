@@ -95,7 +95,7 @@ public class RoleInfo implements CommandExecutor {
 
         builder
                 .setTitle(role.getName())
-                .setDescription("Informações do cargo <@&" + role.getIdLong() + ">!")
+                .setDescription("Informações do cargo <@&" + role.getIdLong() + ">.")
                 .setColor(role.getColor())
                 .addField("📅 Criação", "<t:" + creation + ">\n<t:" + creation + ":R>", true)
                 .addField("💻 Role ID", "`" + role.getIdLong() + "`", true)
