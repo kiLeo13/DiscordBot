@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 import java.awt.*;
 
-@CommandPermission(permissions = Permission.ADMINISTRATOR)
+@CommandPermission(permission = Permission.ADMINISTRATOR)
 public class RegistrationRoles implements CommandExecutor {
 
     @Override

@@ -12,7 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@CommandPermission(permissions = Permission.MANAGE_ROLES)
+@CommandPermission(permission = Permission.MANAGE_ROLES)
 public class RegistrationTake implements CommandExecutor {
 
     @Override

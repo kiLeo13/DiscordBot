@@ -49,18 +49,17 @@ public class Registration implements CommandExecutor, SlashExecutor {
     public void run(Message message) {
 
         Member member = message.getMember();
-        User author = message.getAuthor();
         Guild guild = message.getGuild();
         MessageChannelUnion channel = message.getChannel();
         String content = message.getContentRaw();
         boolean rolesExist = rolesExist(guild);
 
-        if (author.isBot() || member == null) return;
-
         // Is the channel correct?
         if (channel.getIdLong() != Channels.REGISTER_CHANNEL.id()) return;
 
         if (!member.getRoles().contains(requiredRole) && !member.hasPermission(Permission.MANAGE_ROLES)) return;
+
+        message.delete().queue();
 
         try { areRolesSetupProperly(guild); }
         catch (IllegalArgumentException | HierarchyException e) {

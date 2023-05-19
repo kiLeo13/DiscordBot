@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-@CommandPermission(permissions = Permission.MANAGE_SERVER)
+@CommandPermission(permission = Permission.MANAGE_SERVER)
 public class Say implements CommandExecutor {
 
     @Override

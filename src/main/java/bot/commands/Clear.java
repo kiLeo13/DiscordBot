@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
-@CommandPermission(permissions = Permission.MESSAGE_MANAGE)
+@CommandPermission(permission = Permission.MESSAGE_MANAGE)
 public class Clear implements CommandExecutor {
 
     @Override
@@ -41,8 +41,8 @@ public class Clear implements CommandExecutor {
             Bot.sendGhostMessage(channel, String.format(
                     "Prontinho, `%s %s` %s 👍",
                     amount < 10 ? "0" + amount : amount,
-                    amount < 10 ? "mensagem" : "mensagens",
-                    amount < 10 ? "foi apagada" : "foram apagadas"
+                    amount == 1 ? "mensagem" : "mensagens",
+                    amount == 1 ? "foi apagada" : "foram apagadas"
             ), 5000);
         });
     }

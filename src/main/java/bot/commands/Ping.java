@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
-@CommandPermission(permissions = Permission.MANAGE_SERVER)
+@CommandPermission(permission = Permission.MANAGE_SERVER)
 public class Ping implements CommandExecutor {
 
     @Override

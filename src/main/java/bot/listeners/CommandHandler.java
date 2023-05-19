@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 
-import java.util.EnumSet;
 import java.util.HashMap;
 
 public class CommandHandler extends ListenerAdapter {
@@ -43,7 +42,6 @@ public class CommandHandler extends ListenerAdapter {
     }
 
     public void runCommand(Message message) {
-        if (commands.isEmpty()) return;
 
         CommandExecutor registration = Registration.getInstance();
         Member member = message.getMember();
@@ -58,27 +56,17 @@ public class CommandHandler extends ListenerAdapter {
         if (command == null) return;
 
         // This will check if they have the required permission
-        Permission[] permissions = command.getClass().getAnnotation(CommandPermission.class).permissions();
-        EnumSet<Permission> memberPermissions = member.getPermissions();
+        Permission permission = command.getClass().getAnnotation(CommandPermission.class).permission();
 
-        if (permissions.length == 0) {
+        if (member.hasPermission(permission) || permission.getName().equals("UNKNOWN"))
             command.run(message);
-            return;
-        }
 
-        for (Permission p : permissions) {
-            if (memberPermissions.contains(p)) {
-                command.run(message);
+        // Should it be automatically deleted?
+        MessageDeletion annotation = command.getClass().getAnnotation(MessageDeletion.class);
+        boolean deletion = annotation == null || annotation.value();
 
-                // Should it be automatically deleted?
-                MessageDeletion annotation = command.getClass().getAnnotation(MessageDeletion.class);
-                boolean deletion = annotation == null || annotation.value();
-
-                if (deletion)
-                    Bot.delete(message);
-                break;
-            }
-        }
+        if (deletion)
+            Bot.delete(message);
     }
 
     public void addCommand(String name, CommandExecutor command) {

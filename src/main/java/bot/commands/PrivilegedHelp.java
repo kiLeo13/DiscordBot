@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 import java.awt.*;
 
-@CommandPermission(permissions = Permission.MANAGE_SERVER)
+@CommandPermission(permission = Permission.MANAGE_SERVER)
 public class PrivilegedHelp implements CommandExecutor {
 
     @Override

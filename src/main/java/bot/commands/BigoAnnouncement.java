@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
 import java.util.HashMap;
 
-@CommandPermission(permissions = Permission.MANAGE_SERVER)
+@CommandPermission(permission = Permission.MANAGE_SERVER)
 public class BigoAnnouncement implements CommandExecutor {
 
     @Override

@@ -2,6 +2,7 @@ package bot.commands;
 
 import java.awt.Color;
 import java.util.EnumSet;
+import java.util.List;
 
 import bot.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -14,7 +15,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
-@CommandPermission(permissions = Permission.ADMINISTRATOR)
+@CommandPermission()
 public class Permissions implements CommandExecutor {
 
     @Override
@@ -25,15 +26,10 @@ public class Permissions implements CommandExecutor {
         String[] args = content.split(" ");
         Guild guild = message.getGuild();
         MessageChannelUnion channel = message.getChannel();
-        Member target = args.length < 2 ? null : Bot.findMember(guild, args[1]);
-        
-        if (args.length < 2) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
-            return;
-        }
+        Member target = args.length < 2 ? member : Bot.findMember(guild, args[1]);
 
         if (target == null) {
-            Bot.sendGhostMessage(channel, "Membro não encontrado. Caso esteja procurando por informações de um cargo, use `.roleinfo <role>.`", 10000);
+            Bot.sendGhostMessage(channel, "Membro não encontrado. Caso esteja procurando por informações de um cargo, use `.roleinfo <role>`.", 10000);
             return;
         }
 
@@ -56,16 +52,19 @@ public class Permissions implements CommandExecutor {
 
         builder
                 .setTitle(target.getUser().getAsTag())
+                .setThumbnail(target.getUser().getAvatarUrl())
                 .setDescription("Permissões de `" + target.getEffectiveName() + "`.")
-                .addField("🔒 Permissões (" + permissions.size() + ")", permissions(permissions), true)
+                .addField("🔒 Permissões (" + permissions.size() + ")", permissions(permissions), false)
                 .setColor(color)
                 .setFooter(guild.getName(), guild.getIconUrl());
 
         return builder.build();
     }
 
-    private String permissions(EnumSet<Permission> permissions) {
+    private String permissions(EnumSet<Permission> perms) {
         StringBuilder builder = new StringBuilder().append("```\n");
+        List<Permission> permissions = perms.stream().toList();
+
 
         if (permissions.isEmpty())
             return "`Nenhuma`";
@@ -73,11 +72,9 @@ public class Permissions implements CommandExecutor {
         for (int i = 0; i < permissions.size(); i++) {
             if (i != 0) builder.append(", ");
 
-            builder.append(permissions.iterator().next().getName());
+            builder.append(permissions.get(i).getName());
         }
 
-        builder.append(".\n```");
-
-        return builder.toString();
+        return builder.append(".\n```").toString();
     }
 }

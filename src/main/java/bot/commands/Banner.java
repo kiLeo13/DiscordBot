@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 
 import java.awt.*;
 
-@CommandPermission(permissions = Permission.MANAGE_SERVER)
+@CommandPermission(permission = Permission.MANAGE_SERVER)
 public class Banner implements CommandExecutor {
 
     @Override

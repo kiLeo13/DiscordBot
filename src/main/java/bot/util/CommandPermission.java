@@ -22,5 +22,5 @@ import net.dv8tion.jda.api.Permission;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CommandPermission {
-    Permission[] permissions() default {};
+    Permission permission() default Permission.UNKNOWN;
 }
