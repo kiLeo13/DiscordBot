@@ -77,6 +77,7 @@ public final class Main {
         api.addEventListener(new BlockLorittaExploit());
         api.addEventListener(CommandHandler.getInstance());
         api.addEventListener(new Links());
+        api.addEventListener(new OnBotPing());
         api.addEventListener(SlashHandler.getInstance());
         api.addEventListener(new WordFilter());
     }
@@ -103,7 +104,7 @@ public final class Main {
         commands.addCommand("<prefix>randomize", new Randomize());
         commands.addCommand("<prefix>roleinfo", new RoleInfo());
         commands.addCommand("<prefix>p-help", new PrivilegedHelp());
-        commands.addCommand("<prefix>permissions", new Permissions());
+        commands.addCommand(new Permissions(), "<prefix>permissions", "<prefix>permission", "<prefix>perms", "<prefix>perm");
 
         commands.addCommand(new Format(), "<prefix>format", "<prefix>parse");
         commands.addCommand(new Characters(), "<prefix>valorant-agent", "<prefix>v-agent");

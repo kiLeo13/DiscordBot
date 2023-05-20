@@ -19,9 +19,25 @@ public class YamlUtil {
         try (InputStream inputStream = new FileInputStream(file)) {
             HashMap<String, List<String>> data = yaml.load(inputStream);
 
-            return data == null
+            return data == null || data.get("allowed") == null
                     ? new ArrayList<>()
                     : data.get("allowed");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<>();
+    }
+
+    public static List<String> readBlockedLinks() {
+        final File file = new File("resources", "allowedlinks.yml");
+
+        try (InputStream inputStream = new FileInputStream(file)) {
+            HashMap<String, List<String>> data = yaml.load(inputStream);
+
+            return data == null || data.get("blocked") == null
+                    ? new ArrayList<>()
+                    : data.get("blocked");
         } catch (IOException e) {
             e.printStackTrace();
         }

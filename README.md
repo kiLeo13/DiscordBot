@@ -1,5 +1,5 @@
 # <p align="center">✨ DiscordBot ✨
-#### <p align="center">My first discord bot :3
+#### <p align="center">My first discord bot
 
 Yeah, this is my first Discord bot, learning how to use libraries and mostly how to use JDA. I tried to make a discord bot using JS a long time ago and it didn't go very well, so I'm here now trying to make it in Java xD
 
@@ -13,10 +13,6 @@ Yeah, this is my first Discord bot, learning how to use libraries and mostly how
 
 `Register`
 - Yeah, this bot has a simple register system for a single public server (will not work on other servers, you were advised about that).
-
-`Swearing Command`
-- If you run the command `.puta`, the bot will grab a random swearing stored in my YAML file and send it to you :)
-###### Note that if you want to add a swearing to the list you can simply DM me and ask for it as well.
 
 `Misc`
 - Yeah, this bot has many more features that I won't list here, but you can check them out by simply looking at the code.

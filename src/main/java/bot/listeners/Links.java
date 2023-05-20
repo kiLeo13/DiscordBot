@@ -44,13 +44,14 @@ public class Links extends ListenerAdapter {
 
     private boolean memberIsAllowed(Message message) {
         final Member member = message.getMember();
+        final List<String> allowed = YamlUtil.readAllowedLinks();
+        final List<String> blocked = YamlUtil.readBlockedLinks();
 
         // We can just ignore it if they do not exist or are a bot
         if (member == null || member.getUser().isBot()) return true;
 
-        List<String> allowed = YamlUtil.readAllowedLinks();
         String id = message.getChannel().getId();
 
-        return member.hasPermission(Permission.MESSAGE_MANAGE) || allowed.contains(id);
+        return (member.hasPermission(Permission.MESSAGE_MANAGE) || allowed.contains(id)) && !blocked.contains(id);
     }
 }
