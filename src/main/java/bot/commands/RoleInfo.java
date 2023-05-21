@@ -25,8 +25,6 @@ public class RoleInfo implements CommandExecutor {
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
 
-        member.getUser().getFlags();
-
         if (args.length < 2) {
             Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
             return;
@@ -105,7 +103,7 @@ public class RoleInfo implements CommandExecutor {
                         colorGreen < 10 ? "0" + colorGreen : String.valueOf(colorGreen),
                         colorBlue < 10 ? "0" + colorBlue : String.valueOf(colorBlue)
                 ), true)
-                .addField("👥 Membros", "Total: `...`\nOnline: `...`", true)
+                .addField("👥 Membros", "Total: `Waiting...`\nOnline: `Waiting...`", true)
                 .addField("🔒 Permissões", permissions(role), role.getPermissions().isEmpty())
                 .setFooter(guild.getName(), guild.getIconUrl());
 
