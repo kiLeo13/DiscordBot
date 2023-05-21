@@ -2,11 +2,14 @@ package bot;
 
 import bot.commands.Shutdown;
 import bot.commands.*;
+import bot.commands.lifetimemute.LifeMuteCommand;
+import bot.commands.lifetimemute.LifeMuteVoiceJoin;
 import bot.commands.misc.PayServer;
 import bot.commands.valorant.Characters;
 import bot.commands.valorant.Profiles;
 import bot.data.BotData;
 import bot.data.BotFiles;
+import bot.commands.lifetimemute.Reactions;
 import bot.listeners.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -34,8 +37,7 @@ public final class Main {
 
     public static void main(String[] args) {
         try {
-            BotFiles.createYamlFiles();
-            BotFiles.createJSONFiles();
+            BotFiles.loadFiles();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -72,14 +74,21 @@ public final class Main {
         return api;
     }
 
-    private static void registerEvents(JDA api) {
-        api.addEventListener(new AgeFilter());
-        api.addEventListener(new BlockLorittaExploit());
-        api.addEventListener(CommandHandler.getInstance());
-        api.addEventListener(new Links());
-        api.addEventListener(new OnBotPing());
-        api.addEventListener(SlashHandler.getInstance());
-        api.addEventListener(new WordFilter());
+    private static void registerEvents(JDA jda) {
+        // Text
+        jda.addEventListener(new AgeFilter());
+        jda.addEventListener(new BlockLorittaExploit());
+        jda.addEventListener(CommandHandler.getInstance());
+        jda.addEventListener(new Links());
+        jda.addEventListener(new OnBotPing());
+        jda.addEventListener(SlashHandler.getInstance());
+        jda.addEventListener(new WordFilter());
+
+        // Voice
+        jda.addEventListener(new LifeMuteVoiceJoin());
+
+        // Misc
+        jda.addEventListener(new Reactions());
     }
 
     private static void registerOldCommands() {
@@ -87,7 +96,6 @@ public final class Main {
 
         commands.addCommand("<prefix>bigo", new BigoAnnouncement());
         commands.addCommand("<prefix>ping", new Ping());
-        commands.addCommand("<prefix>puta", new Puta());
         commands.addCommand("<prefix>nerd", new Nerd());
         commands.addCommand("<prefix>among", new RoleAmongUs());
         commands.addCommand("<prefix>say", new Say());
@@ -104,6 +112,7 @@ public final class Main {
         commands.addCommand("<prefix>randomize", new Randomize());
         commands.addCommand("<prefix>roleinfo", new RoleInfo());
         commands.addCommand("<prefix>p-help", new PrivilegedHelp());
+        commands.addCommand("<prefix>lifemute", new LifeMuteCommand());
         commands.addCommand(new Permissions(), "<prefix>permissions", "<prefix>permission", "<prefix>perms", "<prefix>perm");
 
         commands.addCommand(new Format(), "<prefix>format", "<prefix>parse");

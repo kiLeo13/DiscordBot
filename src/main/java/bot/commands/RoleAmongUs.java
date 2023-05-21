@@ -21,29 +21,29 @@ public class RoleAmongUs implements CommandExecutor {
         String content = message.getContentRaw();
         String[] args = content.split(" ");
         Guild guild = message.getGuild();
-        Member target = args.length < 2 ? null : Bot.findMember(guild, args[1]);
+        Member target = args.length < 2 ? null : Bot.member(guild, args[1]);
         Role roleAmongUs = guild.getRoleById(Roles.ROLE_AMONG_US.id());
 
         if (!isMemberAllowed(member)) return;
         if (Channels.STAFF_AJUDANTES_CHANNEL.id() != channel.getIdLong()) return;
 
         if (args.length < 2) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 5000);
+            Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 5000);
             return;
         }
 
         if (roleAmongUs == null) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.message(), 10000);
+            Bot.tempMessage(channel, Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.message(), 10000);
             return;
         }
 
         if (target == null) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
+            Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
             return;
         }
 
         if (target.getUser().isBot()) {
-            Bot.sendGhostMessage(channel, "Um bot não pode receber este cargo.", 10000);
+            Bot.tempMessage(channel, "Um bot não pode receber este cargo.", 10000);
             return;
         }
 

@@ -28,14 +28,14 @@ public class RoleInfo implements CommandExecutor {
         member.getUser().getFlags();
 
         if (args.length < 2) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
+            Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
             return;
         }
 
         Role role = Bot.findRole(guild, args[1]);
 
         if (role == null) {
-            Bot.sendGhostMessage(channel, "O cargo fornecido não existe.", 10000);
+            Bot.tempMessage(channel, "O cargo fornecido não existe.", 10000);
             return;
         }
 

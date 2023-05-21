@@ -7,14 +7,16 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import java.awt.Color;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Timer;
@@ -33,7 +35,7 @@ public class Bot {
      * @param time The time (in milliseconds) the bot will wait before deleting the message
      * 
     **/
-    public static void sendGhostMessage(MessageChannelUnion channel, String message, int time) {
+    public static void tempMessage(MessageChannelUnion channel, String message, int time) {
         if (channel == null) return;
         channel.sendMessage(message)
                 .delay(time, TimeUnit.MILLISECONDS)
@@ -49,7 +51,7 @@ public class Bot {
      * @param time The time (in milliseconds) the bot will wait before deleting the message
      *
      **/
-    public static void sendGhostMessage(TextChannel channel, String message, int time) {
+    public static void tempMessage(TextChannel channel, String message, int time) {
         if (channel == null) return;
         channel.sendMessage(message)
                 .delay(time, TimeUnit.MILLISECONDS)
@@ -65,7 +67,7 @@ public class Bot {
      * @param time The time (in milliseconds) the bot will wait before deleting the message
      *
      **/
-    public static void sendGhostReply(Message message, String content, int time) {
+    public static void tempReply(Message message, String content, int time) {
         message.reply(content)
                 .delay(time, TimeUnit.MILLISECONDS)
                 .flatMap(Message::delete)
@@ -73,17 +75,10 @@ public class Bot {
                         .ignore(ErrorResponse.UNKNOWN_MESSAGE));
     }
 
-    /**
-     *
-     * @param message The message to be deleted
-     * @param time The time (in milliseconds) the bot will wait before deleting the message
-     *
-     **/
-    public static void deleteAfter(Message message, int time) {
-        message.delete()
-                .queueAfter(time, TimeUnit.MILLISECONDS,
-                        null, new ErrorHandler()
-                                .ignore(ErrorResponse.UNKNOWN_MESSAGE));
+    public static void dm(User user, MessageCreateData message) {
+        user.openPrivateChannel().queue(channel -> channel.sendMessage(message).queue(),
+                new ErrorHandler().ignore(ErrorResponse.CANNOT_SEND_TO_USER)
+        );
     }
 
     /**
@@ -124,17 +119,7 @@ public class Bot {
         return task;
     }
 
-    /**
-     *
-     * Looks for any member with the provided snowflake (id) in the given {@link Guild}
-     *
-     * @param guild The guild to search the member
-     * @param arg The id or the argument of a command, if you provide <@123> it will only care about the id (the numbers provided)
-     *
-     * @return {@link Member} if one is found, null otherwise
-     *
-     **/
-    public static Member findMember(Guild guild, String arg) {
+    public static Member member(Guild guild, String arg) {
         if (guild == null || arg == null) return null;
         arg = arg.replaceAll("[^0-9]+", "");
 
@@ -147,20 +132,11 @@ public class Bot {
         }
     }
 
-    /**
-     *
-     * Looks for any user with the provided snowflake (id)
-     *
-     * @param arg The id or the argument of a command, if you provide <@123> it will only care about the id (the numbers provided)
-     *
-     * @return {@link User} if one is found, null otherwise
-     *
-     **/
     public static User findUser(String arg) {
         if (arg == null) return null;
         arg = arg.replaceAll("[^0-9]+", "");
 
-        if (arg.stripTrailing().equals("")) return null;
+        if (arg.isBlank()) return null;
 
         try {
             return Main.getApi().retrieveUserById(arg).complete();
@@ -173,7 +149,7 @@ public class Bot {
         if (arg == null) return null;
         arg = arg.replaceAll("[^0-9]+", "");
 
-        if (arg.stripTrailing().equals("")) return null;
+        if (arg.isBlank()) return null;
 
         return guild.getRoleById(arg);
     }
@@ -186,17 +162,16 @@ public class Bot {
             .build();
 
         try (Response response = client.newCall(request).execute()) {
-            return response.isSuccessful()
-                ? response.body().string()
-                : null;
+            if (response.isSuccessful())
+                return response.body().string();
         } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
-        
+
         return null;
     }
 
-    public static InputStream requestFile(String path) {
+    public static InputStream requestObject(String path) {
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
@@ -204,15 +179,16 @@ public class Bot {
             .build();
 
         try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful())
-                return null;
-            
-            byte[] bytes = response.body().bytes();
+            if (response.isSuccessful()) {
+                byte[] bytes = response.body().bytes();
 
-            return new ByteArrayInputStream(bytes);
+                return new ByteArrayInputStream(bytes);
+            }
         } catch (IOException | NullPointerException e) {
-            return null;
+            e.printStackTrace();
         }
+
+        return null;
     }
 
     public static void log(String str) {
@@ -240,26 +216,27 @@ public class Bot {
         System.out.printf("[%s.%s.%s]: %s%s\n", hour, minute, second, str, "\033[0m");
     }
 
-    public static Color hexToRgb(String hex) {
+    public static String read(File file) {
+        if (file == null)
+            return "";
+
         try {
-            int r = Integer.parseInt(hex.substring(0, 2), 16);
-            int g = Integer.parseInt(hex.substring(2, 4), 16);
-            int b = Integer.parseInt(hex.substring(4, 6), 16);
-            int a = Integer.parseInt(hex.substring(6, 8), 16);
-
-            return new Color(r, g, b, a);
-        } catch (NumberFormatException ignore) {}
-
-        return null;
+            return String.join("", Files.readAllLines(Path.of(file.getPath())));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
-    public static String reverse(String str) {
-        StringBuilder builder = new StringBuilder();
-        int begin = str.length() - 1;
-
-        for (int i = begin; i >= 0; i--)
-            builder.append(str.charAt(i));
-
-        return builder.toString();
+    public static void write(String content, File file) {
+        try (
+                OutputStream out = Files.newOutputStream(Path.of(file.getPath()));
+                Writer writer = new OutputStreamWriter(out);
+                ) {
+            writer.write(content);
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-};
+}

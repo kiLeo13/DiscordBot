@@ -24,11 +24,11 @@ public class Avatar implements CommandExecutor {
         Member member = message.getMember();
         String content = message.getContentRaw();
         String[] args = content.split(" ");
-        Member target = args.length < 2 ? member : Bot.findMember(message.getGuild(), args[1]);
+        Member target = args.length < 2 ? member : Bot.member(message.getGuild(), args[1]);
         MessageCreateBuilder send = new MessageCreateBuilder();
 
         if (target == null) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
+            Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
             return;
         }
 
@@ -36,7 +36,7 @@ public class Avatar implements CommandExecutor {
         String avatarUrl = avatarUrl(target, isFromGuild);
 
         if (avatarUrl == null && content.endsWith("--server")) {
-            Bot.sendGhostMessage(channel, "O usuário não possui um avatar específico para este servidor.", 5000);
+            Bot.tempMessage(channel, "O usuário não possui um avatar específico para este servidor.", 5000);
             return;
         }
 

@@ -31,12 +31,12 @@ public class Profiles implements CommandExecutor {
         long now = System.currentTimeMillis();
 
         if (args.length < 2) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
+            Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
             return;
         }
 
         if (now - lastUsed < 2000) {
-            Bot.sendGhostMessage(channel, "Existe um cooldown de `02s` entre usos para este comando, por favor aguarde.", 10000);
+            Bot.tempMessage(channel, "Existe um cooldown de `02s` entre usos para este comando, por favor aguarde.", 10000);
             return;
         }
 
@@ -47,7 +47,7 @@ public class Profiles implements CommandExecutor {
         lastUsed = System.currentTimeMillis();
 
         if (player == null) {
-            Bot.sendGhostMessage(channel, "Usuário `" + name(args) + "#" + tag(args) + "` não foi encontrado.", 10000);
+            Bot.tempMessage(channel, "Usuário `" + name(args) + "#" + tag(args) + "` não foi encontrado.", 10000);
             return;
         }
 
@@ -60,40 +60,22 @@ public class Profiles implements CommandExecutor {
     
     // This will return the exact input tag
     private String name(String[] args) {
-        StringBuilder argBuilder = new StringBuilder();
-
-        for (int i = 1; i < args.length; i++)
-            argBuilder.append(args[i]).append(" ");
-        
-        String arg = argBuilder.toString().stripTrailing();
         StringBuilder builder = new StringBuilder();
 
-        for (int i = 0; i < arg.length(); i++) {
-            if (arg.charAt(i) == '#') break;
+        for (String s : args)
+            builder.append(s).append(" ");
 
-            builder.append(arg.charAt(i));
-        }
-
-        return builder.toString();
+        return builder.toString().split("#")[0];
     }
 
     // This will return the exact input name
     private String tag(String[] args) {
-        StringBuilder argBuilder = new StringBuilder();
-
-        for (int i = 0; i < args.length; i++)
-            argBuilder.append(args[i]).append(" ");
-
-        String arg = argBuilder.toString().stripTrailing();
         StringBuilder builder = new StringBuilder();
 
-        for (int i = arg.length() - 1; i >= 0; i--) {
-            if (arg.charAt(i) == '#') break;
+        for (String s : args)
+            builder.append(s).append(" ");
 
-            builder.append(arg.charAt(i));
-        }
-
-        return Bot.reverse(builder.toString());
+        return builder.toString().split("#")[1];
     }
 
     private MessageEmbed embed(Player player, Guild guild) {
@@ -110,7 +92,7 @@ public class Profiles implements CommandExecutor {
                     ? "`0" + player.account_level + "`"
                     : "`" + player.account_level + "`", true)
                 .setImage(player.card.wide)
-                .setFooter("Oficina Myuu", guild.getIconUrl());
+                .setFooter(guild.getName(), guild.getIconUrl());
 
         return builder.build();
     }
@@ -126,22 +108,9 @@ public class Profiles implements CommandExecutor {
             return input.data;
     }
 
-    private static class PlayerInput {
-        private int status;
-        private Player data;
-    }
+    private record PlayerInput(int status, Player data) {}
 
-    private static class Player {
-        private String name;
-        private String tag;
-        private String puuid;
-        private String region;
-        private int account_level;
-        private Card card;
-    }
+    private record Player(String name, String tag, String puuid, String region, int account_level, Card card) {}
 
-    private static class Card {
-        public String small;
-        public String wide;
-    }
+    private record Card(String small, String wide) {}
 }

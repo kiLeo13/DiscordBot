@@ -1,5 +1,6 @@
 package bot.listeners;
 
+import bot.commands.lifetimemute.LifeMuteCommand;
 import bot.commands.Registration;
 import bot.data.BotData;
 import bot.util.Bot;
@@ -34,6 +35,12 @@ public class CommandHandler extends ListenerAdapter {
         String content = message.getContentRaw();
 
         if (member == null || member.getUser().isBot()) return;
+
+        // If user is life muted, fuck them
+        if (LifeMuteCommand.isLifeMuted(member)) {
+            message.delete().queue();
+            return;
+        }
 
         if (!content.startsWith(BotData.PREFIX) && !content.startsWith(BotData.PREFIX_REGISTER)) return;
 

@@ -32,14 +32,14 @@ public class IPLookup implements CommandExecutor {
         Pattern pattern = Pattern.compile(regex);
 
         if (args.length < 2) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
+            Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
             return;
         }
 
         Matcher matcher = pattern.matcher(args[1]);
 
         if (!matcher.matches()) {
-            Bot.sendGhostMessage(channel, "O IP `" + args[1] + "` é inválido.", 10000);
+            Bot.tempMessage(channel, "O IP `" + args[1] + "` é inválido.", 10000);
             return;
         }
 
@@ -47,7 +47,7 @@ public class IPLookup implements CommandExecutor {
         IP ip = deserialize(returned);
 
         if (ip == null) {
-            Bot.sendGhostMessage(channel,
+            Bot.tempMessage(channel,
                 "Não foi possível encontrar a região do ip `" + args[1] + "`.",
                 10000);
             return;

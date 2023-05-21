@@ -26,10 +26,10 @@ public class Permissions implements CommandExecutor {
         String[] args = content.split(" ");
         Guild guild = message.getGuild();
         MessageChannelUnion channel = message.getChannel();
-        Member target = args.length < 2 ? member : Bot.findMember(guild, args[1]);
+        Member target = args.length < 2 ? member : Bot.member(guild, args[1]);
 
         if (target == null) {
-            Bot.sendGhostMessage(channel, "Membro não encontrado. Caso esteja procurando por informações de um cargo, use `.roleinfo <role>`.", 10000);
+            Bot.tempMessage(channel, "Membro não encontrado. Caso esteja procurando por informações de um cargo, use `.roleinfo <role>`.", 10000);
             return;
         }
 

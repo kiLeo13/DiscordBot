@@ -39,7 +39,7 @@ public class Characters implements CommandExecutor {
 
         // Does the agent exist?
         if (agent == null) {
-            Bot.sendGhostMessage(channel, "Agent não encontrado na API.", 10000);
+            Bot.tempMessage(channel, "Agent não encontrado na API.", 10000);
             return;
         }
 
@@ -54,7 +54,7 @@ public class Characters implements CommandExecutor {
     private MessageEmbed embed(Agent agent, boolean hasDescription) {
         EmbedBuilder builder = new EmbedBuilder();
 
-        Color color = Bot.hexToRgb(agent.backgroundGradientColors[0]);
+        Color color = hexToRgb(agent.backgroundGradientColors[0]);
         String name = agent.displayName;
         String description = agent.description;
         String image = agent.displayIcon;
@@ -99,6 +99,19 @@ public class Characters implements CommandExecutor {
     private List<Agent> parse(String str) {
         Gson gson = new Gson();
         return gson.fromJson(str, Agents.class).data;
+    }
+
+    private Color hexToRgb(String hex) {
+        try {
+            int r = Integer.parseInt(hex.substring(0, 2), 16);
+            int g = Integer.parseInt(hex.substring(2, 4), 16);
+            int b = Integer.parseInt(hex.substring(4, 6), 16);
+            int a = Integer.parseInt(hex.substring(6, 8), 16);
+
+            return new Color(r, g, b, a);
+        } catch (NumberFormatException ignore) {}
+
+        return null;
     }
 
     private record Agents(List<Agent> data) {}

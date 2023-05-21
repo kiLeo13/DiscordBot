@@ -64,7 +64,7 @@ public class ColorRole implements SlashExecutor {
         store(target, color);
 
         event.reply("Cargo `" + color.getName() + "` foi adicionado à `" + target.getEffectiveName() + "`.").setEphemeral(false).setEphemeral(true).queue();
-        Bot.sendGhostMessage(guild.getTextChannelById(Channels.CHANNEL_BANK.id()), "<@" + target.getIdLong() + "> Você recebeu o cargo `" + color.getName() + "` com sucesso!", 300000);
+        Bot.tempMessage(guild.getTextChannelById(Channels.CHANNEL_BANK.id()), "<@" + target.getIdLong() + "> Você recebeu o cargo `" + color.getName() + "` com sucesso!", 300000);
 
         logAdd(member, target, color, guild);
     }

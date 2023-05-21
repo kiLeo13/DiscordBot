@@ -26,14 +26,14 @@ public class Banner implements CommandExecutor {
         User target = args.length < 2 ? member.getUser() : Bot.findUser(args[1]);
 
         if (target == null) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
+            Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
             return;
         }
 
         String banner = target.retrieveProfile().complete().getBannerUrl();
 
         if (banner == null) {
-            Bot.sendGhostMessage(channel, "O usuário não possui um banner ou nenhum foi encontrado.", 10000);
+            Bot.tempMessage(channel, "O usuário não possui um banner ou nenhum foi encontrado.", 10000);
             return;
         }
 

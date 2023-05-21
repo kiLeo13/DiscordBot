@@ -20,11 +20,11 @@ public class Userinfo implements CommandExecutor {
         Guild guild = message.getGuild();
         String content = message.getContentRaw();
         String[] args = content.split(" ");
-        Member target = args.length < 2 ? member : Bot.findMember(guild, args[1]);
+        Member target = args.length < 2 ? member : Bot.member(guild, args[1]);
         MessageCreateBuilder send = new MessageCreateBuilder();
 
         if (target == null) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
+            Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
             return;
         }
 

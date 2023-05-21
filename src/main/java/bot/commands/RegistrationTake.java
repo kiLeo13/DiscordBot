@@ -24,12 +24,12 @@ public class RegistrationTake implements CommandExecutor {
         String[] args = content.split(" ");
         Guild guild = message.getGuild();
         MessageChannelUnion channel = message.getChannel();
-        Member target = args.length < 2 ? null : Bot.findMember(guild, args[1]);
+        Member target = args.length < 2 ? null : Bot.member(guild, args[1]);
 
         if (channel.getIdLong() == Channels.REGISTER_CHANNEL.id()) return;
 
         if (target == null) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
+            Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
             message.delete().queue();
             return;
         }

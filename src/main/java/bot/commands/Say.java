@@ -50,7 +50,7 @@ public class Say implements CommandExecutor {
 
         // If the message to be sent is empty, tell them about it
         if (builder.isEmpty()) {
-            Bot.sendGhostMessage(channel, "A mensagem a ser enviada não pode estar vazia.", 10000);
+            Bot.tempMessage(channel, "A mensagem a ser enviada não pode estar vazia.", 10000);
             return;
         }
 

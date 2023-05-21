@@ -35,10 +35,10 @@ public class AvatarBot implements CommandExecutor {
 
         if (attachments.isEmpty()) {
             if (args.length < 2) {
-                Bot.sendGhostMessage(channel, "Não encontrei nenhum arquivo ou link em sua mensagem, por favor forneça uma imagem ou um link válido.", 15000);
+                Bot.tempMessage(channel, "Não encontrei nenhum arquivo ou link em sua mensagem, por favor forneça uma imagem ou um link válido.", 15000);
             } else {
                 String sentence = content.substring(args[0].length() + 1);
-                image = Bot.requestFile(sentence);
+                image = Bot.requestObject(sentence);
 
                 try {
                     Icon icon = Icon.from(image);
@@ -50,7 +50,7 @@ public class AvatarBot implements CommandExecutor {
                                 exception.printStackTrace();
                             });
                 } catch (IOException | IllegalArgumentException e) {
-                    Bot.sendGhostMessage(channel, "Algo deu errado ao procurar a imagem fornecida. Erro: `" + e.getMessage() + "`.", 10000);
+                    Bot.tempMessage(channel, "Algo deu errado ao procurar a imagem fornecida. Erro: `" + e.getMessage() + "`.", 10000);
                     return;
                 }
 
@@ -60,7 +60,7 @@ public class AvatarBot implements CommandExecutor {
         }
 
         if (!isFileValid(attachments.get(0).getFileName())) {
-            Bot.sendGhostMessage(channel, "O tipo de arquivo fornecido é inválido. Por favor, forneça: `[.png | .jpg | .webp]`.", 15000);
+            Bot.tempMessage(channel, "O tipo de arquivo fornecido é inválido. Por favor, forneça: `[.png | .jpg | .webp]`.", 15000);
             return;
         }
 
@@ -75,9 +75,9 @@ public class AvatarBot implements CommandExecutor {
                         exception.printStackTrace();
                     });
         } catch (InterruptedException | ExecutionException | IOException e) {
-            Bot.sendGhostMessage(channel, "Algo deu errado ao baixar a imagem. Erro: `" + e.getMessage() + "`.", 10000);
+            Bot.tempMessage(channel, "Algo deu errado ao baixar a imagem. Erro: `" + e.getMessage() + "`.", 10000);
         } catch (NullPointerException e) {
-            Bot.sendGhostMessage(channel, "Imagem não foi encontrada.", 10000);
+            Bot.tempMessage(channel, "Imagem não foi encontrada.", 10000);
         }
     }
 

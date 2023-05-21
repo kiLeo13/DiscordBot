@@ -21,7 +21,7 @@ public class Randomize implements CommandExecutor {
         MessageChannelUnion channel = message.getChannel();
 
         if (args.length < 3) {
-            Bot.sendGhostMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
+            Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
             message.delete().queue();
             return;
         }

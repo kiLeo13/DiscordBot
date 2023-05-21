@@ -68,7 +68,7 @@ public class PayServer {
 
         user.openPrivateChannel()
                 .flatMap(channel -> channel.sendMessageEmbeds(finalContent))
-                .delay(5, TimeUnit.HOURS)
+                .delay(3, TimeUnit.HOURS)
                 .flatMap(Message::delete)
                 .queue(null, new ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE, ErrorResponse.CANNOT_SEND_TO_USER));
     }
