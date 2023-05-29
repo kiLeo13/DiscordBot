@@ -3,11 +3,12 @@ package bot.commands.valorant;
 import java.awt.Color;
 import java.util.List;
 
-import bot.util.CommandPermission;
+import bot.util.annotations.CommandPermission;
+import bot.util.requests.RequestManager;
 import com.google.gson.Gson;
 
 import bot.util.Bot;
-import bot.util.CommandExecutor;
+import bot.util.interfaces.CommandExecutor;
 import bot.util.Messages;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -18,6 +19,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 @CommandPermission()
 public class Characters implements CommandExecutor {
+    private static final RequestManager requester = RequestManager.NewManager();
 
     @Override
     public void run(Message message) {
@@ -32,7 +34,7 @@ public class Characters implements CommandExecutor {
             return;
         }
 
-        String request = Bot.request("https://valorant-api.com/v1/agents/");
+        String request = requester.requestAsString("https://valorant-api.com/v1/agents/", null);
         List<Agent> agents = parse(request);
 
         Agent agent = fetchAgent(args[1], agents);

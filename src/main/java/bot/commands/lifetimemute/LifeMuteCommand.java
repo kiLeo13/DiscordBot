@@ -2,9 +2,10 @@ package bot.commands.lifetimemute;
 
 import bot.data.BotFiles;
 import bot.util.Bot;
-import bot.util.CommandExecutor;
-import bot.util.CommandPermission;
+import bot.util.interfaces.CommandExecutor;
+import bot.util.annotations.CommandPermission;
 import bot.util.Messages;
+import bot.util.requests.DiscordManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -24,6 +25,7 @@ import java.util.Map;
 
 @CommandPermission(permission = Permission.BAN_MEMBERS)
 public class LifeMuteCommand implements CommandExecutor {
+    private static final DiscordManager discord = DiscordManager.NewManager();
     private static final File mutedMembersFile = new File(BotFiles.DIR, "lifemuted.json");
 
     private static final Gson gson = new GsonBuilder()
@@ -42,9 +44,9 @@ public class LifeMuteCommand implements CommandExecutor {
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
         Member member = message.getMember();
-        Role muted = Bot.findRole(guild, "592465045686845480");
+        Role muted = discord.roleOf(guild, "592465045686845480");
 
-        if (args.length < 2) {
+        if (args.length < 2 || (args.length < 3 && content.endsWith("--info"))) {
             Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
             return;
         }
@@ -56,10 +58,10 @@ public class LifeMuteCommand implements CommandExecutor {
         Member target = Bot.member(guild, args[1]);
 
         // If the intention is to retrieve information about someone's muted
-        if (content.endsWith("--get") || content.endsWith("--stats") || content.endsWith("--info")) {
-            MutedMember stats = stats(target);
+        if (content.endsWith("--info")) {
+            MutedMember stats = stats(args[1]);
 
-            if (stats == null) Bot.tempMessage(channel, "O membro informado não está silenciado para sempre.", 10000);
+            if (stats == null) Bot.tempMessage(channel, "O membro informado não está silenciado para sempre ou não foi encontrado.", 10000);
             else {
                 final MessageCreateBuilder builder = new MessageCreateBuilder();
 
@@ -90,6 +92,11 @@ public class LifeMuteCommand implements CommandExecutor {
                     .setColor(new Color(100, 255, 100))
                     .setAuthor(target.getUser().getAsTag() + " foi dessilenciado", null, target.getUser().getAvatarUrl())
                     .build();
+
+            if (muted != null)
+                guild.modifyMemberRoles(target, null, List.of(muted)).queue();
+            else
+                Bot.log("<YELLOW>Cargo '592465045686845480' não foi encontrado ao usar o comando lifetime-mute. Ignorando cargo...");
 
             channel.sendMessageEmbeds(embed).queue();
         } else {
@@ -153,11 +160,16 @@ public class LifeMuteCommand implements CommandExecutor {
         Bot.write(toWrite, mutedMembersFile);
     }
 
-    private MutedMember stats(Member member) {
+    private MutedMember stats(String regex) {
+        String id = regex.replaceAll("[^0-9]+", "");
+
+        if (id.isBlank())
+            return null;
+
         final Map<String, MutedMember> muted = mapJson(Bot.read(mutedMembersFile));
 
         for (String m : muted.keySet()) {
-            if (m.equals(member.getId()))
+            if (m.equals(id))
                 return muted.get(m);
         }
 
@@ -186,6 +198,7 @@ public class LifeMuteCommand implements CommandExecutor {
                 .addField("📅 Silenciado (UTC)", "<t:" + muted.dateMuted + ">\n(<t:" + muted.dateMuted + ":R>)", true)
                 .addField("👑 Moderador", "<@" + muted.moderatorId + ">\n`" + muted.moderatorId + "`", true)
                 .addField("🌐 Está no Servidor", target == null ? "❌ Não" : "✅ Sim", true)
+                .addField("💻 User ID", "`" + mutedUser.id + "`", true)
                 .setFooter(guild.getName(), guild.getIconUrl())
                 .setColor(new Color(255, 100, 100));
 

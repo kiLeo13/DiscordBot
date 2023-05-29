@@ -1,6 +1,8 @@
 package bot.commands;
 
 import bot.util.*;
+import bot.util.annotations.CommandPermission;
+import bot.util.interfaces.CommandExecutor;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;

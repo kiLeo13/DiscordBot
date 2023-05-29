@@ -1,11 +1,10 @@
 package bot.commands;
 
 import bot.util.Bot;
-
-import java.io.InputStream;
-import bot.util.CommandExecutor;
-import bot.util.CommandPermission;
 import bot.util.Roles;
+import bot.util.annotations.CommandPermission;
+import bot.util.interfaces.CommandExecutor;
+import bot.util.requests.RequestManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -14,8 +13,11 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
+import java.io.InputStream;
+
 @CommandPermission()
 public class Nerd implements CommandExecutor {
+    private static final RequestManager manager = RequestManager.NewManager();
 
     @Override
     public void run(Message message) {
@@ -37,12 +39,10 @@ public class Nerd implements CommandExecutor {
 
         if (!(member.getRoles().contains(salada) && member.getRoles().contains(alfea))) return;
 
-        InputStream stream = Bot.requestObject("https://raw.githubusercontent.com/kiLeo13/DiscordBot/main/content/images/nerd.png");
+        InputStream stream = manager.requestAsStream("https://raw.githubusercontent.com/kiLeo13/DiscordBot/main/content/images/nerd.png", null);
+        System.out.println(stream);
 
-        if (target == null)
-            send.setContent("<@" + member.getIdLong() + ">");
-        else
-            send.setContent("<@" + target.getIdLong() + ">");
+        send.setContent("<@" + (target == null ? member.getId() : target.getId()) + ">");
 
         if (stream == null) {
             Bot.tempMessage(channel, "Não foi possível executar o comando.", 10000);

@@ -2,6 +2,8 @@ package bot.commands;
 
 import bot.util.*;
 import bot.util.RegistrationRoles;
+import bot.util.annotations.CommandPermission;
+import bot.util.interfaces.CommandExecutor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;

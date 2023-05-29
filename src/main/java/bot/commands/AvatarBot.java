@@ -2,8 +2,9 @@ package bot.commands;
 
 import bot.Main;
 import bot.util.Bot;
-import bot.util.CommandExecutor;
-import bot.util.CommandPermission;
+import bot.util.interfaces.CommandExecutor;
+import bot.util.annotations.CommandPermission;
+import bot.util.requests.RequestManager;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -17,6 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 @CommandPermission()
 public class AvatarBot implements CommandExecutor {
+    private static final RequestManager requester = RequestManager.NewManager();
     private static final List<String> validation = List.of(".png", ".jpg", ".webp");
 
     @Override
@@ -38,7 +40,7 @@ public class AvatarBot implements CommandExecutor {
                 Bot.tempMessage(channel, "Não encontrei nenhum arquivo ou link em sua mensagem, por favor forneça uma imagem ou um link válido.", 15000);
             } else {
                 String sentence = content.substring(args[0].length() + 1);
-                image = Bot.requestObject(sentence);
+                image = requester.requestAsStream(sentence, null);
 
                 try {
                     Icon icon = Icon.from(image);

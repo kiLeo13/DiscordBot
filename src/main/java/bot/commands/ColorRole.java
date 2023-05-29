@@ -4,7 +4,7 @@ import bot.Main;
 import bot.util.Bot;
 import bot.util.Channels;
 import bot.util.Messages;
-import bot.util.SlashExecutor;
+import bot.util.interfaces.SlashExecutor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;

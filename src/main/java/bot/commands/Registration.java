@@ -2,6 +2,8 @@ package bot.commands;
 
 import bot.util.RegistrationRoles;
 import bot.util.*;
+import bot.util.interfaces.CommandExecutor;
+import bot.util.interfaces.SlashExecutor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -82,7 +84,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
     }
 
     @Override
-    public MessageEmbed help(Message message) {
+    public void help(Message message) {
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = message.getGuild();
         String roleName = "[???]";
@@ -126,7 +128,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
                         """, false)
                 .setFooter("Oficina Myuu", guild.getIconUrl());
 
-        return builder.build();
+        message.getChannel().sendMessageEmbeds(builder.build()).queue();
     }
 
     private void performExact(Message message) {
@@ -468,9 +470,8 @@ public class Registration implements CommandExecutor, SlashExecutor {
     private String formattedRolesToEmbed(List<Role> roles) {
         StringBuilder builder = new StringBuilder();
 
-        for (Role r : roles) {
-            builder.append(String.format("<@&%s>", r.getId()));
-        }
+        for (Role r : roles)
+            builder.append(String.format("<@&%s>\n", r.getId()));
 
         return builder.toString().stripTrailing();
     }

@@ -1,12 +1,12 @@
 package bot.listeners;
 
-import bot.commands.lifetimemute.LifeMuteCommand;
 import bot.commands.Registration;
+import bot.commands.lifetimemute.LifeMuteCommand;
 import bot.data.BotData;
 import bot.util.Bot;
-import bot.util.CommandExecutor;
-import bot.util.CommandPermission;
-import bot.util.MessageDeletion;
+import bot.util.annotations.CommandPermission;
+import bot.util.annotations.MessageDeletion;
+import bot.util.interfaces.CommandExecutor;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -14,9 +14,13 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CommandHandler extends ListenerAdapter {
+    private static final ExecutorService executor = Executors.newFixedThreadPool(5);
     private static final HashMap<String, CommandExecutor> commands = new HashMap<>();
     private static CommandHandler INSTANCE;
 
@@ -38,14 +42,14 @@ public class CommandHandler extends ListenerAdapter {
 
         // If user is life muted, fuck them
         if (LifeMuteCommand.isLifeMuted(member)) {
-            message.delete().queue();
+            Bot.delete(message);
             return;
         }
 
         if (!content.startsWith(BotData.PREFIX) && !content.startsWith(BotData.PREFIX_REGISTER)) return;
 
-        // Run command
-        runCommand(message);
+        // Run command (on another thread)
+        executor.execute(() -> runCommand(message));
     }
 
     public void runCommand(Message message) {
@@ -112,6 +116,6 @@ public class CommandHandler extends ListenerAdapter {
     }
 
     public static HashMap<String, CommandExecutor> getCommands() {
-        return commands;
+        return (HashMap<String, CommandExecutor>) Collections.unmodifiableMap(commands);
     }
 }

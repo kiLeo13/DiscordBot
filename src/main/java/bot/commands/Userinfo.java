@@ -1,6 +1,8 @@
 package bot.commands;
 
 import bot.util.*;
+import bot.util.annotations.CommandPermission;
+import bot.util.interfaces.CommandExecutor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;

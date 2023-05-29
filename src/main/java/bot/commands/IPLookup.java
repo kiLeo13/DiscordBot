@@ -4,10 +4,11 @@ import java.awt.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import bot.util.CommandPermission;
+import bot.util.annotations.CommandPermission;
+import bot.util.requests.RequestManager;
 import com.google.gson.Gson;
 
-import bot.util.CommandExecutor;
+import bot.util.interfaces.CommandExecutor;
 import bot.util.Messages;
 import bot.util.Bot;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -20,6 +21,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 @CommandPermission()
 public class IPLookup implements CommandExecutor {
+    private static final RequestManager requester = RequestManager.NewManager();
 
     @Override
     public void run(Message message) {
@@ -43,7 +45,7 @@ public class IPLookup implements CommandExecutor {
             return;
         }
 
-        String returned = Bot.request("http://ip-api.com/json/" + args[1]);
+        String returned = requester.requestAsString("http://ip-api.com/json/" + args[1], null);
         IP ip = deserialize(returned);
 
         if (ip == null) {

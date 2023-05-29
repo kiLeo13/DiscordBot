@@ -43,7 +43,7 @@ public final class Main {
         }
 
         try {
-            api = JDABuilder.createDefault(BotData.getToken(),
+            api = JDABuilder.createDefault(BotData.TOKEN,
                             GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT,
                             GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MEMBERS,
                             GatewayIntent.GUILD_EMOJIS_AND_STICKERS, GatewayIntent.SCHEDULED_EVENTS,
@@ -113,6 +113,7 @@ public final class Main {
         commands.addCommand("<prefix>roleinfo", new RoleInfo());
         commands.addCommand("<prefix>p-help", new PrivilegedHelp());
         commands.addCommand("<prefix>lifemute", new LifeMuteCommand());
+        commands.addCommand("<prefix>transfer", new TransferMemberData());
         commands.addCommand(new Permissions(), "<prefix>permissions", "<prefix>permission", "<prefix>perms", "<prefix>perm");
 
         commands.addCommand(new Format(), "<prefix>format", "<prefix>parse");

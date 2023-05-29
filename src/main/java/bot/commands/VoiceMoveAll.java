@@ -1,12 +1,11 @@
 package bot.commands;
 
 import bot.util.Messages;
-import bot.util.SlashExecutor;
+import bot.util.interfaces.SlashExecutor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
@@ -54,7 +53,7 @@ public class VoiceMoveAll implements SlashExecutor {
     }
 
     @Override
-    public MessageEmbed help(Message message) {
+    public void help(Message message) {
         EmbedBuilder builder = new EmbedBuilder();
         Guild guild = message.getGuild();
 
@@ -67,6 +66,6 @@ public class VoiceMoveAll implements SlashExecutor {
                 .addField("> ❗ Disclaimer", "Tenha em mente que pode demorar um pouco para mover todos os membros devido ao rate-limit do Discord. Saiba mais: https://discord.com/developers/docs/topics/rate-limits", true)
                 .setFooter("Oficina Myuu", guild.getIconUrl());
 
-        return builder.build();
+        message.getChannel().sendMessageEmbeds(builder.build()).queue();
     }
 }

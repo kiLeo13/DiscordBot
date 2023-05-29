@@ -23,6 +23,6 @@ public class OnBotPing extends ListenerAdapter {
         if (member == null || member.getUser().isBot()) return;
 
         if (content.startsWith("<@" + guild.getSelfMember().getId() + ">"))
-            Bot.tempReply(message, "Olá! Meu prefixo é `" + BotData.PREFIX + "`.", 30000);
+            Bot.tempReply(message, "Olá! Meu prefixo é `" + BotData.PREFIX + "`", 30000);
     }
 }

@@ -5,6 +5,8 @@ import java.util.EnumSet;
 import java.util.List;
 
 import bot.util.*;
+import bot.util.annotations.CommandPermission;
+import bot.util.interfaces.CommandExecutor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;

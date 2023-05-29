@@ -1,7 +1,9 @@
 package bot.commands;
 
 import bot.util.*;
-import net.dv8tion.jda.api.EmbedBuilder;
+import bot.util.annotations.CommandPermission;
+import bot.util.interfaces.CommandExecutor;
+import bot.util.interfaces.SlashExecutor;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -54,12 +56,5 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
         event.reply("Ok, desconectado :)")
                 .setEphemeral(true)
                 .queue();
-    }
-
-    @Override
-    public MessageEmbed help(Message message) {
-        EmbedBuilder builder = new EmbedBuilder();
-
-        return builder.build();
     }
 }

@@ -7,20 +7,11 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
-import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Bot {
@@ -73,12 +64,6 @@ public class Bot {
                 .flatMap(Message::delete)
                 .queue(null, new ErrorHandler()
                         .ignore(ErrorResponse.UNKNOWN_MESSAGE));
-    }
-
-    public static void dm(User user, MessageCreateData message) {
-        user.openPrivateChannel().queue(channel -> channel.sendMessage(message).queue(),
-                new ErrorHandler().ignore(ErrorResponse.CANNOT_SEND_TO_USER)
-        );
     }
 
     /**
@@ -143,52 +128,6 @@ public class Bot {
         } catch (ErrorResponseException e) {
             return null;
         }
-    }
-
-    public static Role findRole(Guild guild, String arg) {
-        if (arg == null) return null;
-        arg = arg.replaceAll("[^0-9]+", "");
-
-        if (arg.isBlank()) return null;
-
-        return guild.getRoleById(arg);
-    }
-
-    public static String request(String path) {
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-            .url(path)
-            .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            if (response.isSuccessful())
-                return response.body().string();
-        } catch (IOException | NullPointerException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static InputStream requestObject(String path) {
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-            .url(path)
-            .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            if (response.isSuccessful()) {
-                byte[] bytes = response.body().bytes();
-
-                return new ByteArrayInputStream(bytes);
-            }
-        } catch (IOException | NullPointerException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 
     public static void log(String str) {

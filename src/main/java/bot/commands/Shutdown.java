@@ -2,7 +2,7 @@ package bot.commands;
 
 import bot.Main;
 import bot.util.Bot;
-import bot.util.SlashExecutor;
+import bot.util.interfaces.SlashExecutor;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.User;
