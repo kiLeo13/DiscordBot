@@ -1,10 +1,10 @@
 package bot.commands;
 
 import bot.util.Bot;
-import bot.util.Roles;
-import bot.util.annotations.CommandPermission;
+import bot.util.content.Roles;
 import bot.util.interfaces.CommandExecutor;
-import bot.util.requests.RequestManager;
+import bot.util.interfaces.annotations.CommandPermission;
+import bot.util.managers.requests.RequestManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -17,7 +17,7 @@ import java.io.InputStream;
 
 @CommandPermission()
 public class Nerd implements CommandExecutor {
-    private static final RequestManager manager = RequestManager.NewManager();
+    private static final RequestManager manager = RequestManager.create();
 
     @Override
     public void run(Message message) {

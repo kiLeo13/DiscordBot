@@ -4,13 +4,13 @@ import java.awt.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import bot.util.annotations.CommandPermission;
-import bot.util.requests.RequestManager;
 import com.google.gson.Gson;
 
 import bot.util.interfaces.CommandExecutor;
-import bot.util.Messages;
+import bot.util.interfaces.annotations.CommandPermission;
+import bot.util.managers.requests.RequestManager;
 import bot.util.Bot;
+import bot.util.content.Messages;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -21,7 +21,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 @CommandPermission()
 public class IPLookup implements CommandExecutor {
-    private static final RequestManager requester = RequestManager.NewManager();
+    private static final RequestManager requester = RequestManager.create();
 
     @Override
     public void run(Message message) {

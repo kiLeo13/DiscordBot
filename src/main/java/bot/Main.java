@@ -3,14 +3,20 @@ package bot;
 import bot.commands.Shutdown;
 import bot.commands.*;
 import bot.commands.lifetimemute.LifeMuteCommand;
-import bot.commands.lifetimemute.LifeMuteVoiceJoin;
-import bot.commands.misc.PayServer;
+import bot.commands.lifetimemute.VoiceJoin;
+import bot.tickets.CloseTicket;
+import bot.tickets.OpenTicket;
+import bot.tickets.TicketInfoCreation;
+import bot.util.schedules.PayServer;
 import bot.commands.valorant.Characters;
 import bot.commands.valorant.Profiles;
 import bot.data.BotData;
 import bot.data.BotFiles;
+import bot.generic_listeners.*;
 import bot.commands.lifetimemute.Reactions;
-import bot.listeners.*;
+import bot.util.Bot;
+import bot.util.schedules.ScheduleManager;
+import bot.util.server.SimpleHttpServer;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -54,80 +60,100 @@ public final class Main {
                     .build()
                     .awaitReady();
 
-            registerApplicationCommands(api);
-
             init = System.currentTimeMillis();
             api.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Oficina"), false);
+            runRunnables();
         } catch (InterruptedException e) {
             e.printStackTrace();
             System.out.println("Failed to login, exiting...");
             return;
         }
+                
+                
+        // Run http server
+        try {
+            SimpleHttpServer.runServer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Registers
-        registerEvents(api);
-        registerOldCommands();
-        runRunnables(api);
+        registerCommands();
+        registerEvents();
     }
 
     public static JDA getApi() {
         return api;
     }
 
-    private static void registerEvents(JDA jda) {
-        // Text
-        jda.addEventListener(new AgeFilter());
-        jda.addEventListener(new BlockLorittaExploit());
-        jda.addEventListener(CommandHandler.getInstance());
-        jda.addEventListener(new Links());
-        jda.addEventListener(new OnBotPing());
-        jda.addEventListener(SlashHandler.getInstance());
-        jda.addEventListener(new WordFilter());
+    private static void registerEvents() {
+        api.addEventListener(
 
-        // Voice
-        jda.addEventListener(new LifeMuteVoiceJoin());
+                // Text
+                new AgeFilter(),
+                new BlockLorittaExploit(),
+                new Links(),
+                new OnBotPing(),
+                new WordFilter(),
+                CommandHandler.getManager(),
+                SlashHandler.getManager(),
 
-        // Misc
-        jda.addEventListener(new Reactions());
+                // Voice
+                new VoiceJoin(),
+
+                // Mist
+                new Reactions(),
+
+                // Ticket system
+                new TicketInfoCreation(),
+
+                // Inform them about voice-activity
+                new VoiceBigo()
+        );
     }
 
-    private static void registerOldCommands() {
-        CommandHandler commands = CommandHandler.getInstance();
+    private static void registerCommands() {
+        final CommandHandler commands = CommandHandler.getManager().register("<prefix>retrieve", new Retriever());
 
-        commands.addCommand("<prefix>bigo", new BigoAnnouncement());
-        commands.addCommand("<prefix>ping", new Ping());
-        commands.addCommand("<prefix>nerd", new Nerd());
-        commands.addCommand("<prefix>among", new RoleAmongUs());
-        commands.addCommand("<prefix>say", new Say());
-        commands.addCommand("<prefix>uptime", new Uptime());
-        commands.addCommand("<prefix>clear", new Clear());
-        commands.addCommand("<prefix>userinfo", new Userinfo());
-        commands.addCommand("<prefix>avatar", new Avatar());
-        commands.addCommand("<prefix>help", new Help());
-        commands.addCommand("<prefix>banner", new Banner());
-        commands.addCommand("<prefix>serverinfo", new ServerInfo());
-        commands.addCommand("<prefix>linff", new Linff());
-        commands.addCommand("<prefix>ip", new IPLookup());
-        commands.addCommand("<prefix>avatar-bot", new AvatarBot());
-        commands.addCommand("<prefix>randomize", new Randomize());
-        commands.addCommand("<prefix>roleinfo", new RoleInfo());
-        commands.addCommand("<prefix>p-help", new PrivilegedHelp());
-        commands.addCommand("<prefix>lifemute", new LifeMuteCommand());
-        commands.addCommand("<prefix>transfer", new TransferMemberData());
-        commands.addCommand(new Permissions(), "<prefix>permissions", "<prefix>permission", "<prefix>perms", "<prefix>perm");
+        commands.register("<prefix>bigo", new BigoAnnouncement())
+                .register("<prefix>ping", new Ping())
+                .register("<prefix>nerd", new Nerd())
+                .register("<prefix>among", new RoleAmongUs())
+                .register("<prefix>say", new Say())
+                .register("<prefix>uptime", new Uptime())
+                .register("<prefix>clear", new Clear())
+                .register("<prefix>userinfo", new Userinfo())
+                .register("<prefix>avatar", new Avatar())
+                .register("<prefix>help", new Help())
+                .register("<prefix>banner", new Banner())
+                .register("<prefix>serverinfo", new ServerInfo())
+                .register("<prefix>linff", new Linff())
+                .register("<prefix>ip", new IPLookup())
+                .register("<prefix>avatar-bot", new AvatarBot())
+                .register("<prefix>randomize", new Randomize())
+                .register("<prefix>roleinfo", new RoleInfo())
+                .register("<prefix>p-help", new PrivilegedHelp())
+                .register("<prefix>lifemute", new LifeMuteCommand())
+                .register("<prefix>transfer", new TransferMemberData())
+                .register(new Permissions(), "<prefix>permissions", "<prefix>permission", "<prefix>perms", "<prefix>perm")
 
-        commands.addCommand(new Format(), "<prefix>format", "<prefix>parse");
-        commands.addCommand(new Characters(), "<prefix>valorant-agent", "<prefix>v-agent");
-        commands.addCommand(new Profiles(), "<prefix>valorant-player", "<prefix>v-player");
+        // BRUH
+                .register("<prefix>hook", new HookTwitter())
 
-        commands.addCommand(new Disconnect(), "<prefix>dd", "<prefix>disconnect");
+                .register(new Characters(), "<prefix>valorant-agent", "<prefix>v-agent")
+                .register(new Profiles(), "<prefix>valorant-player", "<prefix>v-player")
 
-        commands.addCommand("<register>roles", new RegistrationRoles());
-        commands.addCommand("<register>take", new RegistrationTake());
+                .register(new Disconnect(), "<prefix>dd", "<prefix>disconnect")
+
+                .register("<register>roles", new RegistrationRoles())
+                .register("<register>take", new RegistrationTake());
+
+        Bot.log("<GREEN>Successfully registered <YELLOW>" + CommandHandler.getCommands().size() + "<GREEN> commands!", false);
+        registerApplicationCommands();
     }
 
-    private static void registerApplicationCommands(JDA jda) {
-        SlashHandler slash = SlashHandler.getInstance();
+    private static void registerApplicationCommands() {
+        SlashHandler slash = SlashHandler.getManager();
         List<CommandData> commands = new ArrayList<>();
 
         /* []====================[] Disconnect []====================[] */
@@ -202,28 +228,47 @@ public final class Main {
                 .addOptions(activityOption, activityName)
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
+        /* -------------------- TICKET SYSTEM -------------------- */
+        OptionData closeTicketIsRefused = new OptionData(OptionType.BOOLEAN, "refused", "Determina se o ticket foi fechado porque foi recusado a ser respondido.");
+        commands.add(Commands.slash("ticket", "Abre um novo ticket para entrar em contato com nossa equipe."));
+
+        commands.add(Commands.slash("close", "Feche o ticket atual.")
+                .addOptions(closeTicketIsRefused)
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
+
         // Registering it
-        jda.updateCommands().addCommands(commands).queue();
+        api.updateCommands().addCommands(commands).queue(m -> {
+                Bot.log("<GREEN>Successfully registered <YELLOW>" + commands.size() + "<GREEN> slash commands!", false);
+        }, e -> {
+                e.printStackTrace();
+                Bot.log("<RED>Could not register commands.", true);
+        });
 
         // Internally register all the slash commands
-        slash.addListenerCommand("disconnect", new Disconnect());
-        slash.addListenerCommand("disconnectall", new DisconnectAll());
-        slash.addListenerCommand("register", Registration.getInstance());
-        slash.addListenerCommand("moveall", new VoiceMoveAll());
-        slash.addListenerCommand("color", new ColorRole());
-        slash.addListenerCommand("shutdown", new Shutdown());
-        slash.addListenerCommand("stream", new BotStatus());
+        slash
+                .addListenerCommand("disconnect", new Disconnect())
+                .addListenerCommand("disconnectall", new DisconnectAll())
+                .addListenerCommand("register", Registration.getInstance())
+                .addListenerCommand("moveall", new VoiceMoveAll())
+                .addListenerCommand("color", new ColorRole())
+                .addListenerCommand("shutdown", new Shutdown())
+                .addListenerCommand("stream", new BotStatus())
+                .addListenerCommand("close", new CloseTicket())
+                .addListenerCommand("ticket", new OpenTicket());
     }
 
     public static long getInitTime() {
         return init;
     }
 
-    private static void runRunnables(JDA api) {
-        // Pay Server
-        new PayServer(api);
+    private static void runRunnables() {
+        final ScheduleManager scheduler = ScheduleManager.getManager();
 
-        // Color Role runnable
-        ColorRole.startCounter();
+        scheduler
+                .addRunnable(3600 * 1000, new PayServer())
+                .addRunnable(60000, new ColorRole());
+
+        // Starts the schedule
+        scheduler.release();
     }
 }

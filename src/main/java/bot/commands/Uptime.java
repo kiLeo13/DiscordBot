@@ -2,7 +2,7 @@ package bot.commands;
 
 import bot.Main;
 import bot.util.interfaces.CommandExecutor;
-import bot.util.annotations.CommandPermission;
+import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -13,7 +13,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
-@CommandPermission(permission = Permission.MANAGE_SERVER)
+@CommandPermission(permissions = Permission.MANAGE_SERVER)
 public class Uptime implements CommandExecutor {
     private static final byte timeZone = -3;
 

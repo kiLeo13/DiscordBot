@@ -1,10 +1,10 @@
 package bot.commands;
 
 import bot.util.Bot;
+import bot.util.content.Messages;
 import bot.util.interfaces.CommandExecutor;
-import bot.util.annotations.CommandPermission;
-import bot.util.Messages;
-import bot.util.requests.DiscordManager;
+import bot.util.interfaces.annotations.CommandPermission;
+import bot.util.managers.requests.DiscordManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;

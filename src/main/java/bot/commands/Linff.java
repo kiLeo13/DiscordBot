@@ -2,9 +2,9 @@ package bot.commands;
 
 import java.util.List;
 
+import bot.util.content.Roles;
 import bot.util.interfaces.CommandExecutor;
-import bot.util.annotations.CommandPermission;
-import bot.util.Roles;
+import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;

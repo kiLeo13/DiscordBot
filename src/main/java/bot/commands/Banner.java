@@ -1,9 +1,9 @@
 package bot.commands;
 
 import bot.util.Bot;
+import bot.util.content.Messages;
 import bot.util.interfaces.CommandExecutor;
-import bot.util.annotations.CommandPermission;
-import bot.util.Messages;
+import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 
 import java.awt.*;
 
-@CommandPermission(permission = Permission.MANAGE_SERVER)
+@CommandPermission(permissions = Permission.MANAGE_SERVER)
 public class Banner implements CommandExecutor {
 
     @Override

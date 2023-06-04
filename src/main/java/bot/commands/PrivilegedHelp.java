@@ -1,7 +1,7 @@
 package bot.commands;
 
 import bot.util.interfaces.CommandExecutor;
-import bot.util.annotations.CommandPermission;
+import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 import java.awt.*;
 
-@CommandPermission(permission = Permission.MANAGE_SERVER)
+@CommandPermission(permissions = Permission.MANAGE_SERVER)
 public class PrivilegedHelp implements CommandExecutor {
 
     @Override

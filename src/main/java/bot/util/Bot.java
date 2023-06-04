@@ -2,11 +2,12 @@ package bot.util;
 
 import bot.Main;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.requests.RestAction;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,23 +27,7 @@ public class Bot {
      * @param time The time (in milliseconds) the bot will wait before deleting the message
      * 
     **/
-    public static void tempMessage(MessageChannelUnion channel, String message, int time) {
-        if (channel == null) return;
-        channel.sendMessage(message)
-                .delay(time, TimeUnit.MILLISECONDS)
-                .flatMap(Message::delete)
-                .queue(null, new ErrorHandler()
-                        .ignore(ErrorResponse.UNKNOWN_MESSAGE));
-    }
-
-    /**
-     *
-     * @param channel The channel to be sent the message
-     * @param message The message to be sent in the channel
-     * @param time The time (in milliseconds) the bot will wait before deleting the message
-     *
-     **/
-    public static void tempMessage(TextChannel channel, String message, int time) {
+    public static void tempMessage(MessageChannel channel, String message, int time) {
         if (channel == null) return;
         channel.sendMessage(message)
                 .delay(time, TimeUnit.MILLISECONDS)
@@ -99,16 +84,26 @@ public class Bot {
                 runnable.run();
             }
         };
-
+        
         timer.scheduleAtFixedRate(task, 0, delay);
         return task;
     }
+    
+    public static RestAction<RichCustomEmoji> emoji(Guild guild, String id) {
+        if (guild == null || id == null) return null;
 
+        id = id.replaceAll("[^0-9]+", "");
+
+        if (id.stripTrailing().isBlank()) return null;
+
+        return guild.retrieveEmojiById(id);
+    }
+    
     public static Member member(Guild guild, String arg) {
         if (guild == null || arg == null) return null;
         arg = arg.replaceAll("[^0-9]+", "");
 
-        if (arg.stripTrailing().equals("")) return null;
+        if (arg.stripTrailing().isEmpty()) return null;
 
         try {
             return guild.retrieveMemberById(arg).complete();
@@ -130,7 +125,7 @@ public class Bot {
         }
     }
 
-    public static void log(String str) {
+    public static void log(String str, boolean error) {
         final HashMap<String, String> placeholders = new HashMap<>();
 
         placeholders.put("<RESET>", "\033[0m");
@@ -152,7 +147,10 @@ public class Bot {
         String minute = now.getMinute() < 10 ? "0" + now.getMinute() : String.valueOf(now.getMinute());
         String second = now.getSecond() < 10 ? "0" + now.getSecond() : String.valueOf(now.getSecond());
 
-        System.out.printf("[%s.%s.%s]: %s%s\n", hour, minute, second, str, "\033[0m");
+        if (error)
+            System.err.printf("[%s.%s.%s]: %s%s\n", hour, minute, second, str, "\033[0m");
+        else
+            System.out.printf("[%s.%s.%s]: %s%s\n", hour, minute, second, str, "\033[0m");
     }
 
     public static String read(File file) {

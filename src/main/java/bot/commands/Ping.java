@@ -2,14 +2,14 @@ package bot.commands;
 
 import bot.Main;
 import bot.util.interfaces.CommandExecutor;
-import bot.util.annotations.CommandPermission;
+import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
-@CommandPermission(permission = Permission.MANAGE_SERVER)
+@CommandPermission(permissions = Permission.MANAGE_SERVER)
 public class Ping implements CommandExecutor {
 
     @Override

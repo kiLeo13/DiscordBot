@@ -1,9 +1,11 @@
 package bot.commands;
 
 import bot.util.*;
-import bot.util.RegistrationRoles;
-import bot.util.annotations.CommandPermission;
+import bot.util.content.Channels;
+import bot.util.content.Messages;
+import bot.util.content.RegistrationRoles;
 import bot.util.interfaces.CommandExecutor;
+import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -14,7 +16,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@CommandPermission(permission = Permission.MANAGE_ROLES)
+@CommandPermission(permissions = Permission.MANAGE_ROLES)
 public class RegistrationTake implements CommandExecutor {
 
     @Override
@@ -28,7 +30,7 @@ public class RegistrationTake implements CommandExecutor {
         MessageChannelUnion channel = message.getChannel();
         Member target = args.length < 2 ? null : Bot.member(guild, args[1]);
 
-        if (channel.getIdLong() == Channels.REGISTER_CHANNEL.id()) return;
+        if (channel.getId().equals(Channels.REGISTER_CHANNEL.id())) return;
 
         if (target == null) {
             Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);

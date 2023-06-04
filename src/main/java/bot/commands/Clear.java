@@ -1,14 +1,14 @@
 package bot.commands;
 
 import bot.util.Bot;
+import bot.util.content.Messages;
 import bot.util.interfaces.CommandExecutor;
-import bot.util.annotations.CommandPermission;
-import bot.util.Messages;
+import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
-@CommandPermission(permission = Permission.MESSAGE_MANAGE)
+@CommandPermission(permissions = Permission.MESSAGE_MANAGE)
 public class Clear implements CommandExecutor {
 
     @Override

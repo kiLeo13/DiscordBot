@@ -1,7 +1,7 @@
 package bot.commands;
 
-import bot.util.annotations.CommandPermission;
 import bot.util.interfaces.CommandExecutor;
+import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.entities.Message;
 
 @CommandPermission()

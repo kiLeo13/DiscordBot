@@ -1,9 +1,11 @@
 package bot.commands;
 
 import bot.util.*;
-import bot.util.annotations.CommandPermission;
+import bot.util.content.Channels;
+import bot.util.content.Messages;
 import bot.util.interfaces.CommandExecutor;
 import bot.util.interfaces.SlashExecutor;
+import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -36,8 +38,8 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
     @Override
     public void process(SlashCommandInteractionEvent event) {
 
-        List<Long> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_SELF_CHANNELS.ids();
-        if (!allowedDisconnectChannels.contains(event.getChannel().getIdLong())) return;
+        List<String> allowedDisconnectChannels = Channels.COMMAND_DISCONNECT_SELF_CHANNELS.ids();
+        if (!allowedDisconnectChannels.contains(event.getChannel().getId())) return;
 
         Guild guild = event.getGuild();
         Member member = event.getMember();

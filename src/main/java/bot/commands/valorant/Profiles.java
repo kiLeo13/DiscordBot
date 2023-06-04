@@ -1,10 +1,11 @@
 package bot.commands.valorant;
 
 import bot.util.Bot;
+import bot.util.content.Messages;
 import bot.util.interfaces.CommandExecutor;
-import bot.util.annotations.CommandPermission;
-import bot.util.Messages;
-import bot.util.requests.RequestManager;
+import bot.util.interfaces.annotations.CommandPermission;
+import bot.util.managers.requests.RequestManager;
+
 import com.google.gson.Gson;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -18,7 +19,7 @@ import java.awt.*;
 
 @CommandPermission()
 public class Profiles implements CommandExecutor {
-    private static final RequestManager requester = RequestManager.NewManager();
+    private static final RequestManager requester = RequestManager.create();
     private long lastUsed;
 
     @Override

@@ -1,6 +1,6 @@
 package bot.commands;
 
-import bot.util.Messages;
+import bot.util.content.Messages;
 import bot.util.interfaces.SlashExecutor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;

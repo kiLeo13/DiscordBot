@@ -1,8 +1,11 @@
 package bot.commands;
 
 import bot.util.*;
-import bot.util.annotations.CommandPermission;
+import bot.util.content.Channels;
+import bot.util.content.Messages;
+import bot.util.content.Roles;
 import bot.util.interfaces.CommandExecutor;
+import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -27,7 +30,7 @@ public class RoleAmongUs implements CommandExecutor {
         Role roleAmongUs = guild.getRoleById(Roles.ROLE_AMONG_US.id());
 
         if (!isMemberAllowed(member)) return;
-        if (Channels.STAFF_AJUDANTES_CHANNEL.id() != channel.getIdLong()) return;
+        if (!Channels.STAFF_AJUDANTES_CHANNEL.id().equals(channel.getId())) return;
 
         if (args.length < 2) {
             Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 5000);

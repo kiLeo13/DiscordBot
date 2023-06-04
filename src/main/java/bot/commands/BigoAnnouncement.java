@@ -1,14 +1,14 @@
 package bot.commands;
 
 import bot.util.interfaces.CommandExecutor;
-import bot.util.annotations.CommandPermission;
+import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
 import java.util.HashMap;
 
-@CommandPermission(permission = Permission.MANAGE_SERVER)
+@CommandPermission(permissions = Permission.MANAGE_SERVER)
 public class BigoAnnouncement implements CommandExecutor {
 
     @Override

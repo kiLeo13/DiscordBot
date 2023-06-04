@@ -3,8 +3,8 @@ package bot.commands;
 import bot.Main;
 import bot.util.Bot;
 import bot.util.interfaces.CommandExecutor;
-import bot.util.annotations.CommandPermission;
-import bot.util.requests.RequestManager;
+import bot.util.interfaces.annotations.CommandPermission;
+import bot.util.managers.requests.RequestManager;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 @CommandPermission()
 public class AvatarBot implements CommandExecutor {
-    private static final RequestManager requester = RequestManager.NewManager();
+    private static final RequestManager requester = RequestManager.create();
     private static final List<String> validation = List.of(".png", ".jpg", ".webp");
 
     @Override

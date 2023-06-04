@@ -3,13 +3,13 @@ package bot.commands.valorant;
 import java.awt.Color;
 import java.util.List;
 
-import bot.util.annotations.CommandPermission;
-import bot.util.requests.RequestManager;
 import com.google.gson.Gson;
 
 import bot.util.Bot;
+import bot.util.content.Messages;
 import bot.util.interfaces.CommandExecutor;
-import bot.util.Messages;
+import bot.util.interfaces.annotations.CommandPermission;
+import bot.util.managers.requests.RequestManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 @CommandPermission()
 public class Characters implements CommandExecutor {
-    private static final RequestManager requester = RequestManager.NewManager();
+    private static final RequestManager requester = RequestManager.create();
 
     @Override
     public void run(Message message) {

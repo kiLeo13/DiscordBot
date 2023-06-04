@@ -1,7 +1,9 @@
 package bot.commands;
 
-import bot.util.RegistrationRoles;
 import bot.util.*;
+import bot.util.content.Channels;
+import bot.util.content.Messages;
+import bot.util.content.RegistrationRoles;
 import bot.util.interfaces.CommandExecutor;
 import bot.util.interfaces.SlashExecutor;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -57,7 +59,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         boolean rolesExist = rolesExist(guild);
 
         // Is the channel correct?
-        if (channel.getIdLong() != Channels.REGISTER_CHANNEL.id()) return;
+        if (!channel.getId().equals(Channels.REGISTER_CHANNEL.id())) return;
 
         if (!member.getRoles().contains(requiredRole) && !member.hasPermission(Permission.MANAGE_ROLES)) return;
 
@@ -464,7 +466,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         if (channel != null) channel.sendMessageEmbeds(builder.build()).queue();
         else System.out.println("Não foi possível salvar o registro pois nenhum chat foi encontrado.");
 
-        Bot.log(String.format("%s registrou o membro %s\n", author.getAsTag(), target.getUser().getAsTag()));
+        Bot.log(String.format("%s registrou o membro %s\n", author.getAsTag(), target.getUser().getAsTag()), false);
     }
 
     private String formattedRolesToEmbed(List<Role> roles) {

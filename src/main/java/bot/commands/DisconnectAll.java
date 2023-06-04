@@ -1,7 +1,7 @@
 package bot.commands;
 
-import bot.util.Messages;
-import bot.util.Roles;
+import bot.util.content.Messages;
+import bot.util.content.Roles;
 import bot.util.interfaces.SlashExecutor;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;

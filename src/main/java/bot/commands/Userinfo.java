@@ -1,8 +1,11 @@
 package bot.commands;
 
 import bot.util.*;
-import bot.util.annotations.CommandPermission;
+import bot.util.content.Messages;
+import bot.util.content.Roles;
+import bot.util.content.StaffEmoji;
 import bot.util.interfaces.CommandExecutor;
+import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;

@@ -2,8 +2,9 @@ package bot.commands;
 
 import bot.Main;
 import bot.util.Bot;
-import bot.util.Channels;
-import bot.util.Messages;
+import bot.util.content.Channels;
+import bot.util.content.Messages;
+import bot.util.interfaces.BotScheduler;
 import bot.util.interfaces.SlashExecutor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -26,7 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ColorRole implements SlashExecutor {
+public class ColorRole implements SlashExecutor, BotScheduler {
 
     public static final int REMOVAL = 60;
     private static final File file = new File("resources", "colors.json");
@@ -167,7 +168,8 @@ public class ColorRole implements SlashExecutor {
 
     public record Data(long now, long remove, String member, String guildId, String roleId) {}
 
-    public static void startCounter() {
+    @Override
+    public void perform() {
         Bot.setInterval(() -> {
             Map<String, ColorRole.Data> information = ColorRole.read();
             LocalDateTime now = LocalDateTime.now();
@@ -193,7 +195,7 @@ public class ColorRole implements SlashExecutor {
                         guild.removeRoleFromMember(m, role).queue();
 
                         logRemove(data.guildId, s, data.roleId);
-                        Bot.log(m.getUser().getAsTag() + " teve o cargo de cor " + role.getName() + " removido.");
+                        Bot.log(m.getUser().getAsTag() + " teve o cargo de cor " + role.getName() + " removido.", false);
                     });
                 }
             }

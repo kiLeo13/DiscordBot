@@ -2,10 +2,11 @@ package bot.commands.lifetimemute;
 
 import bot.data.BotFiles;
 import bot.util.Bot;
+import bot.util.content.Messages;
 import bot.util.interfaces.CommandExecutor;
-import bot.util.annotations.CommandPermission;
-import bot.util.Messages;
-import bot.util.requests.DiscordManager;
+import bot.util.interfaces.annotations.CommandPermission;
+import bot.util.managers.requests.DiscordManager;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -23,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@CommandPermission(permission = Permission.BAN_MEMBERS)
+@CommandPermission(permissions = Permission.BAN_MEMBERS)
 public class LifeMuteCommand implements CommandExecutor {
     private static final DiscordManager discord = DiscordManager.NewManager();
     private static final File mutedMembersFile = new File(BotFiles.DIR, "lifemuted.json");
@@ -96,7 +97,7 @@ public class LifeMuteCommand implements CommandExecutor {
             if (muted != null)
                 guild.modifyMemberRoles(target, null, List.of(muted)).queue();
             else
-                Bot.log("<YELLOW>Cargo '592465045686845480' não foi encontrado ao usar o comando lifetime-mute. Ignorando cargo...");
+                Bot.log("<YELLOW>Cargo '592465045686845480' não foi encontrado ao usar o comando lifetime-mute. Ignorando cargo...", false);
 
             channel.sendMessageEmbeds(embed).queue();
         } else {
@@ -115,7 +116,7 @@ public class LifeMuteCommand implements CommandExecutor {
             if (muted != null)
                 guild.modifyMemberRoles(target, List.of(muted), null).queue();
             else
-                Bot.log("<YELLOW>Cargo '592465045686845480' não foi encontrado ao usar o comando lifetime-mute. Ignorando cargo...");
+                Bot.log("<YELLOW>Cargo '592465045686845480' não foi encontrado ao usar o comando lifetime-mute. Ignorando cargo...", false);
 
             channel.sendMessageEmbeds(embed).queue();
         }
