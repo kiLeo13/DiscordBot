@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.io.*;
@@ -14,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,9 +45,9 @@ public class TicketStorage {
      * @param file The file you want to read the content from.
      * @return A {@link String} object of the content of the provided {@link File}.
      */
-    protected String readFile(File file) {
+    protected String read(File file) {
         try {
-            String json = String.join("", Files.readAllLines(Path.of(file.getAbsolutePath())));
+            String json = String.join(System.lineSeparator(), Files.readAllLines(Path.of(file.getAbsolutePath())));
 
             if (!json.isBlank()) return json;
         } catch (IOException e) {
@@ -56,10 +58,10 @@ public class TicketStorage {
     }
 
     /**
-     * @return An immutable {@link Map} containing all the closed-tickets.
+     * @return An immutable {@link Map} containing all the basic-information about the tickets.
      */
     protected Map<String, Ticket> getTickets() {
-        String json = readFile(tickets);
+        String json = read(tickets);
         TypeToken<Map<String, Ticket>> token = new TypeToken<>() {};
         Map<String, Ticket> tickets = gson.fromJson(json, token.getType());
 
@@ -69,28 +71,53 @@ public class TicketStorage {
     }
 
     /**
+     * Returns the ticket matching the id you provided.
+     *
+     * @param id The id of the channel of the ticket.
+     * @return A {@link Ticket} object of the ticket containing all the basic-information, null otherwise.
+     */
+    protected Ticket getTicket(String id) {
+        final Map<String, Ticket> tickets = getTickets();
+
+        for (String k : tickets.keySet()) {
+            Ticket value = tickets.get(k);
+            if (k.equals(id))
+                return value;
+        }
+
+        return null;
+    }
+
+    /**
      * Stores a ticket in the JSON file.
      *
      * @param issuer Who created the ticket.
      * @param subject The subject of the ticket.
      * @param description The description of the ticket that holds more information about it.
      */
-    protected void storeTicket(Member issuer, String subject, String description) {
+    protected void storeTicket(Member issuer, MessageChannel channel, String subject, String description) {
         final Map<String, Ticket> tickets = new HashMap<>(getTickets());
-        int max = Integer.MIN_VALUE;
+        int ticketId = 0;
         LocalDateTime now = LocalDateTime.now();
 
         // Finding the greatest value of the keys
-        for (String k : tickets.keySet()) {
-            int value = Integer.parseInt(k);
+        for (Ticket k : tickets.values()) {
+            int value = k.id;
 
-            if (value >= max)
-                max = value;
+            if (value >= ticketId)
+                ticketId = value;
         }
 
         tickets.put(
-                String.valueOf(max + 1),
-                new Ticket(issuer.getId(), now.toEpochSecond(ZoneOffset.UTC), subject, description)
+                channel.getId(),
+                new Ticket(
+                        issuer.getId(),
+                        now.toEpochSecond(ZoneOffset.UTC),
+                        ticketId + 1,
+                        subject,
+                        description,
+                        new Reason(false, null)
+                )
         );
 
         String write = gson.toJson(tickets);
@@ -100,15 +127,18 @@ public class TicketStorage {
     /**
      * Deletes a certain ticket.
      *
-     * @param id The id of the ticket to be deleted.
+     * @param id The KEY of the ticket that will have the value changed, NOT the ID of the ticket.
      */
-    protected void deleteTicket(String id) {
+    protected void setRefused(String id, boolean refused, String reason) {
         final Map<String, Ticket> tickets = new HashMap<>(getTickets());
 
-        tickets.remove(id);
+        Ticket initial = tickets.get(id);
+        if (initial == null) return;
 
-        String json = gson.toJson(tickets);
-        write(json, TicketStorage.tickets);
+        tickets.put(id, new Ticket(initial.issuer, initial.creation, initial.id, initial.subject, initial.description, new Reason(refused, reason)));
+
+        String write = gson.toJson(tickets);
+        write(write, TicketStorage.tickets);
     }
 
     /**
@@ -137,16 +167,44 @@ public class TicketStorage {
     protected File newTemporary(MessageChannel channel) throws IOException {
         final File dir = BotFiles.DIR_TICKETS;
 
+        if (dir.mkdirs())
+            Bot.log("<YELLOW>'tickets' directory was not found. Creating a new one.", false);
+
         if (!dir.isDirectory())
             throw new UnsupportedOperationException("The provided file object is not a directory");
-
-        if (!dir.mkdirs())
-            Bot.log("<YELLOW>'tickets' directory was not found. Creating a new one.", false);
 
         File file = new File(dir, channel.getId() + ".txt");
         file.createNewFile();
 
+        setSpecs(channel, file);
+
         return file;
+    }
+
+    /**
+     * Sets the proper specifications for the temporary file.
+     *
+     * @param channel The channel of the ticket.
+     */
+    private void setSpecs(MessageChannel channel, File file) {
+        Ticket ticket = getTicket(channel.getId());
+        LocalDateTime creation = LocalDateTime.ofEpochSecond(ticket.creation, 0, ZoneOffset.UTC);
+        String formatted = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss").format(creation);
+
+        String content = String.format("""
+                Quem criou: %s
+                Quando: %s
+                Assunto: %s
+                Descrição: %s
+                ------------------------------------------------------------
+                """,
+                ticket.issuer,
+                formatted,
+                ticket.subject,
+                ticket.description
+        );
+
+        write(content, file);
     }
 
     /**
@@ -160,30 +218,22 @@ public class TicketStorage {
      */
     protected void storeTemporary(Message message) throws IOException {
         LocalDateTime now = LocalDateTime.now();
-        Member issuer = message.getMember();
+        User issuer = message.getMember().getUser();
         MessageChannel channel = message.getChannel();
         String content = message.getContentDisplay();
-        int secs = now.getSecond();
-        int mins = now.getMinute();
-        int hrs = now.getHour();
 
-        File temporary = getTemporary(channel);
+        File temporary = getTemporary(channel.getId());
         if (temporary == null) temporary = newTemporary(message.getChannel());
 
-        String read = readFile(temporary);
+        String read = read(temporary);
         String write = String.format(
-                "[%s:%s:%s] %s: %s",
-                hrs < 10 ? "0" + secs : secs,
-                mins < 10 ? "0" + mins : mins,
-                secs < 10 ? "0" + secs : secs,
-                issuer.getUser().getName(),
+                "[%s] %s: %s",
+                DateTimeFormatter.ofPattern("HH:mm:ss").format(now),
+                issuer.isBot() ? issuer.getName() + " [BOT]" : issuer.getName(),
                 content
         );
 
-        if (read.isBlank())
-            write(write, temporary);
-        else
-            write(read + "\n" + write, temporary);
+        write(read + "\n" + write, temporary);
     }
 
     /**
@@ -193,11 +243,11 @@ public class TicketStorage {
     protected List<File> getTemporaries() {
         final File dir = BotFiles.DIR_TICKETS;
 
+        if (dir.mkdirs())
+            Bot.log("<YELLOW>'tickets' directory was not found. Creating a new one.", false);
+
         if (!dir.isDirectory())
             throw new UnsupportedOperationException("The provided file object is not a directory");
-
-        if (!dir.mkdirs())
-            Bot.log("<YELLOW>'tickets' directory was not found. Creating a new one.", false);
 
         File[] files = dir.listFiles();
 
@@ -211,14 +261,14 @@ public class TicketStorage {
      * <p><b>This method will NOT create a new file if no files are found.</b>
      * <p>If you want to create a new file if the one does not exist, use {@link #newTemporary(MessageChannel)}
      *
-     * @param channel The channel of the ticket.
+     * @param id The id of the ticket (the ticket-channel id).
      * @return A {@link File} object of the history of the ticket channel or null if no files are found.
      */
-    protected File getTemporary(MessageChannel channel) {
+    protected File getTemporary(String id) {
         final List<File> tickets = getTemporaries();
 
         for (File f : tickets)
-            if (f.getName().startsWith(channel.getId()))
+            if (f.getName().startsWith(id))
                 return f;
 
         return null;
@@ -229,12 +279,10 @@ public class TicketStorage {
      * @return {@code true} if the channel is a ticket channel, {@code false} otherwise.
      */
     protected boolean isFromTicket(MessageChannel channel) {
-        final List<File> tickets = getTemporaries();
+        final Map<String, Ticket> tickets = getTickets();
 
-        for (File f : tickets)
-            // It's easier to just check startsWith()
-            // Cause the file extension ending would dismatch the channel id
-            if (f.getName().startsWith(channel.getId()))
+        for (String id : tickets.keySet())
+            if (id.equals(channel.getId()))
                 return true;
 
         return false;
@@ -243,7 +291,12 @@ public class TicketStorage {
     protected record Ticket(
             String issuer,
             long creation,
+            int id,
             String subject,
-            String description
+            String description,
+            Reason refused
     ) {}
+
+    protected record Reason(boolean status, String reason) {
+    }
 }

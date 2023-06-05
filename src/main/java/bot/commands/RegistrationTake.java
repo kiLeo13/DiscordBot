@@ -28,7 +28,7 @@ public class RegistrationTake implements CommandExecutor {
         String[] args = content.split(" ");
         Guild guild = message.getGuild();
         MessageChannelUnion channel = message.getChannel();
-        Member target = args.length < 2 ? null : Bot.member(guild, args[1]);
+        Member target = args.length < 2 ? null : Bot.fetchMember(guild, args[1]);
 
         if (channel.getId().equals(Channels.REGISTER_CHANNEL.id())) return;
 

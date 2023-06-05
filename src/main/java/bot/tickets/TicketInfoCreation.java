@@ -24,6 +24,8 @@ public class TicketInfoCreation extends ListenerAdapter {
     @SubscribeEvent
     public void onModalInteraction(@NotNull ModalInteractionEvent event) {
 
+        if (!event.getInteraction().getModalId().equals("create-ticket")) return;
+
         Guild guild = event.getGuild();
         Member member = event.getMember();
         Category supportCategory = guild.getCategoryById(Categories.SUPPORT.id());
@@ -39,15 +41,22 @@ public class TicketInfoCreation extends ListenerAdapter {
             return;
         }
 
+        String subject = event.getInteraction().getValue("subject").getAsString();
+        String description = event.getInteraction().getValue("description").getAsString();
+
         supportCategory
                 .createTextChannel("🔸｜ticket-" + member.getUser().getName())
+                .setTopic("**Assunto: **" + subject)
                 .addPermissionOverride(guild.getPublicRole(), null, List.of(Permission.VIEW_CHANNEL))
                 .queue(c -> {
                     event.reply("Ticket criado: " + c.getAsMention() + ". Dirija-se até o canal de texto citado para mais informações.")
                             .setEphemeral(true)
                             .queue();
 
-                    c.sendMessageEmbeds(embed(event)).queue(e -> {
+                    // Storing the ticket to the JSON fie
+
+                    c.sendMessageEmbeds(embed(event, subject.replace("`", ""), description.replace("`", ""))).queue(e -> {
+                        manager.storeTicket(member, c, subject, description);
                         c.sendMessage(member.getAsMention() + " sinta-se a vontade para nos fornecer mais detalhes ou imagens relacionadas ao seu problema.").queue();
                     });
                 });
@@ -56,10 +65,8 @@ public class TicketInfoCreation extends ListenerAdapter {
         OpenTicket.cooldown.put(member.getId(), System.currentTimeMillis());
     }
 
-    private MessageEmbed embed(ModalInteractionEvent event) {
+    private MessageEmbed embed(ModalInteractionEvent event, String subject, String description) {
         final EmbedBuilder builder = new EmbedBuilder();
-        String subject = event.getInteraction().getValue("subject").getAsString().replace("`", "\\`").replace("\\", "");
-        String description = event.getInteraction().getValue("description").getAsString().replace("`", "\\`");
         Member issuer = event.getMember();
 
         builder

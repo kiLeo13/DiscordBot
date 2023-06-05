@@ -1,18 +1,23 @@
 package bot.util;
 
 import bot.Main;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
-import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 public class Bot {
@@ -89,17 +94,7 @@ public class Bot {
         return task;
     }
     
-    public static RestAction<RichCustomEmoji> emoji(Guild guild, String id) {
-        if (guild == null || id == null) return null;
-
-        id = id.replaceAll("[^0-9]+", "");
-
-        if (id.stripTrailing().isBlank()) return null;
-
-        return guild.retrieveEmojiById(id);
-    }
-    
-    public static Member member(Guild guild, String arg) {
+    public static Member fetchMember(Guild guild, String arg) {
         if (guild == null || arg == null) return null;
         arg = arg.replaceAll("[^0-9]+", "");
 
@@ -120,6 +115,19 @@ public class Bot {
 
         try {
             return Main.getApi().retrieveUserById(arg).complete();
+        } catch (ErrorResponseException e) {
+            return null;
+        }
+    }
+
+    public static CacheRestAction<User> fetchUser(String arg) {
+        if (arg == null) return null;
+        arg = arg.replaceAll("[^0-9]+", "");
+
+        if (arg.isBlank()) return null;
+
+        try {
+            return Main.getApi().retrieveUserById(arg);
         } catch (ErrorResponseException e) {
             return null;
         }

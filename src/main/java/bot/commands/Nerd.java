@@ -30,7 +30,7 @@ public class Nerd implements CommandExecutor {
         MessageChannelUnion channel = message.getChannel();
         String[] args = content.split(" ");
         MessageCreateBuilder send = new MessageCreateBuilder();
-        Member target = args.length >= 2 ? Bot.member(guild, args[1]) : member;
+        Member target = args.length >= 2 ? Bot.fetchMember(guild, args[1]) : member;
 
         if (salada == null || alfea == null) {
             System.out.println("Could not find role 'salada' or 'alfea'. Ignoring `nerd` command...");

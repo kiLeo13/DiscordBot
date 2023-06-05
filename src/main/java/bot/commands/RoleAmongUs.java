@@ -26,7 +26,7 @@ public class RoleAmongUs implements CommandExecutor {
         String content = message.getContentRaw();
         String[] args = content.split(" ");
         Guild guild = message.getGuild();
-        Member target = args.length < 2 ? null : Bot.member(guild, args[1]);
+        Member target = args.length < 2 ? null : Bot.fetchMember(guild, args[1]);
         Role roleAmongUs = guild.getRoleById(Roles.ROLE_AMONG_US.id());
 
         if (!isMemberAllowed(member)) return;

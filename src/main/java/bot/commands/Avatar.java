@@ -24,7 +24,7 @@ public class Avatar implements CommandExecutor {
         Member member = message.getMember();
         String content = message.getContentRaw();
         String[] args = content.split(" ");
-        Member target = args.length < 2 ? member : Bot.member(message.getGuild(), args[1]);
+        Member target = args.length < 2 ? member : Bot.fetchMember(message.getGuild(), args[1]);
         MessageCreateBuilder send = new MessageCreateBuilder();
 
         if (target == null) {

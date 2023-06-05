@@ -146,7 +146,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         List<Role> toGiveRoles = new ArrayList<>();
         List<Role> toTakeRoles = new ArrayList<>(2);
 
-        Member target = Bot.member(guild, args[1]);
+        Member target = Bot.fetchMember(guild, args[1]);
 
         // If target member was not found
         if (target == null) {
@@ -230,7 +230,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         List<Role> toGiveRoles = new ArrayList<>();
         List<Role> toTakeRoles = new ArrayList<>(2);
 
-        Member target = Bot.member(guild, args[1]);
+        Member target = Bot.fetchMember(guild, args[1]);
 
         // If target member was not found
         if (target == null) {

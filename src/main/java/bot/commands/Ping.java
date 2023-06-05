@@ -25,8 +25,8 @@ public class Ping implements CommandExecutor {
         channel.sendMessage(String.format("""
                 <@%s> **Oie!** <:Hiro:855653864693694494>
                 
-                🕒** | Gateway Ping**: `%d`ms
-                📡** | API Ping**: `%d`ms
+                🕒** | Gateway Ping**: `%dms`
+                📡** | API Ping**: `%dms`
                 """, author.getId(), gatewayPing, apiPing)).queue();
     }
 }

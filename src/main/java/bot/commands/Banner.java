@@ -23,6 +23,7 @@ public class Banner implements CommandExecutor {
         String[] args = content.split(" ");
         MessageChannelUnion channel = message.getChannel();
 
+
         User target = args.length < 2 ? member.getUser() : Bot.findUser(args[1]);
 
         if (target == null) {

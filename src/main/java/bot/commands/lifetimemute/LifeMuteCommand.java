@@ -56,7 +56,7 @@ public class LifeMuteCommand implements CommandExecutor {
                 ? "No reason provided."
                 : content.substring(args[0].length() + args[1].length() + 2);
 
-        Member target = Bot.member(guild, args[1]);
+        Member target = Bot.fetchMember(guild, args[1]);
 
         // If the intention is to retrieve information about someone's muted
         if (content.endsWith("--info")) {

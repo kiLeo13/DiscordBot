@@ -1,7 +1,7 @@
 package bot.util.content;
 
 public enum Categories {
-    SUPPORT("691788421697503322");
+    SUPPORT("1114709273495212152");
 
     final String id;
 

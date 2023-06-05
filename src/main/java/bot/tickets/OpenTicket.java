@@ -30,7 +30,8 @@ public class OpenTicket implements SlashExecutor {
             return;
         }
 
-        if (waitTime.duration.getSeconds() > 0) {
+        // At least 1 hour between two tickets
+        if (waitTime.duration.getSeconds() < 3600) {
             event.reply("Você precisa esperar `" + waitTime.format() + "` antes de abrir outro ticket..").setEphemeral(true).queue();
             return;
         }
@@ -61,7 +62,7 @@ public class OpenTicket implements SlashExecutor {
         }
 
         long lastUse = cooldown.get(member.getId());
-        return new Cooldown(Duration.ofMillis(now - lastUse));
+        return new Cooldown(Duration.ofMillis(lastUse));
     }
 
     private record Cooldown(Duration duration) {
@@ -72,7 +73,7 @@ public class OpenTicket implements SlashExecutor {
             int hrs = duration.toHoursPart();
 
             if (hrs > 0) builder.append(String.format("%sh", hrs < 10 ? "0" + hrs : hrs)).append(", ");
-            if (mins > 0) builder.append(String.format("%sm", mins < 10 ? "0" + secs : secs)).append(", ");
+            if (mins > 0) builder.append(String.format("%sm", mins < 10 ? "0" + mins : mins)).append(", ");
             if (secs > 0) builder.append(String.format("%ss", secs < 10 ? "0" + secs : secs)).append(", ");
 
             String converted = builder.toString().stripTrailing();

@@ -25,7 +25,7 @@ public class Userinfo implements CommandExecutor {
         Guild guild = message.getGuild();
         String content = message.getContentRaw();
         String[] args = content.split(" ");
-        Member target = args.length < 2 ? member : Bot.member(guild, args[1]);
+        Member target = args.length < 2 ? member : Bot.fetchMember(guild, args[1]);
         MessageCreateBuilder send = new MessageCreateBuilder();
 
         if (target == null) {

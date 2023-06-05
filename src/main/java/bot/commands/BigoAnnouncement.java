@@ -6,33 +6,22 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
-import java.util.HashMap;
-
-@CommandPermission(permissions = Permission.MANAGE_SERVER)
+@CommandPermission(permissions = Permission.MESSAGE_MANAGE)
 public class BigoAnnouncement implements CommandExecutor {
 
     @Override
     public void run(Message message) {
 
         MessageChannelUnion channel = message.getChannel();
-        String announcement = getAnnouncement("""
-                Vão lá conferir a live do <streamer>!
+        String announcement = String.format("""
+                Vão lá conferir a live do %s!
                 
-                <link>
-                """);
+                %s
+                """,
+                "Bigo",
+                "https://www.twitch.tv/poderosobigo"
+        );
 
         channel.sendMessage(announcement).queue();
-    }
-
-    private static String getAnnouncement(String str) {
-        HashMap<String, String> placeholders = new HashMap<>();
-
-        placeholders.put("<streamer>", "Bigo");
-        placeholders.put("<link>", "https://www.twitch.tv/poderosobigo");
-
-        for (String p : placeholders.keySet())
-            str = str.replaceAll(p, placeholders.get(p));
-
-        return str;
     }
 }

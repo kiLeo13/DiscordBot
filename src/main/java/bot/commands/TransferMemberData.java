@@ -41,7 +41,7 @@ public class TransferMemberData implements CommandExecutor {
 
         // Sometimes we just want to revert something, right?
         if (content.endsWith("--undo") || content.endsWith("--revert")) {
-            Member target = Bot.member(guild, args[1]);
+            Member target = Bot.fetchMember(guild, args[1]);
 
             if (undo(target))
                 channel.sendMessage("Removendo cargos dados para `" + target.getUser().getAsTag() + "` na última operação...").queue();

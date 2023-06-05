@@ -4,9 +4,7 @@ import bot.commands.Shutdown;
 import bot.commands.*;
 import bot.commands.lifetimemute.LifeMuteCommand;
 import bot.commands.lifetimemute.VoiceJoin;
-import bot.tickets.CloseTicket;
-import bot.tickets.OpenTicket;
-import bot.tickets.TicketInfoCreation;
+import bot.tickets.*;
 import bot.util.schedules.PayServer;
 import bot.commands.valorant.Characters;
 import bot.commands.valorant.Profiles;
@@ -97,6 +95,7 @@ public final class Main {
                 new WordFilter(),
                 CommandHandler.getManager(),
                 SlashHandler.getManager(),
+                new MessageInputTicket(),
 
                 // Voice
                 new VoiceJoin(),
@@ -104,8 +103,9 @@ public final class Main {
                 // Mist
                 new Reactions(),
 
-                // Ticket system
+                // Modals
                 new TicketInfoCreation(),
+                new TicketClosedReason(),
 
                 // Inform them about voice-activity
                 new VoiceBigo()
@@ -229,7 +229,7 @@ public final class Main {
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
         /* -------------------- TICKET SYSTEM -------------------- */
-        OptionData closeTicketIsRefused = new OptionData(OptionType.BOOLEAN, "refused", "Determina se o ticket foi fechado porque foi recusado a ser respondido.");
+        OptionData closeTicketIsRefused = new OptionData(OptionType.BOOLEAN, "refused", "Determina se o ticket foi fechado porque foi recusado a ser respondido.", false);
         commands.add(Commands.slash("ticket", "Abre um novo ticket para entrar em contato com nossa equipe."));
 
         commands.add(Commands.slash("close", "Feche o ticket atual.")
