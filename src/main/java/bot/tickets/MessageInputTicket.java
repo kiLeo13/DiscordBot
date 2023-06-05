@@ -18,7 +18,7 @@ public class MessageInputTicket extends ListenerAdapter {
         Message message = event.getMessage();
         MessageChannel channel = message.getChannel();
 
-        if (!manager.isFromTicket(channel)) return;
+        if (!manager.isFromTicket(channel.getId())) return;
 
         try {
             manager.storeTemporary(message);

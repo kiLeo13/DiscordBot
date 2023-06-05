@@ -44,8 +44,13 @@ public class CloseTicket implements SlashExecutor {
             return;
         }
 
-        if (!manager.isFromTicket(channel)) {
+        if (!manager.isFromTicket(channel.getId())) {
             event.reply("Este canal não foi criado a partir de um ticket e não pode ser apagado por este comando.").setEphemeral(true).queue();
+            return;
+        }
+
+        if (!manager.isTicketOpen(channel.getId())) {
+            event.reply("Este ticket já foi fechado ou nunca existiu.").setEphemeral(true).queue();
             return;
         }
 
@@ -87,18 +92,19 @@ public class CloseTicket implements SlashExecutor {
 
         manager.setRefused(channel.getId(), refused, reason);
 
+        // Sending the ticket-conversation to the channel
         final EmbedBuilder embedBuilder = new EmbedBuilder();
 
-        // Sending the ticket-conversation to the channel
         embedBuilder
                 .setTitle("Ticket `#" + ticket.id() + "`")
                 .addField("👥 Responsável", "<@" + ticket.issuer() + ">", true)
                 .addField("📝 Assunto", "`" + ticket.subject() + "`", true)
-                .addField("📅 Criação", "<t:" + ticket.creation() + ">\n(<t:" + ticket.creation() + ":R>)", true)
+                .addField("📅 Criação", "<t:" + ticketCreation.toEpochSecond(ZoneOffset.UTC) + ">\n(<t:" + ticketCreation.toEpochSecond(ZoneOffset.UTC) + ":R>)", true)
                 .setColor(BotData.DEFAULT_COLOR)
                 .addField("🚫 Foi recusado", refused ? "`Sim`" : "`Não`", true)
                 .setFooter(guild.getName(), guild.getIconUrl());
 
+        send.setEmbeds(embedBuilder.build());
         send.setFiles(FileUpload.fromData(
                 closedTicketContent,
                 String.format("%s_%s.txt",

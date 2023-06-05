@@ -265,25 +265,51 @@ public class TicketStorage {
      * @return A {@link File} object of the history of the ticket channel or null if no files are found.
      */
     protected File getTemporary(String id) {
-        final List<File> tickets = getTemporaries();
+        final List<File> temporaries = getTemporaries();
 
-        for (File f : tickets)
-            if (f.getName().startsWith(id))
+        for (File f : temporaries) {
+            // Holds the name of a file without the extension
+            int lastIndex = f.getName().lastIndexOf(".");
+            String fileName = f.getName().substring(0, lastIndex);
+
+            if (fileName.equals(id))
                 return f;
+        }
 
         return null;
     }
 
     /**
-     * @param channel The possible-ticket channel to be tested.
+     * @param id The possible-ticket channel id to be tested.
      * @return {@code true} if the channel is a ticket channel, {@code false} otherwise.
      */
-    protected boolean isFromTicket(MessageChannel channel) {
+    protected boolean isFromTicket(String id) {
         final Map<String, Ticket> tickets = getTickets();
 
-        for (String id : tickets.keySet())
-            if (id.equals(channel.getId()))
+        for (String p : tickets.keySet())
+            if (p.equals(id))
                 return true;
+
+        return false;
+    }
+
+    /**
+     * Checks if a ticket is still open.
+     *
+     * @param id The id of the channel of the ticket.
+     * @return {@code true} if the ticket is stil open, {@code false} otherwise.
+     */
+    protected boolean isTicketOpen(String id) {
+        final List<File> temporaries = getTemporaries();
+
+        for (File f : temporaries) {
+            // Holds the name of a file without the extension
+            int lastIndex = f.getName().lastIndexOf(".");
+            String fileName = f.getName().substring(0, lastIndex);
+
+            if (fileName.equals(id))
+                return true;
+        }
 
         return false;
     }
