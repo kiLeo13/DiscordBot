@@ -1,12 +1,11 @@
 package bot.util.schedules;
 
-import java.util.Collections;
+import bot.util.interfaces.BotScheduler;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import bot.util.interfaces.BotScheduler;
 
 public class ScheduleManager {
     private static final Timer timer = new Timer(true);
@@ -36,13 +35,6 @@ public class ScheduleManager {
 
         runnables.put(interval, scheduler);
         return this;
-    }
-
-    /**
-     * @return An immutable {@link Map<>} object containing all the scheduled events.
-     */
-    public Map<Long, BotScheduler> getScheduledTasks() {
-        return Collections.unmodifiableMap(runnables);
     }
 
     /**

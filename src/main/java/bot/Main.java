@@ -5,6 +5,7 @@ import bot.commands.*;
 import bot.commands.lifetimemute.LifeMuteCommand;
 import bot.commands.lifetimemute.VoiceJoin;
 import bot.tickets.*;
+import bot.util.schedules.BigoVoiceChannel;
 import bot.util.schedules.PayServer;
 import bot.commands.valorant.Characters;
 import bot.commands.valorant.Profiles;
@@ -105,10 +106,7 @@ public final class Main {
 
                 // Modals
                 new TicketInfoCreation(),
-                new TicketClosedReason(),
-
-                // Inform them about voice-activity
-                new VoiceBigo()
+                new TicketClosedReason()
         );
     }
 
@@ -266,7 +264,8 @@ public final class Main {
 
         scheduler
                 .addRunnable(3600 * 1000, new PayServer())
-                .addRunnable(60000, new ColorRole());
+                .addRunnable(60000, new ColorRole())
+                .addRunnable(3600 * 1000, new BigoVoiceChannel());
 
         // Starts the schedule
         scheduler.release();
