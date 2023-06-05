@@ -37,12 +37,13 @@ public class Clear implements CommandExecutor {
         }
 
         channel.getHistory().retrievePast(amount + 1).queue(msgs -> {
+            int deleted = msgs.size();
             channel.purgeMessages(msgs);
             Bot.tempMessage(channel, String.format(
                     "Prontinho, `%s %s` %s 👍",
-                    amount < 10 ? "0" + amount : amount,
-                    amount == 1 ? "mensagem" : "mensagens",
-                    amount == 1 ? "foi apagada" : "foram apagadas"
+                    deleted < 10 ? "0" + deleted : deleted,
+                    deleted == 1 ? "mensagem" : "mensagens",
+                    deleted == 1 ? "foi apagada" : "foram apagadas"
             ), 5000);
         });
     }

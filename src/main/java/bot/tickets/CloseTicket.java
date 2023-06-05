@@ -1,5 +1,6 @@
 package bot.tickets;
 
+import bot.data.BotData;
 import bot.util.Bot;
 import bot.util.content.Categories;
 import bot.util.content.Channels;
@@ -94,6 +95,7 @@ public class CloseTicket implements SlashExecutor {
                 .addField("👥 Responsável", "<@" + ticket.issuer() + ">", true)
                 .addField("📝 Assunto", "`" + ticket.subject() + "`", true)
                 .addField("📅 Criação", "<t:" + ticket.creation() + ">\n(<t:" + ticket.creation() + ":R>)", true)
+                .setColor(BotData.DEFAULT_COLOR)
                 .addField("🚫 Foi recusado", refused ? "`Sim`" : "`Não`", true)
                 .setFooter(guild.getName(), guild.getIconUrl());
 
