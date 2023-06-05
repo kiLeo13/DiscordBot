@@ -1,11 +1,9 @@
 package bot.tickets;
 
-import bot.data.BotData;
 import bot.util.Bot;
 import bot.util.content.Categories;
 import bot.util.content.Channels;
 import bot.util.interfaces.SlashExecutor;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
@@ -93,18 +91,21 @@ public class CloseTicket implements SlashExecutor {
         manager.setRefused(channel.getId(), refused, reason);
 
         // Sending the ticket-conversation to the channel
-        final EmbedBuilder embedBuilder = new EmbedBuilder();
+        send.setContent(String.format("""
+                **Responsável:** <@%s>
+                **Assunto:** `%s`
+                **Criação:** <t:%s>
+                **Recusado:** `%s`
+                **Ticket ID:** `#%s`
+                """,
+                ticket.issuer(),
+                ticket.subject(),
+                ticketCreation.plusHours(3).toEpochSecond(ZoneOffset.UTC),
+                ticket.refused().status() ? "Sim" : "Não",
+                ticket.id()
+                )
+        );
 
-        embedBuilder
-                .setTitle("Ticket `#" + ticket.id() + "`")
-                .addField("👥 Responsável", "<@" + ticket.issuer() + ">", true)
-                .addField("📝 Assunto", "`" + ticket.subject() + "`", true)
-                .addField("📅 Criação", "<t:" + ticketCreation.toEpochSecond(ZoneOffset.UTC) + ">\n(<t:" + ticketCreation.toEpochSecond(ZoneOffset.UTC) + ":R>)", true)
-                .setColor(BotData.DEFAULT_COLOR)
-                .addField("🚫 Foi recusado", refused ? "`Sim`" : "`Não`", true)
-                .setFooter(guild.getName(), guild.getIconUrl());
-
-        send.setEmbeds(embedBuilder.build());
         send.setFiles(FileUpload.fromData(
                 closedTicketContent,
                 String.format("%s_%s.txt",

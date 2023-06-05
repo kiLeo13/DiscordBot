@@ -37,12 +37,12 @@ public class Clear implements CommandExecutor {
         }
 
         channel.getHistory().retrievePast(amount + 1).queue(msgs -> {
-            if (msgs.size() == 0) {
+            if (msgs.isEmpty()) {
                 Bot.tempMessage(channel, "Nenhuma mensagem foi encontrada este canal de texto.", 10000);
                 return;
             }
 
-            int deleted = msgs.size();
+            int deleted = msgs.size() - 1;
             channel.purgeMessages(msgs);
             Bot.tempMessage(channel, String.format(
                     "Prontinho, `%s %s` %s 👍",

@@ -40,7 +40,6 @@ public class Nerd implements CommandExecutor {
         if (!(member.getRoles().contains(salada) && member.getRoles().contains(alfea))) return;
 
         InputStream stream = manager.requestAsStream("https://raw.githubusercontent.com/kiLeo13/DiscordBot/main/content/images/nerd.png", null);
-        System.out.println(stream);
 
         send.setContent("<@" + (target == null ? member.getId() : target.getId()) + ">");
 

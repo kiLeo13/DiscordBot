@@ -28,6 +28,9 @@ public class VoiceBigo extends ListenerAdapter {
 
         if (salada == null || saladaVC == null || channel == null) return;
 
+        if (!channel.getId().equals(saladaVC.getId()))
+            return;
+
         final List<Member> members = channel.getMembers();
 
         if (members.size() == 5) {

@@ -67,7 +67,17 @@ public class CommandHandler extends ListenerAdapter {
 
         // This will check if they have the required permission
         final List<Permission> permissions = List.of(command.getClass().getAnnotation(CommandPermission.class).permissions());
-        
+
+        if (permissions.isEmpty()) {
+            command.run(message);
+
+            MessageDeletion annotation = command.getClass().getAnnotation(MessageDeletion.class);
+            boolean deletion = annotation == null || annotation.value();
+
+            if (deletion)
+                Bot.delete(message);
+        }
+
         for (Permission p : permissions) {
             if (member.hasPermission(p)) {
                 command.run(message);
@@ -96,11 +106,8 @@ public class CommandHandler extends ListenerAdapter {
         for (String i : prefixes.keySet())
             name = name.replaceAll(i, prefixes.get(i)).toLowerCase();
 
-        if (name.stripTrailing().equals(""))
+        if (name.isBlank())
             throw new IllegalArgumentException("Command name cannot be empty");
-
-        if (name.split(" ").length != 1)
-            throw new IllegalArgumentException("Command name cannot contain multiple words");
 
         commands.put(name, command);
         return this;
@@ -113,8 +120,7 @@ public class CommandHandler extends ListenerAdapter {
         for (String n : name) {
             n = n.replaceAll("<prefix>", BotData.PREFIX).toLowerCase();
 
-            if (n.stripTrailing().equals("")) throw new IllegalArgumentException("Command name cannot be empty");
-            if (n.split(" ").length != 1) throw new IllegalArgumentException("Command name cannot contain multiple words");
+            if (n.isBlank()) throw new IllegalArgumentException("Command name cannot be empty");
 
             commands.put(n, command);
         }

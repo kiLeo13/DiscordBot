@@ -2,6 +2,7 @@ package bot.tickets;
 
 import bot.util.content.RegistrationRoles;
 import bot.util.interfaces.SlashExecutor;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -23,7 +24,7 @@ public class OpenTicket implements SlashExecutor {
         Member member = event.getMember();
         Guild guild = event.getGuild();
         Role registered = guild.getRoleById(RegistrationRoles.ROLE_REGISTERED.id());
-        Cooldown waitTime = getCooldown(member);
+        long waitTime = member.hasPermission(Permission.MANAGE_SERVER) ? Long.MAX_VALUE : getSince(member);
 
         if (registered == null || !member.getRoles().contains(registered)) {
             event.reply("Apenas membros registrados podem abrir tickets.").setEphemeral(true).queue();
@@ -31,8 +32,8 @@ public class OpenTicket implements SlashExecutor {
         }
 
         // At least 1 hour between two tickets
-        if (waitTime.duration.getSeconds() != 0) {
-            event.reply("Você precisa esperar `" + waitTime.format() + "` antes de abrir outro ticket..").setEphemeral(true).queue();
+        if (waitTime < 3600000) {
+            event.reply("Você precisa esperar `" + formatDuration(3600000 - waitTime) + "` antes de abrir outro ticket.").setEphemeral(true).queue();
             return;
         }
 
@@ -53,37 +54,39 @@ public class OpenTicket implements SlashExecutor {
         event.replyModal(modal).queue();
     }
 
-    protected Cooldown getCooldown(Member member) {
+    /**
+     * Checks the cooldown of a member.
+     *
+     * <p>Note that to get how much time to run the command again you should do {@code time - getSince()};
+     * <p>For example, if the time between runs is 1h, do {@code 3600000 - getSince()};
+     *
+     * @param member The member to check the cooldown.
+     * @return How much time has passed since last time they used the command.
+     */
+    protected long getSince(Member member) {
         long now = System.currentTimeMillis();
 
         if (!cooldown.containsKey(member.getId())) {
             cooldown.put(member.getId(), System.currentTimeMillis());
-            return new Cooldown(Duration.ZERO);
+            return Long.MAX_VALUE;
         }
 
         long lastUse = cooldown.get(member.getId());
 
-        // Return 0 if the cooldown is fine
-        if (now - lastUse > 3600000)
-            return new Cooldown(Duration.ZERO);
-
-        return new Cooldown(Duration.ofMillis(3600000 - (now - lastUse)));
+        return now - lastUse;
     }
 
-    private record Cooldown(Duration duration) {
+    private String formatDuration(long period) {
+        final StringBuilder builder = new StringBuilder();
+        Duration duration = Duration.ofMillis(period);
+        int secs = duration.toSecondsPart();
+        int mins = duration.toMinutesPart();
+        int hour = duration.toHoursPart();
 
-        public String format() {
-            final StringBuilder builder = new StringBuilder();
-            int secs = duration.toSecondsPart();
-            int mins = duration.toMinutesPart();
-            int hrs = duration.toHoursPart();
+        if (hour != 0) builder.append(String.format("%sh", hour < 10 ? "0" + hour : hour)).append(", ");
+        if (mins != 0) builder.append(String.format("%sm", mins < 10 ? "0" + mins : mins)).append(", ");
+        builder.append(String.format("%ss", secs < 10 ? "0" + secs : secs));
 
-            if (hrs > 0) builder.append(String.format("%sh", hrs < 10 ? "0" + hrs : hrs)).append(", ");
-            if (mins > 0) builder.append(String.format("%sm", mins < 10 ? "0" + mins : mins)).append(", ");
-            builder.append(String.format("%ss", secs < 10 ? "0" + secs : secs)).append(", ");
-
-            String converted = builder.toString().stripTrailing();
-            return converted.substring(0, builder.length() - 2);
-        }
+        return builder.toString();
     }
 }
