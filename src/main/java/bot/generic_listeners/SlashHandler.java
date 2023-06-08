@@ -40,7 +40,7 @@ public class SlashHandler extends ListenerAdapter {
         command.process(event);
     }
 
-    public SlashHandler addListenerCommand(String name, SlashExecutor command) {
+    public SlashHandler register(String name, SlashExecutor command) {
 
         if (name.stripTrailing().equals(""))
             throw new IllegalArgumentException("Command name cannot be empty");

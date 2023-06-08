@@ -39,7 +39,7 @@ public class ServerInfo implements CommandExecutor {
         long creationLong = guild.getTimeCreated().toEpochSecond();
 
         Member owner = guild.retrieveOwner().complete();
-        String ownerName = owner == null ? "Not found" : owner.getEffectiveName() + "#" + owner.getUser().getDiscriminator();
+        String ownerName = owner == null ? "Not found" : owner.getEffectiveName();
         String banner = guild.getBannerUrl() == null ? "" : guild.getBannerUrl() + "?size=2048";
 
         List<GuildChannel> channels = guild.getChannels(true);

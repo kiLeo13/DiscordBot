@@ -4,7 +4,6 @@ import bot.util.Bot;
 import bot.util.content.Messages;
 import bot.util.interfaces.CommandExecutor;
 import bot.util.interfaces.annotations.CommandPermission;
-import bot.util.managers.requests.DiscordManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
@@ -16,7 +15,6 @@ import java.util.List;
 
 @CommandPermission()
 public class RoleInfo implements CommandExecutor {
-    private static final DiscordManager manager = DiscordManager.NewManager();
 
     @Override
     public void run(Message message) {
@@ -32,7 +30,7 @@ public class RoleInfo implements CommandExecutor {
             return;
         }
 
-        Role role = manager.roleOf(guild, args[1]);
+        Role role = Bot.getRole(guild, args[1]);
 
         if (role == null) {
             Bot.tempMessage(channel, "O cargo fornecido não existe.", 10000);

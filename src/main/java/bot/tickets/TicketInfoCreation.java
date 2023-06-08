@@ -36,7 +36,7 @@ public class TicketInfoCreation extends ListenerAdapter {
             TextChannel ajudantes = guild.getTextChannelById(Channels.STAFF_AJUDANTES_CHANNEL.id());
 
             if (ajudantes != null)
-                ajudantes.sendMessage("Não foi possíven encontrar a categoria 'Support' (`" + Categories.SUPPORT.id() + "`). Ignorando ticket enviado por: `" + member.getUser().getAsTag() + "`.").queue();
+                ajudantes.sendMessage("Não foi possíven encontrar a categoria 'Support' (`" + Categories.SUPPORT.id() + "`). Ignorando ticket enviado por: `" + member.getUser().getName() + "`.").queue();
 
             return;
         }
@@ -70,7 +70,7 @@ public class TicketInfoCreation extends ListenerAdapter {
         Member issuer = event.getMember();
 
         builder
-                .setAuthor("Ticket de " + issuer.getUser().getAsTag(), null, issuer.getUser().getAvatarUrl())
+                .setAuthor("Ticket de " + issuer.getUser().getName(), null, issuer.getUser().getAvatarUrl())
                 .addField("🏷 Assunto", "```\n" + subject + "\n```", false)
                 .addField("🏴 Descrição", "```\n" + description + "\n```", false)
                 .setColor(BotData.DEFAULT_COLOR);

@@ -1,6 +1,5 @@
 package bot.util.content;
 
-import java.util.Arrays;
 import java.util.List;
 
 public enum Channels {

@@ -1,27 +1,23 @@
 package bot.util;
 
 import bot.Main;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
+import net.dv8tion.jda.api.utils.concurrent.Task;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Bot {
-    private static final Timer timer = new Timer(false);
+    private static Timer timer;
 
     private Bot() {}
 
@@ -70,6 +66,7 @@ public class Bot {
     }
 
     public static void setTimeout(Runnable runnable, long delay) {
+        timer = new Timer(true);
         TimerTask task = new TimerTask() {
 
             @Override
@@ -82,6 +79,7 @@ public class Bot {
     }
 
     public static TimerTask setInterval(Runnable runnable, long delay) {
+        timer = new Timer(true);
         TimerTask task = new TimerTask() {
             
             @Override
@@ -92,6 +90,15 @@ public class Bot {
         
         timer.scheduleAtFixedRate(task, 0, delay);
         return task;
+    }
+
+    public static Role getRole(Guild guild, String id) {
+        if (id == null) return null;
+        id = id.replaceAll("[^0-9]+", "");
+
+        if (id.isBlank()) return null;
+
+        return guild.getRoleById(id);
     }
     
     public static Member fetchMember(Guild guild, String arg) {
@@ -117,6 +124,18 @@ public class Bot {
             return Main.getApi().retrieveUserById(arg).complete();
         } catch (ErrorResponseException e) {
             return null;
+        }
+    }
+
+    public static Task<List<Member>> fetchMembers(Guild guild, String... ids) {
+        try {
+            final List<Long> inputs = Arrays.stream(ids)
+                    .map(s -> Long.parseLong(s.replaceAll("[^0-9]+", "")))
+                    .toList();
+
+            return guild.retrieveMembersByIds(inputs);
+        } catch (NumberFormatException e) {
+            return guild.retrieveMembersByIds("-1");
         }
     }
 

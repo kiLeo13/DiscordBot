@@ -44,7 +44,7 @@ public class Retriever implements CommandExecutor {
 
     private void updateFile(List<Member> members) {
         final List<String> tags = new ArrayList<>();
-        tags.addAll(members.stream().map(m -> m.getUser().getAsTag()).toList());
+        tags.addAll(members.stream().map(m -> m.getUser().getName()).toList());
         Collections.sort(tags);
 
         StringBuilder builder = new StringBuilder();

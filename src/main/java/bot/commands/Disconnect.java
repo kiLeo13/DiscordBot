@@ -22,7 +22,7 @@ public class Disconnect implements CommandExecutor, SlashExecutor {
         Member member = message.getMember();
         Guild guild = message.getGuild();
 
-        if (!Channels.COMMAND_DISCONNECT_SELF_CHANNELS.ids().contains(channel.getIdLong())) return;
+        if (!Channels.COMMAND_DISCONNECT_SELF_CHANNELS.ids().contains(channel.getId())) return;
 
         GuildVoiceState voiceState = member.getVoiceState();
 

@@ -1,81 +1,66 @@
 package bot.commands;
 
 import bot.data.BotData;
-import bot.util.Bot;
-import bot.util.content.Messages;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
+import bot.util.interfaces.SlashExecutor;
 import bot.util.managers.economy.Balance;
 import bot.util.managers.economy.EconomyManager;
-import bot.util.managers.requests.DiscordManager;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-@CommandPermission(permissions = Permission.MANAGE_SERVER)
-public class TransferMemberData implements CommandExecutor {
-    private static final DiscordManager manager = DiscordManager.NewManager();
+public class TransferMemberData implements SlashExecutor {
+    private static final EconomyManager manager = new EconomyManager(BotData.UNBELIEVABOAT_TOKEN);
     private static final HashMap<String, List<Role>> roleHistory = new HashMap<>();
 
     @Override
-    public void run(Message message) {
+    public void process(SlashCommandInteractionEvent event) {
 
-        String content = message.getContentRaw();
-        String[] args = content.split(" ");
-        MessageChannelUnion channel = message.getChannel();
-        Guild guild = message.getGuild();
+        OptionMapping actionInput = event.getOption("action");
+        Member from = event.getOption("from").getAsMember();
+        Member current = event.getOption("to").getAsMember();
+        String action = actionInput == null ? "none" : actionInput.getAsString();
 
-        if (args.length < 3) {
-            Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
+        // Sometimes we just want to revert something, right?
+        if (action.equals("revert")) {
+            if (undo(current))
+                event.reply("Removendo cargos dados para `" + current.getUser().getName() + "` na última operação...").setEphemeral(true).queue();
+            else
+                event.reply("Não encontramos o usuário fornecido no histórico! Se for um caso extremo, use `" + BotData.PREFIX + "removeroles <@user>` para remover todos os cargos do usuário.").setEphemeral(true).queue();
             return;
         }
 
-        // Sometimes we just want to revert something, right?
-        if (content.endsWith("--undo") || content.endsWith("--revert")) {
-            Member target = Bot.fetchMember(guild, args[1]);
-
-            if (undo(target))
-                channel.sendMessage("Removendo cargos dados para `" + target.getUser().getAsTag() + "` na última operação...").queue();
-            else
-                Bot.tempMessage(channel, "Não encontramos o usuário fornecido no histórico! Se for um caso extremo, use `" + BotData.PREFIX + "removeroles <@user>` para remover todos os cargos do usuário.", 10000);
+        if (from.getPermissions().size() > current.getPermissions().size() && !action.equals("ignore")) {
+            event.reply("O membro `" + from.getUser().getName() + "` tem mais permissões que `" + current.getUser().getName() + "`. Para ignorar e prosseguir mesmo assim, defina `Ignore` no argumento `action`.").setEphemeral(true).queue();
+            return;
         }
 
-        manager.members(guild, args[1], args[2]).onSuccess(l -> {
-            if (l.size() < 2) {
-                Bot.tempMessage(channel, "Um ou mais membros não foram encontrados.", 10000);
-                return;
-            }
+        StringBuilder response = new StringBuilder();
 
-            Member old = l.get(0);
-            Member current = l.get(1);
+        if (apply(from, current))
+            response.append("Enviando cargos de `" + from.getUser().getName() + "` para `" + current.getUser().getName() + "`.\n");
+        else {
+            event.reply("Algo deu errado! Talvez você forneceu o mesmo usuário em ambos os argumentos ou eu não tenho permissão para dar tais cargos.").setEphemeral(true).queue();
+            return;
+        }
 
-            if (old.getPermissions().size() < current.getPermissions().size() && !content.endsWith("--ignore")) {
-                Bot.tempMessage(channel, "O membro `" + old.getUser().getAsTag() + "` tem mais permissões que `" + old.getUser().getAsTag() + "`. Caso queira ignorar este aviso e aplicar os cargos mesmo assim, adicione `--ignore` no fim do comando.", 20000);
-                return;
-            }
+        Balance oldBalance = manager.getBalance(from);
 
-            if (apply(old, current)) {
-                channel.sendMessage("Cargos de `" + old.getUser().getAsTag() + "` foram transferidos para `" + current.getUser().getAsTag() + "` com sucesso!").queue(m -> {
-                    final Balance balanceUpdate = updateBalance(old, current);
+        if (oldBalance.total() < 1000)
+            response.append("Nenhuma quantia de dinheiro foi recuperada pois o valor é insignificante.");
+        else {
+            manager.setBalance();
+            response.append("Quantia recuperada: `");
+        }
 
-                    if (balanceUpdate.total() < 1000)
-                        m.editMessage(m.getContentRaw() + "\nSaldo do banco não alterado. Motivo: valor insignificante.").queue();
-                    else
-                        m.editMessage(m.getContentRaw() + "\nSaldo alterado com sucesso! Total: `" + balanceUpdate.total() + "` (rank `#" + balanceUpdate.rank() + "`)").queue();
-                });
-            } else {
-                Bot.tempMessage(channel, "Algo deu errado! Talvez seja algum cargo que eu não possa dar ou você forneceu o mesmo membro nos dois argumentos.", 10000);
-            }
-        });
+        event.reply(response.toString()).setEphemeral(true).queue();
     }
 
     private boolean undo(Member member) {
@@ -89,46 +74,31 @@ public class TransferMemberData implements CommandExecutor {
         return true;
     }
 
-    private boolean apply(Member first, Member second) {
-        final List<Role> roles = first.getRoles();
-        Guild guild = first.getGuild();
+    private boolean apply(Member old, Member current) {
+        final List<Role> roles = old.getRoles();
+        Guild guild = old.getGuild();
 
-        if (first.getIdLong() == second.getIdLong())
+        if (old.getIdLong() == current.getIdLong())
             return false;
 
         try {
-            guild.modifyMemberRoles(second, roles, null).queue();
-            roleHistory.put(second.getId(), getNotPresentRoles(first, second));
+            guild.modifyMemberRoles(current, roles, null).queue();
+            roleHistory.put(current.getId(), getNotPresentRoles(old, current));
             return true;
         } catch (HierarchyException e) {
             return false;
         }
     }
 
-    private List<Role> getNotPresentRoles(Member first, Member second) {
-        List<Role> secondRoles = second.getRoles();
+    private List<Role> getNotPresentRoles(Member old, Member current) {
+        List<Role> secondRoles = current.getRoles();
         final List<Role> added = new ArrayList<>();
 
-        for (Role r : first.getRoles()) {
+        for (Role r : old.getRoles()) {
             if (!secondRoles.contains(r))
                 added.add(r);
         }
 
         return Collections.unmodifiableList(added);
-    }
-
-    private Balance updateBalance(Member old, Member current) {
-        final EconomyManager manager = new EconomyManager(BotData.UNBELIEVABOAT_TOKEN);
-
-        Balance balance = manager.getBalance(old);
-
-        // Members will only receive 30% of their money
-        long newTotal = (long) Math.floor(balance.total() / 0.3);
-
-        if (newTotal >= 1000)
-            manager.updateBalance(current, newTotal, 0, null);
-
-        manager.resetBalance(old);
-        return balance;
     }
 }

@@ -167,7 +167,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // Why would someone register someone that is already registered?
         if (target.getRoles().contains(registered)) {
-            Bot.tempMessage(channel, "O membro `" + target.getUser().getAsTag() + "` já está registrado.", 5000);
+            Bot.tempMessage(channel, "O membro `" + target.getUser().getName() + "` já está registrado.", 5000);
             return;
         }
 
@@ -251,7 +251,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
 
         // Why would someone register someone that is already registered?
         if (target.getRoles().contains(registered)) {
-            Bot.tempMessage(channel, "<@" + author.getIdLong() + "> O membro `" + target.getUser().getAsTag() + "` já está registrado.", 5000);
+            Bot.tempMessage(channel, "<@" + author.getIdLong() + "> O membro `" + target.getUser().getName() + "` já está registrado.", 5000);
             return;
         }
 
@@ -342,7 +342,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         }
 
         if (target.getRoles().contains(registered)) {
-            event.reply("O membro `" + target.getUser().getAsTag() + "` já está registrado.").setEphemeral(true).queue();
+            event.reply("O membro `" + target.getUser().getName() + "` já está registrado.").setEphemeral(true).queue();
             return;
         }
 
@@ -457,8 +457,8 @@ public class Registration implements CommandExecutor, SlashExecutor {
         builder
                 .setColor(Color.GREEN)
                 .setThumbnail(target.getEffectiveAvatarUrl())
-                .setTitle("`" + target.getUser().getAsTag() + "` foi registrado!")
-                .setDescription("Registrado por `" + author.getAsTag() + "`")
+                .setTitle("`" + target.getUser().getName() + "` foi registrado!")
+                .setDescription("Registrado por `" + author.getName() + "`")
                 .addField("> **Cargos Dados**", formattedRolesToEmbed(givenRoles), true)
                 .addField("> **Cargos Removidos**", formattedRolesToEmbed(removedRoles), true)
                 .setFooter("Oficina Myuu・ID: " + target.getIdLong(), guild.getIconUrl());
@@ -466,7 +466,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         if (channel != null) channel.sendMessageEmbeds(builder.build()).queue();
         else System.out.println("Não foi possível salvar o registro pois nenhum chat foi encontrado.");
 
-        Bot.log(String.format("%s registrou o membro %s\n", author.getAsTag(), target.getUser().getAsTag()), false);
+        Bot.log(String.format("%s registrou o membro %s\n", author.getName(), target.getUser().getName()), false);
     }
 
     private String formattedRolesToEmbed(List<Role> roles) {

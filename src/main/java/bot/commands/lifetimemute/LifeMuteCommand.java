@@ -5,7 +5,6 @@ import bot.util.Bot;
 import bot.util.content.Messages;
 import bot.util.interfaces.CommandExecutor;
 import bot.util.interfaces.annotations.CommandPermission;
-import bot.util.managers.requests.DiscordManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -26,7 +25,6 @@ import java.util.Map;
 
 @CommandPermission(permissions = Permission.BAN_MEMBERS)
 public class LifeMuteCommand implements CommandExecutor {
-    private static final DiscordManager discord = DiscordManager.NewManager();
     private static final File mutedMembersFile = new File(BotFiles.DIR, "lifemuted.json");
 
     private static final Gson gson = new GsonBuilder()
@@ -45,7 +43,7 @@ public class LifeMuteCommand implements CommandExecutor {
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
         Member member = message.getMember();
-        Role muted = discord.roleOf(guild, "592465045686845480");
+        Role muted = Bot.getRole(guild, "592465045686845480");
 
         if (args.length < 2 || (args.length < 3 && content.endsWith("--info"))) {
             Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
@@ -91,7 +89,7 @@ public class LifeMuteCommand implements CommandExecutor {
 
             final MessageEmbed embed = new EmbedBuilder()
                     .setColor(new Color(100, 255, 100))
-                    .setAuthor(target.getUser().getAsTag() + " foi dessilenciado", null, target.getUser().getAvatarUrl())
+                    .setAuthor(target.getUser().getName() + " foi dessilenciado", null, target.getUser().getAvatarUrl())
                     .build();
 
             if (muted != null)
@@ -105,7 +103,7 @@ public class LifeMuteCommand implements CommandExecutor {
 
             final MessageEmbed embed = new EmbedBuilder()
                     .setColor(new Color(255, 100, 100))
-                    .setAuthor(target.getUser().getAsTag() + " foi silenciado", null, target.getUser().getAvatarUrl())
+                    .setAuthor(target.getUser().getName() + " foi silenciado", null, target.getUser().getAvatarUrl())
                     .setDescription("**Motivo:** " + reason)
                     .build();
 
@@ -145,7 +143,7 @@ public class LifeMuteCommand implements CommandExecutor {
                 now.toEpochSecond(ZoneOffset.UTC),
                 reason,
                 moderator.getId(),
-                new UserData(target.getUser().getAsTag(), target.getId(), target.getUser().getAvatarUrl())
+                new UserData(target.getUser().getName(), target.getId(), target.getUser().getAvatarUrl())
         ));
 
         String toWrite = gson.toJson(muted);

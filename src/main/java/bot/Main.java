@@ -3,17 +3,17 @@ package bot;
 import bot.commands.Shutdown;
 import bot.commands.*;
 import bot.commands.lifetimemute.LifeMuteCommand;
+import bot.commands.lifetimemute.Reactions;
 import bot.commands.lifetimemute.VoiceJoin;
-import bot.tickets.*;
-import bot.util.schedules.BigoVoiceChannel;
-import bot.util.schedules.PayServer;
 import bot.commands.valorant.Characters;
 import bot.commands.valorant.Profiles;
 import bot.data.BotData;
 import bot.data.BotFiles;
 import bot.generic_listeners.*;
-import bot.commands.lifetimemute.Reactions;
+import bot.tickets.*;
 import bot.util.Bot;
+import bot.util.schedules.BigoVoiceChannel;
+import bot.util.schedules.PayServer;
 import bot.util.schedules.ScheduleManager;
 import bot.util.server.SimpleHttpServer;
 import net.dv8tion.jda.api.JDA;
@@ -132,12 +132,9 @@ public final class Main {
                 .register("<prefix>roleinfo", new RoleInfo())
                 .register("<prefix>p-help", new PrivilegedHelp())
                 .register("<prefix>lifemute", new LifeMuteCommand())
-                .register("<prefix>transfer", new TransferMemberData())
                 .register(new Permissions(), "<prefix>permissions", "<prefix>permission", "<prefix>perms", "<prefix>perm")
 
         // BRUH
-                .register("<prefix>hook", new HookTwitter())
-
                 .register(new Characters(), "<prefix>valorant-agent", "<prefix>v-agent")
                 .register(new Profiles(), "<prefix>valorant-player", "<prefix>v-player")
 
@@ -226,6 +223,17 @@ public final class Main {
                 .addOptions(activityOption, activityName)
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
+        /* []====================[] Transfer Member Data []====================[] */
+        OptionData transferFirstMember = new OptionData(OptionType.USER, "from", "De qual membro devemos pegar os cargos.", true);
+        OptionData transferSecondMember = new OptionData(OptionType.USER, "to", "Para qual membro devemos adicionar os cargos.", true);
+        OptionData transferIgnore = new OptionData(OptionType.STRING, "action", "Se devemos ignorar se o membro 'from' tem mais permissões que o outro que receberá os cargos.", false)
+                .addChoice("Ignore", "ignore")
+                .addChoice("Revert", "revert");
+
+        commands.add(Commands.slash("transfer", "Transfere os cargos de um membro para outro (o membro anterior não perderá os cargos).")
+                .addOptions(transferFirstMember, transferSecondMember, transferIgnore)
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
+
         /* -------------------- TICKET SYSTEM -------------------- */
         OptionData closeTicketIsRefused = new OptionData(OptionType.BOOLEAN, "refused", "Determina se o ticket foi fechado porque foi recusado a ser respondido.", false);
         commands.add(Commands.slash("ticket", "Abre um novo ticket para entrar em contato com nossa equipe."));
@@ -244,15 +252,16 @@ public final class Main {
 
         // Internally register all the slash commands
         slash
-                .addListenerCommand("disconnect", new Disconnect())
-                .addListenerCommand("disconnectall", new DisconnectAll())
-                .addListenerCommand("register", Registration.getInstance())
-                .addListenerCommand("moveall", new VoiceMoveAll())
-                .addListenerCommand("color", new ColorRole())
-                .addListenerCommand("shutdown", new Shutdown())
-                .addListenerCommand("stream", new BotStatus())
-                .addListenerCommand("close", new CloseTicket())
-                .addListenerCommand("ticket", new OpenTicket());
+                .register("disconnect", new Disconnect())
+                .register("disconnectall", new DisconnectAll())
+                .register("register", Registration.getInstance())
+                .register("moveall", new VoiceMoveAll())
+                .register("color", new ColorRole())
+                .register("shutdown", new Shutdown())
+                .register("stream", new BotStatus())
+                .register("close", new CloseTicket())
+                .register("ticket", new OpenTicket())
+                .register("transfer", new TransferMemberData());
     }
 
     public static long getInitTime() {

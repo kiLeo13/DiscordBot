@@ -28,7 +28,7 @@ public class Shutdown implements SlashExecutor {
                     
                     ==============================
                     
-                    """, user.getAsTag());
+                    """, user.getName());
         }, 5000);
     }
 }

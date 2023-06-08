@@ -53,7 +53,7 @@ public class Permissions implements CommandExecutor {
         Color color = highest == null ? null : highest.getColor();
 
         builder
-                .setTitle(target.getUser().getAsTag())
+                .setTitle(target.getUser().getName())
                 .setThumbnail(target.getUser().getAvatarUrl())
                 .setDescription("Permissões de `" + target.getEffectiveName() + "`.")
                 .addField("🔒 Permissões (" + permissions.size() + ")", permissions(permissions), false)

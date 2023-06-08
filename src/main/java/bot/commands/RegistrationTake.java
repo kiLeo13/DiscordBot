@@ -52,19 +52,15 @@ public class RegistrationTake implements CommandExecutor {
         logRegister(target, toGiveRoles, toRemoveRoles, member);
     }
 
-    private void logRegister(Member target, List<Role> givenRoles, List<Role> removedRoles, Member registerMaker) {
+    private void logRegister(Member target, List<Role> givenRoles, List<Role> removedRoles, Member staff) {
         EmbedBuilder builder = new EmbedBuilder();
-        String targetName = target.getUser().getName();
-        String targetDiscriminator = target.getUser().getDiscriminator();
-        String staffName = registerMaker.getUser().getName();
-        String staffDiscriminator = registerMaker.getUser().getDiscriminator();
         TextChannel channel = target.getGuild().getTextChannelById(Channels.REGISTER_LOG_CHANNEL.id());
 
         builder
                 .setColor(Color.RED)
                 .setThumbnail(target.getEffectiveAvatarUrl())
-                .setTitle("Registro de `" + targetName + "#" + targetDiscriminator + "` removido!")
-                .setDescription("Removido por `" + staffName + "#" + staffDiscriminator + "`\n ")
+                .setTitle("Registro de `" + target.getUser().getName() + "` removido!")
+                .setDescription("Removido por `" + staff.getUser().getName() + "`\n ")
                 .addField("> **Cargos Dados**", getFormattedRolesToEmbed(givenRoles), true)
                 .addField("> **Cargos Removidos**", getFormattedRolesToEmbed(removedRoles), true)
                 .setFooter("Oficina Myuu", "https://cdn.discordapp.com/attachments/631974560605929493/1086540588788228117/a_d51df27b11a16bbfaf5ce83acfeebfd8.png");

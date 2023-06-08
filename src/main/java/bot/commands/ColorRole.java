@@ -79,12 +79,12 @@ public class ColorRole implements SlashExecutor, BotScheduler {
         TextChannel channel = guild.getTextChannelById(Channels.LOG_COLOR_ROLE_COMMAND_CHANNEL.id());
 
         builder
-            .setTitle("Membro: `" + target.getUser().getAsTag() + "`!")
+            .setTitle("Membro: `" + target.getUser().getName() + "`!")
             .setThumbnail(target.getUser().getAvatarUrl())
             .setColor(color.getColor())
             .setDescription("Cargos de cor são removidos após `" + REMOVAL + "` dias.")
             .addField("🏷 Cargo", "<@&" + color.getIdLong() + ">", true)
-            .addField("👑 Staff", "`" + author.getUser().getAsTag() + "`", true)
+            .addField("👑 Staff", "`" + author.getUser().getName() + "`", true)
             .addField("💻 Target ID", "`" + target.getIdLong() + "`", true)
             .addField("📅 Adicionado", "`" + date.format(now) + " às " + time.format(now) + "`", true)
             .addField("📅 Será removido", "`" + date.format(now.plusDays(REMOVAL)) + " às " + time.format(now.plusDays(REMOVAL)) + "`", true)
@@ -107,7 +107,7 @@ public class ColorRole implements SlashExecutor, BotScheduler {
 
         guild.retrieveMemberById(memberId).queue(m -> {
             builder
-                    .setTitle("`" + m.getUser().getAsTag() + "`")
+                    .setTitle("`" + m.getUser().getName() + "`")
                     .setThumbnail(m.getUser().getAvatarUrl())
                     .setColor(Color.RED)
                     .setDescription("Cargo de cor foi removido.")
@@ -195,7 +195,7 @@ public class ColorRole implements SlashExecutor, BotScheduler {
                         guild.removeRoleFromMember(m, role).queue();
 
                         logRemove(data.guildId, s, data.roleId);
-                        Bot.log(m.getUser().getAsTag() + " teve o cargo de cor " + role.getName() + " removido.", false);
+                        Bot.log(m.getUser().getName() + " teve o cargo de cor " + role.getName() + " removido.", false);
                     });
                 }
             }
