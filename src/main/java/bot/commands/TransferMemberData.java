@@ -18,7 +18,9 @@ import java.util.List;
 
 public class TransferMemberData implements SlashExecutor {
     private static final EconomyManager manager = new EconomyManager(BotData.UNBELIEVABOAT_TOKEN);
-    private static final HashMap<String, List<Role>> roleHistory = new HashMap<>();
+    private static final HashMap<String, Backup> history = new HashMap<>();
+    private long oldTotal;
+    private long newTotal;
 
     @Override
     public void process(SlashCommandInteractionEvent event) {
@@ -51,13 +53,15 @@ public class TransferMemberData implements SlashExecutor {
             return;
         }
 
-        Balance oldBalance = manager.getBalance(from);
+        oldTotal = manager.getBalance(from).total();
 
-        if (oldBalance.total() < 1000)
+        if (oldTotal < 1000)
             response.append("Nenhuma quantia de dinheiro foi recuperada pois o valor é insignificante.");
         else {
-            manager.setBalance();
-            response.append("Quantia recuperada: `");
+            newTotal = (int) Math.floor(oldTotal / 0.3); // 30% of their old balance
+            Balance newBalance = manager.setBalance(current, newTotal, 0, "Perdeu a conta.");
+            response.append("Quantia recuperada: `" + newBalance.total() + "`.");
+            backup(from, current, oldTotal);
         }
 
         event.reply(response.toString()).setEphemeral(true).queue();
@@ -66,12 +70,21 @@ public class TransferMemberData implements SlashExecutor {
     private boolean undo(Member member) {
         Guild guild = member.getGuild();
 
-        if (!roleHistory.containsKey(member.getId()))
+        if (!history.containsKey(member.getId()))
             return false;
 
-        guild.modifyMemberRoles(member, null, roleHistory.get(member.getId())).queue();
-        roleHistory.remove(member.getId());
+        final List<Role> roles = history.get(member.getId()).roles;
+
+        guild.modifyMemberRoles(member, null, roles).queue();
+        history.remove(member.getId());
         return true;
+    }
+
+    private void backup(Member old, Member current, long oldTotal) {
+        history.put(
+                current.getId(),
+                new Backup(getNotPresentRoles(old, current), oldTotal)
+        );
     }
 
     private boolean apply(Member old, Member current) {
@@ -83,7 +96,6 @@ public class TransferMemberData implements SlashExecutor {
 
         try {
             guild.modifyMemberRoles(current, roles, null).queue();
-            roleHistory.put(current.getId(), getNotPresentRoles(old, current));
             return true;
         } catch (HierarchyException e) {
             return false;
@@ -101,4 +113,9 @@ public class TransferMemberData implements SlashExecutor {
 
         return Collections.unmodifiableList(added);
     }
+
+    private record Backup(
+        List<Role> roles,
+        long oldAmount
+    ) {}
 }

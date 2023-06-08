@@ -5,6 +5,5 @@ public record Balance(
         String user_id,
         long cash,
         long bank,
-        long total,
-        boolean found
+        long total
 ) {}
