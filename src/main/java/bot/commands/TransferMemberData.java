@@ -25,6 +25,11 @@ public class TransferMemberData implements SlashExecutor {
     @Override
     public void process(SlashCommandInteractionEvent event) {
 
+        if (true) {
+            event.reply("Command not ready to be used yet.").setEphemeral(true).queue();
+            return;
+        }
+
         OptionMapping actionInput = event.getOption("action");
         Member from = event.getOption("from").getAsMember();
         Member current = event.getOption("to").getAsMember();
