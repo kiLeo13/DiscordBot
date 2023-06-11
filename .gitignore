@@ -31,8 +31,9 @@ src/main/java/bot/data/
 .idea/
 .vscode/
 
-# Target directory
+# Useless directories
 target/
+resources/
 
 # Some util stuff, like channels & roles
 src/main/java/bot/util/Channels.java

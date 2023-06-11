@@ -15,8 +15,6 @@ public class BigoVoiceChannel implements BotScheduler {
     @Override
     public void perform() {
 
-        if (true) return;
-
         VoiceChannel saladaVC = Main.getApi().getVoiceChannelById(Voices.SALADA.id());
         TextChannel salada = Main.getApi().getTextChannelById(Channels.SALADA.id());
         String bigo = "974159685764649010";

@@ -4,11 +4,12 @@ import bot.util.interfaces.BotScheduler;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ScheduleManager {
-    private static final Timer timer = new Timer(true);
+    private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(5);
     private static final Map<Long, BotScheduler> runnables = new HashMap<>();
     private static ScheduleManager instance;
 
@@ -42,16 +43,6 @@ public class ScheduleManager {
      * Calling this method multiple times will lead to multiple events running multiple times.
      */
     public void release() {
-        runnables.forEach((k, v) -> {
-            TimerTask task = new TimerTask() {
-
-                @Override
-                public void run() {
-                    v.perform();
-                }
-            };
-
-            timer.scheduleAtFixedRate(task, 0, k);
-        });
+        runnables.forEach((k, v) -> executor.scheduleWithFixedDelay(v::perform, 1000, k, TimeUnit.MILLISECONDS));
     }
 }

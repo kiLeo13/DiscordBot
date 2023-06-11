@@ -54,7 +54,7 @@ public class RoleAmongUs implements CommandExecutor {
             }
 
             guild.addRoleToMember(m, roleAmongUs).queue();
-            channel.sendMessage(String.format("<@%s> o cargo `%s` foi adicionado com sucesso à <@%s>!", member.getId(), roleAmongUs.getName(), m.getUser().getName())).queue();
+            channel.sendMessage(String.format("<@%s> o cargo `%s` foi adicionado com sucesso à <@%s>!", member.getId(), roleAmongUs.getName(), m.getId())).queue();
         }, e -> Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000));
     }
 
