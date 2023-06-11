@@ -10,13 +10,14 @@ import bot.util.managers.requests.RequestManager;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import okhttp3.ResponseBody;
+import org.jetbrains.annotations.NotNull;
 
 @CommandPermission(permissions = Permission.ADMINISTRATOR)
 public class HookTwitter implements CommandExecutor {
     private static final RequestManager manager = RequestManager.create();
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
 
         try {
             message.getChannel().sendMessage("```json\n" + request().string() + "\n```").queue();

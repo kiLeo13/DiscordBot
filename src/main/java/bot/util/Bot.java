@@ -1,13 +1,14 @@
 package bot.util;
 
 import bot.Main;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
 import net.dv8tion.jda.api.utils.concurrent.Task;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -17,7 +18,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Bot {
-    private static Timer timer;
+    private static final Timer timer = new Timer(false);
 
     private Bot() {}
 
@@ -38,11 +39,9 @@ public class Bot {
     }
 
     /**
-     *
      * @param message The message to be replied to
      * @param content The message to be sent in the channel
      * @param time The time (in milliseconds) the bot will wait before deleting the message
-     *
      **/
     public static void tempReply(Message message, String content, int time) {
         message.reply(content)
@@ -53,11 +52,9 @@ public class Bot {
     }
 
     /**
-     *
      * Useful for deleting a message you are not sure if still exists without throwing an exception.
      *
-     * @param message The message to be deleted
-     *
+     * @param message The message to be deleted.
      **/
     public static void delete(Message message) {
         message.delete()
@@ -66,7 +63,6 @@ public class Bot {
     }
 
     public static void setTimeout(Runnable runnable, long delay) {
-        timer = new Timer(true);
         TimerTask task = new TimerTask() {
 
             @Override
@@ -79,7 +75,6 @@ public class Bot {
     }
 
     public static TimerTask setInterval(Runnable runnable, long delay) {
-        timer = new Timer(true);
         TimerTask task = new TimerTask() {
             
             @Override
@@ -100,32 +95,6 @@ public class Bot {
 
         return guild.getRoleById(id);
     }
-    
-    public static Member fetchMember(Guild guild, String arg) {
-        if (guild == null || arg == null) return null;
-        arg = arg.replaceAll("[^0-9]+", "");
-
-        if (arg.stripTrailing().isEmpty()) return null;
-
-        try {
-            return guild.retrieveMemberById(arg).complete();
-        } catch (ErrorResponseException e) {
-            return null;
-        }
-    }
-
-    public static User findUser(String arg) {
-        if (arg == null) return null;
-        arg = arg.replaceAll("[^0-9]+", "");
-
-        if (arg.isBlank()) return null;
-
-        try {
-            return Main.getApi().retrieveUserById(arg).complete();
-        } catch (ErrorResponseException e) {
-            return null;
-        }
-    }
 
     public static Task<List<Member>> fetchMembers(Guild guild, String... ids) {
         try {
@@ -139,17 +108,21 @@ public class Bot {
         }
     }
 
-    public static CacheRestAction<User> fetchUser(String arg) {
-        if (arg == null) return null;
+    public static CacheRestAction<User> fetchUser(@NotNull String arg) {
+        final JDA jda = Main.getApi();
+
+        arg = arg.replaceAll("[^0-9]+", "");
+        if (arg.isBlank()) arg = "-1";
+
+        return jda.retrieveUserById(arg);
+    }
+
+    public static CacheRestAction<Member> fetchMember(@NotNull Guild guild, @NotNull String arg) {
         arg = arg.replaceAll("[^0-9]+", "");
 
-        if (arg.isBlank()) return null;
+        if (arg.isBlank()) arg = "-1";
 
-        try {
-            return Main.getApi().retrieveUserById(arg);
-        } catch (ErrorResponseException e) {
-            return null;
-        }
+        return guild.retrieveMemberById(arg);
     }
 
     public static void log(String str, boolean error) {

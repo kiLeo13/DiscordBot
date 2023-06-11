@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ import java.util.List;
 public class RoleInfo implements CommandExecutor {
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
         
         String content = message.getContentRaw();
         Member member = message.getMember();

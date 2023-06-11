@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
@@ -14,7 +15,7 @@ import java.awt.*;
 public class PrivilegedHelp implements CommandExecutor {
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
         
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();

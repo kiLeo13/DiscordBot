@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.time.LocalDateTime;
@@ -19,7 +20,7 @@ import java.util.List;
 public class ServerInfo implements CommandExecutor {
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
 
         MessageChannelUnion channel = message.getChannel();
         User author = message.getAuthor();

@@ -1,7 +1,6 @@
 package bot.commands;
 
 import bot.util.Bot;
-import bot.util.content.Messages;
 import bot.util.interfaces.CommandExecutor;
 import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -9,8 +8,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
@@ -18,32 +18,36 @@ import java.awt.*;
 public class Avatar implements CommandExecutor {
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
 
-        MessageChannelUnion channel = message.getChannel();
+        TextChannel channel = message.getChannel().asTextChannel();
         Member member = message.getMember();
+        Guild guild = message.getGuild();
         String content = message.getContentRaw();
         String[] args = content.split(" ");
-        Member target = args.length < 2 ? member : Bot.fetchMember(message.getGuild(), args[1]);
         MessageCreateBuilder send = new MessageCreateBuilder();
+        boolean fromGuild = content.toLowerCase().endsWith("--server");
 
-        if (target == null) {
-            Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
-            return;
+        send.setContent("<@" + member.getId() + ">");
+
+        if (args.length < 2) {
+            String avatarUrl = avatarUrl(member, fromGuild);
+
+            send.setEmbeds(embed(avatarUrl, member));
+            channel.sendMessage(send.build()).queue();
+        } else {
+            Bot.fetchMember(guild, fromGuild ? member.getId() : args[1]).queue(m -> {
+                String avatarUrl = avatarUrl(m, fromGuild);
+
+                if (avatarUrl == null) {
+                    Bot.tempMessage(channel, "O usuário não possui um avatar específico para este servidor.", 5000);
+                    return;
+                }
+
+                send.setEmbeds(embed(avatarUrl, m));
+                channel.sendMessage(send.build()).queue();
+            }, e -> Bot.tempMessage(channel, "Membro não encontrado! Talvez você esteja procurando um usuário que não está neste servidor, garanto que este recurso está sendo desenvolvido.", 15000));
         }
-
-        boolean isFromGuild = content.endsWith("--server");
-        String avatarUrl = avatarUrl(target, isFromGuild);
-
-        if (avatarUrl == null && content.endsWith("--server")) {
-            Bot.tempMessage(channel, "O usuário não possui um avatar específico para este servidor.", 5000);
-            return;
-        }
-
-        send.addEmbeds(embed(avatarUrl, target));
-        send.setContent(String.format("<@%d>", member.getIdLong()));
-
-        channel.sendMessage(send.build()).queue();
     }
 
     private MessageEmbed embed(String url, Member target) {
@@ -88,7 +92,7 @@ public class Avatar implements CommandExecutor {
     private String avatarUrl(Member target, boolean fromGuild) {
         String avatar = fromGuild ? target.getAvatarUrl() : target.getUser().getAvatarUrl();
 
-        // If avatar is null, well, then just return null lol
+        // Return null if not found, resize the image otherwise
         return avatar == null ? null : avatar + "?size=2048";
     }
 }

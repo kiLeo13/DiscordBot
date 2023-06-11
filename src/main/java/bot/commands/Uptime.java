@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -18,7 +19,7 @@ public class Uptime implements CommandExecutor {
     private static final byte timeZone = -3;
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
 
         User author = message.getAuthor();
         MessageChannelUnion channel = message.getChannel();

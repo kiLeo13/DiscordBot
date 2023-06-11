@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
     }
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
 
         Member member = message.getMember();
         Guild guild = message.getGuild();
@@ -146,7 +147,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         List<Role> toGiveRoles = new ArrayList<>();
         List<Role> toTakeRoles = new ArrayList<>(2);
 
-        Member target = Bot.fetchMember(guild, args[1]);
+        Member target = Bot.fetchMember(guild, args[1]).complete();
 
         // If target member was not found
         if (target == null) {
@@ -230,7 +231,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         List<Role> toGiveRoles = new ArrayList<>();
         List<Role> toTakeRoles = new ArrayList<>(2);
 
-        Member target = Bot.fetchMember(guild, args[1]);
+        Member target = Bot.fetchMember(guild, args[1]).complete();
 
         // If target member was not found
         if (target == null) {

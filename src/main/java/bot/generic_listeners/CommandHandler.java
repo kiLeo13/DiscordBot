@@ -1,7 +1,6 @@
 package bot.generic_listeners;
 
 import bot.commands.Registration;
-import bot.commands.lifetimemute.LifeMuteCommand;
 import bot.data.BotData;
 import bot.util.Bot;
 import bot.util.interfaces.CommandExecutor;
@@ -18,8 +17,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CommandHandler extends ListenerAdapter {
+    protected static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(3);
     private static final Map<String, CommandExecutor> commands = new HashMap<>();
     private static CommandHandler INSTANCE;
 
@@ -39,16 +41,10 @@ public class CommandHandler extends ListenerAdapter {
 
         if (member == null || member.getUser().isBot()) return;
 
-        // If user is life muted, fuck them
-        if (LifeMuteCommand.isLifeMuted(member)) {
-            Bot.delete(message);
-            return;
-        }
-
         if (!content.startsWith(BotData.PREFIX) && !content.startsWith(BotData.PREFIX_REGISTER)) return;
 
         // Run command (on another thread)
-        BotData.EXECUTOR.execute(() -> runCommand(message));
+        EXECUTOR.execute(() -> runCommand(message));
     }
 
     public void runCommand(Message message) {
@@ -68,30 +64,21 @@ public class CommandHandler extends ListenerAdapter {
         // This will check if they have the required permission
         final List<Permission> permissions = List.of(command.getClass().getAnnotation(CommandPermission.class).permissions());
 
-        if (permissions.isEmpty()) {
-            command.run(message);
-
-            MessageDeletion annotation = command.getClass().getAnnotation(MessageDeletion.class);
-            boolean deletion = annotation == null || annotation.value();
-
-            if (deletion)
-                Bot.delete(message);
-        }
-
-        for (Permission p : permissions) {
-            if (member.hasPermission(p)) {
+        int i = 0;
+        do {
+            if (permissions.isEmpty() || member.hasPermission(permissions.get(i))) {
                 command.run(message);
 
-                // Should it be automatically deleted?
                 MessageDeletion annotation = command.getClass().getAnnotation(MessageDeletion.class);
                 boolean deletion = annotation == null || annotation.value();
 
                 if (deletion)
                     Bot.delete(message);
-
                 break;
             }
-        }
+
+            i++;
+        } while (i > permissions.size());
     }
 
     public CommandHandler register(String name, CommandExecutor command) {

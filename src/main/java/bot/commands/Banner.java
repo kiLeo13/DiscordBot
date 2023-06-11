@@ -7,8 +7,9 @@ import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
@@ -16,47 +17,39 @@ import java.awt.*;
 public class Banner implements CommandExecutor {
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
 
         Member member = message.getMember();
         String content = message.getContentRaw();
         String[] args = content.split(" ");
-        MessageChannelUnion channel = message.getChannel();
+        Guild guild = message.getGuild();
+        TextChannel channel = message.getChannel().asTextChannel();
+        MessageCreateBuilder send = new MessageCreateBuilder();
 
+        send.setContent("<@" + member.getId() + ">");
 
-        User target = args.length < 2 ? member.getUser() : Bot.findUser(args[1]);
+        Bot.fetchUser(args.length < 2 ? member.getId() : args[1]).queue(m -> {
+            m.retrieveProfile().queue(p -> {
+                String banner = p.getBannerUrl() == null
+                        ? null
+                        : p.getBannerUrl() + "?size=2048";
 
-        if (target == null) {
-            Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
-            return;
-        }
+                if (banner == null) {
+                    Bot.tempMessage(channel, "Nenhum banner foi encontrado para este usuário.", 10000);
+                    return;
+                }
 
-        String banner = target.retrieveProfile().complete().getBannerUrl();
-
-        if (banner == null) {
-            Bot.tempMessage(channel, "O usuário não possui um banner ou nenhum foi encontrado.", 10000);
-            return;
-        }
-
-        banner += "?size=2048";
-
-        channel.sendMessageEmbeds(embed(banner, message.getGuild(), target)).queue();
+                send.setEmbeds(embed(banner, guild, m));
+                channel.sendMessage(send.build()).queue();
+            }, e -> Bot.tempMessage(channel, Messages.ERROR_USER_NOT_FOUND.message(), 10000));
+        });
     }
 
     private MessageEmbed embed(String url, Guild guild, User target) {
         final EmbedBuilder builder = new EmbedBuilder();
-        String name = target.getName();
-        String nick;
-
-        try {
-             Member member = guild.retrieveMemberById(target.getIdLong()).complete();
-             nick = member.getEffectiveName();
-        } catch (ErrorResponseException | NullPointerException e) {
-            nick = name;
-        }
 
         // Embed related
-        String title = "🖼 " + name;
+        String title = "🖼 " + target.getGlobalName();
         Color color = new Color(88, 101, 242);
 
         switch (target.getId()) {
@@ -64,25 +57,25 @@ public class Banner implements CommandExecutor {
             // Custom stuff for Anjo
             case "742729586659295283" -> {
                 color = new Color(148, 0, 211);
-                title = "\\🍑 " + name;
+                title = "🍑 " + target.getName();
             }
 
             // Custom stuff for Myuu (main)
             case "183645448509194240" -> {
                 color = new Color(194, 0, 0);
-                title = "🍒 " + name;
+                title = "🍒 " + target.getName();
             }
 
             // Custom stuff for Myuu (alt)
             case "727978798464630824" -> {
                 color = new Color(255, 51, 243);
-                title = "🍒 " + name;
+                title = "🍒 " + target.getName();
             }
         }
 
         return builder
                 .setTitle(title, url)
-                .setDescription(String.format("Banner de `%s`", nick))
+                .setDescription(String.format("Banner de `%s`", target.getName()))
                 .setColor(color) // Discord 'blue color'
                 .setImage(url)
                 .setFooter(guild.getName(), guild.getIconUrl())

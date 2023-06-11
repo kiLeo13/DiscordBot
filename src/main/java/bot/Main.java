@@ -2,9 +2,6 @@ package bot;
 
 import bot.commands.Shutdown;
 import bot.commands.*;
-import bot.commands.lifetimemute.LifeMuteCommand;
-import bot.commands.lifetimemute.Reactions;
-import bot.commands.lifetimemute.VoiceJoin;
 import bot.commands.valorant.Characters;
 import bot.commands.valorant.Profiles;
 import bot.data.BotData;
@@ -67,8 +64,7 @@ public final class Main {
             System.out.println("Failed to login, exiting...");
             return;
         }
-                
-                
+        
         // Run http server
         try {
             SimpleHttpServer.runServer();
@@ -98,12 +94,6 @@ public final class Main {
                 SlashHandler.getManager(),
                 new MessageInputTicket(),
 
-                // Voice
-                new VoiceJoin(),
-
-                // Mist
-                new Reactions(),
-
                 // Modals
                 new TicketInfoCreation(),
                 new TicketClosedReason()
@@ -113,9 +103,7 @@ public final class Main {
     private static void registerCommands() {
         final CommandHandler commands = CommandHandler.getManager().register("<prefix>retrieve", new Retriever());
 
-        commands.register("<prefix>bigo", new BigoAnnouncement())
-                .register("<prefix>ping", new Ping())
-                .register("<prefix>nerd", new Nerd())
+        commands.register("<prefix>ping", new Ping())
                 .register("<prefix>among", new RoleAmongUs())
                 .register("<prefix>say", new Say())
                 .register("<prefix>uptime", new Uptime())
@@ -128,13 +116,10 @@ public final class Main {
                 .register("<prefix>linff", new Linff())
                 .register("<prefix>ip", new IPLookup())
                 .register("<prefix>avatar-bot", new AvatarBot())
-                .register("<prefix>randomize", new Randomize())
                 .register("<prefix>roleinfo", new RoleInfo())
                 .register("<prefix>p-help", new PrivilegedHelp())
-                .register("<prefix>lifemute", new LifeMuteCommand())
                 .register(new Permissions(), "<prefix>permissions", "<prefix>permission", "<prefix>perms", "<prefix>perm")
 
-        // BRUH
                 .register(new Characters(), "<prefix>valorant-agent", "<prefix>v-agent")
                 .register(new Profiles(), "<prefix>valorant-player", "<prefix>v-player")
 
@@ -243,11 +228,9 @@ public final class Main {
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
         // Registering it
-        api.updateCommands().addCommands(commands).queue(m -> {
-                Bot.log("<GREEN>Successfully registered <YELLOW>" + commands.size() + "<GREEN> slash commands!", false);
-        }, e -> {
-                e.printStackTrace();
-                Bot.log("<RED>Could not register commands.", true);
+        api.updateCommands().addCommands(commands).queue(m -> Bot.log("<GREEN>Successfully registered <YELLOW>" + commands.size() + "<GREEN> slash commands!", false),e -> {
+            e.printStackTrace();
+            Bot.log("<RED>Could not register commands.", true);
         });
 
         // Internally register all the slash commands
@@ -260,8 +243,7 @@ public final class Main {
                 .register("shutdown", new Shutdown())
                 .register("stream", new BotStatus())
                 .register("close", new CloseTicket())
-                .register("ticket", new OpenTicket())
-                .register("transfer", new TransferMemberData());
+                .register("ticket", new OpenTicket());
     }
 
     public static long getInitTime() {

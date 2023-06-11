@@ -54,7 +54,11 @@ public class RequestManager {
     }
 
     /**
-     * @param url The API endpoint.
+     * Returns a {@link ResponseBody} representation of the request.
+     * <p>
+     * <b>You MUST close every {@link ResponseBody} after using it.</b>
+     * 
+     * @param url The endpoint.
      * @param headers The headers (optional).
      * @param method The method to make the request.
      * @param requestBody The request body (optional for GET requests).
@@ -64,10 +68,9 @@ public class RequestManager {
     public ResponseBody request(@NotNull String url, @Nullable Map<String, String> headers, @NotNull Method method, @Nullable String requestBody) throws IOException {
         final OkHttpClient client = new OkHttpClient();
 
-        Request.Builder request = new Request.Builder()
-                .url(url);
+        Request.Builder request = new Request.Builder().url(url);
 
-        if (requestBody != null)
+        if (requestBody != null && !requestBody.isEmpty())
             request.method(method.name(), RequestBody.create(requestBody, MediaType.parse("application/json")));
 
         if (headers != null && !headers.isEmpty()) {

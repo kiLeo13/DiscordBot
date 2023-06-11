@@ -15,6 +15,8 @@ public class BigoVoiceChannel implements BotScheduler {
     @Override
     public void perform() {
 
+        if (true) return;
+
         VoiceChannel saladaVC = Main.getApi().getVoiceChannelById(Voices.SALADA.id());
         TextChannel salada = Main.getApi().getTextChannelById(Channels.SALADA.id());
         String bigo = "974159685764649010";
@@ -27,15 +29,18 @@ public class BigoVoiceChannel implements BotScheduler {
         if (members.stream().map(Member::getId).toList().contains(bigo)) return;
 
         if (members.size() >= 5)
-            Bot.tempMessage(salada, "<@974159685764649010> acabei de verificar e é melhor vc não entrar na call, tem `" + members.size() + "` pessoas lá :fearful:", 300000);
+            Bot.tempMessage(salada, "<@974159685764649010> acabei de verificar e é melhor vc não entrar na call, tem `" + members.size() + "` pessoas lá :fearful:", 600000);
 
         if (members.size() == 4)
-            Bot.tempMessage(salada, "<@974159685764649010> tem mais 1 vaga para a call, dá para vc entrar hein.", 300000);
+            Bot.tempMessage(salada, "<@974159685764649010> tem mais 1 vaga para a call, dá para vc entrar hein.", 600000);
 
-        if (members.size() <= 3 && members.size() != 1)
-            Bot.tempMessage(salada, "<@974159685764649010> tá de boa para entrar, tem só `" + members.size() + "` pessoas na call.", 300000);
+        if (members.size() <= 3 && members.size() >= 1)
+            Bot.tempMessage(salada, "<@974159685764649010> tá de boa para entrar, tem só `" + members.size() + "` pessoas na call.", 600000);
 
         if (members.size() == 1)
-            Bot.tempMessage(salada, "<@974159685764649010> vai lá fazer companhia pro cara, tem só ele ou ela na call, sei lá", 300000);
+            Bot.tempMessage(salada, "<@974159685764649010> vai lá fazer companhia pro cara, tem só ele ou ela na call, sei lá", 600000);
+
+        if (members.size() == 0)
+            Bot.tempMessage(salada, "<@974159685764649010> não tem ninguém lá na call, mas se vc quiser entrar... vai de vc", 600000);
     }
 }

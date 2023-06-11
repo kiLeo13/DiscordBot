@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.concurrent.ExecutionException;
 public class Say implements CommandExecutor {
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
 
         MessageChannelUnion channel = message.getChannel();
         String content = message.getContentRaw();

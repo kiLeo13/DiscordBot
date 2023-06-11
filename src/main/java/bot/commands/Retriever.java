@@ -15,13 +15,14 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import org.jetbrains.annotations.NotNull;
 
 @CommandPermission(permissions = Permission.ADMINISTRATOR)
 public class Retriever implements CommandExecutor {
     private static final File file = new File("C:/Users/Leonardo/Desktop/ServerMembers.txt");
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
         
         Guild guild = message.getGuild();
         MessageChannelUnion channel = message.getChannel();

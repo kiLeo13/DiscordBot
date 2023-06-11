@@ -1,6 +1,6 @@
 package bot.commands;
 
-import bot.util.*;
+import bot.util.Bot;
 import bot.util.content.Channels;
 import bot.util.content.Messages;
 import bot.util.content.RegistrationRoles;
@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -20,36 +20,40 @@ import java.util.List;
 public class RegistrationTake implements CommandExecutor {
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
 
-        User author = message.getAuthor();
         Member member = message.getMember();
         String content = message.getContentRaw();
         String[] args = content.split(" ");
         Guild guild = message.getGuild();
-        MessageChannelUnion channel = message.getChannel();
-        Member target = args.length < 2 ? null : Bot.fetchMember(guild, args[1]);
+        TextChannel channel = message.getChannel().asTextChannel();
 
         if (channel.getId().equals(Channels.REGISTER_CHANNEL.id())) return;
 
-        if (target == null) {
-            Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 5000);
-            message.delete().queue();
+        if (args.length < 2) {
+            Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
             return;
         }
 
-        List<Role> toRemoveRoles = toRemove(target);
-        List<Role> toGiveRoles = toGive(guild);
+        Bot.fetchMember(guild, args[1]).queue(m -> {
+            List<Role> toGive = toGive(guild);
+            List<Role> toRemove = toRemove(m);
 
-        if (target.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_NOT_REGISTERED.id()))
-                && !target.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_REGISTERED.id()))) {
-            channel.sendMessage("<@" + author.getIdLong() + "> o membro <@" + target.getIdLong() + "> não está registrado.").queue();
-            return;
-        }
+            if (m.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_NOT_REGISTERED.id()))
+                    && !m.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_REGISTERED.id()))) {
+                channel.sendMessage("O membro <@" + m.getId() + "> não está registrado.").queue();
+                return;
+            }
 
-        guild.modifyMemberRoles(target, toGiveRoles, toRemoveRoles).queue();
-        channel.sendMessage("<@" + author.getIdLong() + "> registro de <@" + target.getIdLong() + "> foi removido com sucesso!").queue();
-        logRegister(target, toGiveRoles, toRemoveRoles, member);
+            guild.modifyMemberRoles(m, toGive, toRemove).queue(s -> {
+                channel.sendMessage("O registro de <@" + m.getId() + "> foi removido com sucesso!").queue();
+                logRegister(m, toGive, toRemove, member);
+            }, e -> {
+                channel.sendMessage("Não foi possível concluir a operação! Verifique o console para mais informações sobre o erro.").queue();
+                e.printStackTrace();
+            });
+
+        }, e -> Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000));
     }
 
     private void logRegister(Member target, List<Role> givenRoles, List<Role> removedRoles, Member staff) {

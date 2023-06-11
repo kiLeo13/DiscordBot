@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import bot.util.*;
+import bot.util.content.Messages;
 import bot.util.interfaces.CommandExecutor;
 import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -16,32 +17,30 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.jetbrains.annotations.NotNull;
 
 @CommandPermission()
 public class Permissions implements CommandExecutor {
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
 
         Member member = message.getMember();
         String content = message.getContentRaw();
         String[] args = content.split(" ");
         Guild guild = message.getGuild();
         MessageChannelUnion channel = message.getChannel();
-        Member target = args.length < 2 ? member : Bot.fetchMember(guild, args[1]);
-
-        if (target == null) {
-            Bot.tempMessage(channel, "Membro não encontrado. Caso esteja procurando por informações de um cargo, use `.roleinfo <role>`.", 10000);
-            return;
-        }
-
-        MessageEmbed embed = embed(target);
         MessageCreateBuilder send = new MessageCreateBuilder();
 
-        send.setContent("<@" + member.getIdLong() + ">");
-        send.setEmbeds(embed);
-
-        channel.sendMessage(send.build()).queue();
+        if (args.length < 2) {
+            send.setEmbeds(embed(member));
+            channel.sendMessage(send.build()).queue();
+        } else {
+            Bot.fetchMember(guild, args[1]).queue(m -> {
+                send.setEmbeds(embed(m));
+                channel.sendMessage(send.build()).queue();
+            }, e -> channel.sendMessage(Messages.ERROR_MEMBER_NOT_FOUND.message()).queue());
+        }
     }
 
     private MessageEmbed embed(Member target) {

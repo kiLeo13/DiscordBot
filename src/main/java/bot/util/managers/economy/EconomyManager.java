@@ -118,7 +118,7 @@ public class EconomyManager {
      * 
      * @param guild The guild you want to get the leaderboard.
      * @return A {@link Leaderboard} instance containing all the leaderboard information or null if something goes wrong.
-     * @see EconomyManager#getLeaderboard(Guild, int, int)
+     * @see EconomyManager#getLeaderboard(Guild, int, int, int)
      */
     @Nullable
     public Leaderboard getLeaderboard(Guild guild) {
@@ -149,7 +149,7 @@ public class EconomyManager {
                 )
         );
 
-        return json == null ? "{}" : json;
+        return json == null || json.isBlank() ? "{}" : json;
     }
 
     private String fetchLeaderboard(Guild guild, int page, int limit, int offset) {

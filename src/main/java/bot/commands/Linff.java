@@ -10,12 +10,13 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import org.jetbrains.annotations.NotNull;
 
 @CommandPermission()
 public class Linff implements CommandExecutor {
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
 
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();

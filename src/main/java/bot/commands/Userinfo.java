@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.List;
@@ -18,25 +19,26 @@ import java.util.List;
 public class Userinfo implements CommandExecutor {
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
 
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
         String content = message.getContentRaw();
         String[] args = content.split(" ");
-        Member target = args.length < 2 ? member : Bot.fetchMember(guild, args[1]);
         MessageCreateBuilder send = new MessageCreateBuilder();
 
-        if (target == null) {
-            Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000);
-            return;
-        }
-
         send.setContent("<@" + member.getId() + ">");
-        send.addEmbeds(embed(target));
 
-        channel.sendMessage(send.build()).queue();
+        if (args.length < 2) {
+            send.setEmbeds(embed(member));
+            channel.sendMessage(send.build()).queue();
+        } else {
+            Bot.fetchMember(guild, args[1]).queue(m -> {
+                send.setEmbeds(embed(m));
+                channel.sendMessage(send.build()).queue();
+            }, e -> channel.sendMessage(Messages.ERROR_MEMBER_NOT_FOUND.message()).queue());
+        }
     }
 
     private MessageEmbed embed(Member target) {
@@ -49,7 +51,7 @@ public class Userinfo implements CommandExecutor {
         Role salada = target.getGuild().getRoleById(Roles.ROLE_SALADA.id());
         Guild guild = target.getGuild();
 
-        // Embed stuff
+        // Embed default settings
         String title = "👥 " + target.getUser().getName();
         String description = "Informações de `" + target.getEffectiveName() + "` <a:M_Myuu:643942157325041668>";
         Color color = highest.isEmpty() ? Color.GRAY : highest.get(0).getColor();
@@ -61,7 +63,7 @@ public class Userinfo implements CommandExecutor {
             // Anjo
             case "742729586659295283" -> {
                 color = new Color(148, 0, 211);
-                title = "\\🍑 " + target.getUser().getName();
+                title = "🍑 " + target.getUser().getName();
                 description = "Informações de `" + target.getEffectiveName() + "` <a:alienanjo:1094823207342719007>";
             }
 

@@ -7,12 +7,13 @@ import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import org.jetbrains.annotations.NotNull;
 
 @CommandPermission(permissions = Permission.MESSAGE_MANAGE)
 public class Clear implements CommandExecutor {
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
 
         MessageChannelUnion channel = message.getChannel();
         String[] args = message.getContentRaw().split(" ");

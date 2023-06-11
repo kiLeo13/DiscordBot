@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +23,7 @@ public class AvatarBot implements CommandExecutor {
     private static final List<String> validation = List.of(".png", ".jpg", ".webp");
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
         
         List<Long> allowed = List.of(183645448509194240L, 727978798464630824L, 742729586659295283L, 596939790532739075L);
         Member member = message.getMember();

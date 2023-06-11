@@ -1,6 +1,5 @@
 package bot.generic_listeners;
 
-import bot.data.BotData;
 import bot.util.interfaces.SlashExecutor;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -28,7 +27,7 @@ public class SlashHandler extends ListenerAdapter {
         // Yeah, it HAS to be run in a guild
         if (event.getGuild() == null || member == null || event.getUser().isBot()) return;
 
-        BotData.EXECUTOR.execute(() -> runCommand(event));
+        CommandHandler.EXECUTOR.execute(() -> runCommand(event));
     }
 
     public void runCommand(SlashCommandInteractionEvent event) {

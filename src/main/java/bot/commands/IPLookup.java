@@ -18,13 +18,14 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.jetbrains.annotations.NotNull;
 
 @CommandPermission()
 public class IPLookup implements CommandExecutor {
     private static final RequestManager requester = RequestManager.create();
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
         
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();

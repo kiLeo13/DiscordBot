@@ -9,6 +9,7 @@ import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
 public class Disconnect implements CommandExecutor, SlashExecutor {
 
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message) {
 
         MessageChannelUnion channel = message.getChannel();
         Member member = message.getMember();
