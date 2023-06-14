@@ -19,6 +19,8 @@ public class BigoVoiceChannel implements BotScheduler {
         TextChannel salada = Main.getApi().getTextChannelById(Channels.SALADA.id());
         String bigo = "974159685764649010";
 
+        if (true) return;
+
         if (saladaVC == null || salada == null) return;
 
         final List<Member> members = saladaVC.getMembers();
@@ -32,7 +34,7 @@ public class BigoVoiceChannel implements BotScheduler {
         if (members.size() == 4)
             Bot.tempMessage(salada, "<@974159685764649010> tem mais 1 vaga para a call, dá para vc entrar hein.", 600000);
 
-        if (members.size() <= 3 && members.size() >= 1)
+        if (members.size() <= 3 && members.size() > 1)
             Bot.tempMessage(salada, "<@974159685764649010> tá de boa para entrar, tem só `" + members.size() + "` pessoas na call.", 600000);
 
         if (members.size() == 1)

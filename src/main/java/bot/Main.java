@@ -1,17 +1,16 @@
 package bot;
 
 import bot.commands.Shutdown;
+import bot.commands.colorroles.CheckColorsSchedule;
+import bot.commands.colorroles.ColorRole;
 import bot.commands.*;
-import bot.commands.valorant.Characters;
-import bot.commands.valorant.Profiles;
+import bot.commands.valorant.*;
 import bot.data.BotData;
 import bot.data.BotFiles;
 import bot.generic_listeners.*;
 import bot.tickets.*;
 import bot.util.Bot;
-import bot.util.schedules.BigoVoiceChannel;
-import bot.util.schedules.PayServer;
-import bot.util.schedules.ScheduleManager;
+import bot.util.schedules.*;
 import bot.util.server.SimpleHttpServer;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -103,30 +102,33 @@ public final class Main {
     private static void registerCommands() {
         final CommandHandler commands = CommandHandler.getManager().register("<prefix>retrieve", new Retriever());
 
-        commands.register("<prefix>ping", new Ping())
-                .register("<prefix>among", new RoleAmongUs())
-                .register("<prefix>say", new Say())
-                .register("<prefix>uptime", new Uptime())
-                .register("<prefix>clear", new Clear())
-                .register("<prefix>userinfo", new Userinfo())
-                .register("<prefix>avatar", new Avatar())
-                .register("<prefix>help", new Help())
-                .register("<prefix>banner", new Banner())
-                .register("<prefix>serverinfo", new ServerInfo())
-                .register("<prefix>linff", new Linff())
-                .register("<prefix>ip", new IPLookup())
-                .register("<prefix>avatar-bot", new AvatarBot())
-                .register("<prefix>roleinfo", new RoleInfo())
-                .register("<prefix>p-help", new PrivilegedHelp())
-                .register(new Permissions(), "<prefix>permissions", "<prefix>permission", "<prefix>perms", "<prefix>perm")
+        commands.register("<pfix>ping", new Ping())
+                .register("<pfix>among", new RoleAmongUs())
+                .register("<pfix>say", new Say())
+                .register("<pfix>uptime", new Uptime())
+                .register("<pfix>clear", new Clear())
+                .register("<pfix>userinfo", new Userinfo())
+                .register("<pfix>avatar", new Avatar())
+                .register("<pfix>help", new Help())
+                .register("<pfix>banner", new Banner())
+                .register("<pfix>serverinfo", new ServerInfo())
+                .register("<pfix>linff", new Linff())
+                .register("<pfix>ip", new IPLookup())
+                .register("<pfix>avatar-bot", new AvatarBot())
+                .register("<pfix>roleinfo", new RoleInfo())
+                .register("<pfix>p-help", new PrivilegedHelp())
+                .register(new Tumaes(), "<pfix>tumaes", "<pfix>anão", "<pfix>toquinho", "<pfix>sacy")
+                .register(new Permissions(), "<pfix>permissions", "<pfix>permission")
 
-                .register(new Characters(), "<prefix>valorant-agent", "<prefix>v-agent")
-                .register(new Profiles(), "<prefix>valorant-player", "<prefix>v-player")
+                .register(new Characters(), "<pfix>valorant-agent", "<pfix>v-agent")
+                .register(new Profiles(), "<pfix>valorant-player", "<pfix>v-player")
 
-                .register(new Disconnect(), "<prefix>dd", "<prefix>disconnect")
+                .register(new Disconnect(), "<pfix>dd", "<pfix>disconnect")
 
-                .register("<register>roles", new RegistrationRoles())
-                .register("<register>take", new RegistrationTake());
+                .register("<pfix>sql", new ConnectDataBase())
+
+                .register("<regs>roles", new RegistrationRoles())
+                .register("<regs>take", new RegistrationTake());
 
         Bot.log("<GREEN>Successfully registered <YELLOW>" + CommandHandler.getCommands().size() + "<GREEN> commands!", false);
         registerApplicationCommands();
@@ -255,7 +257,7 @@ public final class Main {
 
         scheduler
                 .addRunnable(3600 * 1000, new PayServer())
-                .addRunnable(60000, new ColorRole())
+                .addRunnable(60000, new CheckColorsSchedule())
                 .addRunnable(3600 * 1000, new BigoVoiceChannel());
 
         // Starts the schedule

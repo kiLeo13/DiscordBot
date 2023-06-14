@@ -158,7 +158,7 @@ public class Bot {
             return "";
 
         try {
-            return String.join("", Files.readAllLines(Path.of(file.getPath())));
+            return String.join(System.lineSeparator(), Files.readAllLines(Path.of(file.getPath())));
         } catch (IOException e) {
             e.printStackTrace();
             return "";

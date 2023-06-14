@@ -243,7 +243,7 @@ public class Registration implements CommandExecutor, SlashExecutor {
         if (target.getUser().isBot()) {
             return;
         }
-
+        
         // Why would someone register themselves?
         if (target.getIdLong() == author.getIdLong()) {
             Bot.tempMessage(channel, "<@" + author.getIdLong() + "> Você não pode registrar você mesmo.", 5000);

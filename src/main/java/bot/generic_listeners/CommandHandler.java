@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class CommandHandler extends ListenerAdapter {
-    protected static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(3);
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(3);
     private static final Map<String, CommandExecutor> commands = new HashMap<>();
     private static CommandHandler INSTANCE;
 
@@ -67,13 +67,14 @@ public class CommandHandler extends ListenerAdapter {
         int i = 0;
         do {
             if (permissions.isEmpty() || member.hasPermission(permissions.get(i))) {
-                command.run(message);
-
                 MessageDeletion annotation = command.getClass().getAnnotation(MessageDeletion.class);
                 boolean deletion = annotation == null || annotation.value();
-
+                
                 if (deletion)
                     Bot.delete(message);
+
+                // And finally call the command function
+                command.run(message);
                 break;
             }
 
@@ -87,8 +88,8 @@ public class CommandHandler extends ListenerAdapter {
 
         final HashMap<String, String> prefixes = new HashMap<>();
 
-        prefixes.put("<prefix>", BotData.PREFIX);
-        prefixes.put("<register>", BotData.PREFIX_REGISTER);
+        prefixes.put("<pfix>", BotData.PREFIX);
+        prefixes.put("<regs>", BotData.PREFIX_REGISTER);
 
         for (String i : prefixes.keySet())
             name = name.replaceAll(i, prefixes.get(i)).toLowerCase();
@@ -100,14 +101,15 @@ public class CommandHandler extends ListenerAdapter {
         return this;
     }
 
-    public CommandHandler register(CommandExecutor command, String... name) {
+    public CommandHandler register(CommandExecutor command, String... values) {
         if (!command.getClass().isAnnotationPresent(CommandPermission.class))
             throw new IllegalArgumentException("Class " + command.getClass().getName() + " is not annotated with 'CommandPermission'");
 
-        for (String n : name) {
-            n = n.replaceAll("<prefix>", BotData.PREFIX).toLowerCase();
+        for (String n : values) {
+            n = n.replaceAll("<pfix>", BotData.PREFIX).toLowerCase();
 
-            if (n.isBlank()) throw new IllegalArgumentException("Command name cannot be empty");
+            if (n.isBlank())
+                throw new IllegalArgumentException("Command name cannot be empty");
 
             commands.put(n, command);
         }
