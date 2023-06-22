@@ -3,13 +3,13 @@ package bot.commands.valorant;
 import java.awt.Color;
 import java.util.List;
 
+import bot.internal.abstractions.BotCommand;
 import com.google.gson.Gson;
 
 import bot.util.Bot;
 import bot.util.content.Messages;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
-import bot.util.managers.requests.RequestManager;
+import bot.internal.abstractions.annotations.CommandPermission;
+import bot.internal.managers.requests.RequestManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -19,26 +19,28 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.jetbrains.annotations.NotNull;
 
 @CommandPermission()
-public class Characters implements CommandExecutor {
+public class Characters extends BotCommand {
     private static final RequestManager requester = RequestManager.create();
 
+    public Characters(String name) {
+        super(true, name);
+    }
+
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
         
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
         String content = message.getContentRaw();
-        String[] args = content.split(" ");
 
-        if (args.length < 2) {
+        if (args.length < 1) {
             channel.sendMessage(Messages.ERROR_TOO_FEW_ARGUMENTS.message()).queue();
             return;
         }
 
-        String request = requester.requestAsString("https://valorant-api.com/v1/agents/", null);
-        List<Agent> agents = parse(request);
+        List<Agent> agents = fetchAgents();
 
-        Agent agent = fetchAgent(args[1], agents);
+        Agent agent = resolveAgent(args[0], agents);
 
         // Does the agent exist?
         if (agent == null) {
@@ -49,7 +51,7 @@ public class Characters implements CommandExecutor {
         MessageCreateBuilder send = new MessageCreateBuilder();
 
         send.setEmbeds(embed(agent, content.toLowerCase().endsWith("--full")));
-        send.setContent("<@" + member.getIdLong() + ">");
+        send.setContent(member.getAsMention());
 
         channel.sendMessage(send.build()).queue();
     }
@@ -91,7 +93,7 @@ public class Characters implements CommandExecutor {
         return builder.build();
     }
 
-    private Agent fetchAgent(String arg, List<Agent> agents) {
+    private Agent resolveAgent(String arg, List<Agent> agents) {
         for (Agent a : agents)
             if (a.displayName.equalsIgnoreCase(arg) && a.isPlayableCharacter)
                 return a;
@@ -99,9 +101,10 @@ public class Characters implements CommandExecutor {
         return null;
     }
 
-    private List<Agent> parse(String str) {
+    private List<Agent> fetchAgents() {
+        String response = requester.requestAsString("https://valorant-api.com/v1/agents/", null);
         Gson gson = new Gson();
-        return gson.fromJson(str, Agents.class).data;
+        return gson.fromJson(response, Agents.class).data;
     }
 
     private Color hexToRgb(String hex) {

@@ -1,7 +1,7 @@
 package bot.commands;
 
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
+import bot.internal.abstractions.BotCommand;
+import bot.internal.abstractions.annotations.CommandPermission;
 import com.mysql.cj.MysqlConnection;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import net.dv8tion.jda.api.Permission;
@@ -11,10 +11,14 @@ import org.jetbrains.annotations.NotNull;
 import java.sql.SQLException;
 
 @CommandPermission(permissions = Permission.ADMINISTRATOR)
-public class ConnectDataBase implements CommandExecutor {
+public class ConnectDataBase extends BotCommand {
+
+    public ConnectDataBase(String name) {
+        super(false, name);
+    }
 
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
         try {
             MysqlDataSource dataSource = new MysqlDataSource();
 

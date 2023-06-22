@@ -4,10 +4,10 @@ import java.awt.Color;
 import java.util.EnumSet;
 import java.util.List;
 
+import bot.internal.abstractions.BotCommand;
 import bot.util.*;
 import bot.util.content.Messages;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
+import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,23 +20,25 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.jetbrains.annotations.NotNull;
 
 @CommandPermission()
-public class Permissions implements CommandExecutor {
+public class Permissions extends BotCommand {
+
+    public Permissions(String... names) {
+        super(true, names);
+    }
 
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
 
         Member member = message.getMember();
-        String content = message.getContentRaw();
-        String[] args = content.split(" ");
         Guild guild = message.getGuild();
         MessageChannelUnion channel = message.getChannel();
         MessageCreateBuilder send = new MessageCreateBuilder();
 
-        if (args.length < 2) {
+        if (args.length < 1) {
             send.setEmbeds(embed(member));
             channel.sendMessage(send.build()).queue();
         } else {
-            Bot.fetchMember(guild, args[1]).queue(m -> {
+            Bot.fetchMember(guild, args[0]).queue(m -> {
                 send.setEmbeds(embed(m));
                 channel.sendMessage(send.build()).queue();
             }, e -> channel.sendMessage(Messages.ERROR_MEMBER_NOT_FOUND.message()).queue());

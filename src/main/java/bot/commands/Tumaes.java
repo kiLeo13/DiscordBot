@@ -7,11 +7,12 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 
+import bot.internal.abstractions.BotCommand;
+import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.Yaml;
 
 import bot.util.content.Channels;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
+import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -19,12 +20,16 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 @CommandPermission()
-public class Tumaes implements CommandExecutor {
+public class Tumaes extends BotCommand {
     private static final File file = new File("resources", "tumaes.yml");
     private static final Yaml yaml = new Yaml();
 
+    public Tumaes(String... names) {
+        super(false, names);
+    }
+
     @Override
-    public void run(Message message) {
+    public void run(@NotNull Message message, String[] name) {
         
         TextChannel channel = message.getChannel().asTextChannel();
         Guild guild = message.getGuild();
@@ -34,10 +39,7 @@ public class Tumaes implements CommandExecutor {
 
         if (allowed == null || (channel.getIdLong() != allowed.getIdLong() && !member.hasPermission(Permission.MANAGE_SERVER))) return;
 
-        if (gif == null)
-            channel.sendMessage("Nenhum gif adicionado à lista ou ocorreu um erro.").queue();
-        else
-            channel.sendMessage(gif).queue();
+        channel.sendMessage(gif == null ? "Nenhum gif adicionado à lista ou ocorreu um erro." : gif).queue();
     }
 
     private String getGif() {

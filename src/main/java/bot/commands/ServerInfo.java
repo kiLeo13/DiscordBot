@@ -1,7 +1,7 @@
 package bot.commands;
 
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
+import bot.internal.abstractions.BotCommand;
+import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -17,17 +17,21 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 @CommandPermission()
-public class ServerInfo implements CommandExecutor {
+public class ServerInfo extends BotCommand {
+
+    public ServerInfo(String name) {
+        super(true, name);
+    }
 
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
 
         MessageChannelUnion channel = message.getChannel();
         User author = message.getAuthor();
         Guild guild = message.getGuild();
         MessageCreateBuilder send = new MessageCreateBuilder();
 
-        send.setContent("<@" + author.getIdLong() + ">");
+        send.setContent(author.getAsMention());
         send.addEmbeds(embed(guild));
 
         channel.sendMessage(send.build()).queue();

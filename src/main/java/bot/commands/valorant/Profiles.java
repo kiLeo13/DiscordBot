@@ -1,10 +1,10 @@
 package bot.commands.valorant;
 
+import bot.internal.abstractions.BotCommand;
 import bot.util.Bot;
 import bot.util.content.Messages;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
-import bot.util.managers.requests.RequestManager;
+import bot.internal.abstractions.annotations.CommandPermission;
+import bot.internal.managers.requests.RequestManager;
 
 import com.google.gson.Gson;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -19,19 +19,21 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 
 @CommandPermission()
-public class Profiles implements CommandExecutor {
+public class Profiles extends BotCommand {
+    private static final Gson gson = new Gson();
     private static final RequestManager requester = RequestManager.create();
     private long lastUsed;
 
+    public Profiles(String name) {
+        super(true, name);
+    }
+
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
         
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
-        String content = message.getContentRaw();
         Guild guild = message.getGuild();
-        String[] args = content.split(" ");
-        String[] inputArgs = content.substring(args[0].length() + 1).split(" ");
         long now = System.currentTimeMillis();
 
         if (args.length < 2) {
@@ -44,26 +46,25 @@ public class Profiles implements CommandExecutor {
             return;
         }
 
-        String request = requester.requestAsString("https://api.henrikdev.xyz/valorant/v1/account/" + nameTag(inputArgs, true) + "/" + nameTag(inputArgs, false), null);
-        Player player = parse(request);
+        Player player = fetchPlayer(args);
 
         // Updating cooldown
         lastUsed = System.currentTimeMillis();
 
         if (player == null) {
-            Bot.tempMessage(channel, "Usuário `" + nameTag(inputArgs, true) + "#" + nameTag(inputArgs, false) + "` não foi encontrado.", 10000);
+            Bot.tempMessage(channel, "Usuário `" + resolve(args, true) + "#" + resolve(args, false) + "` não foi encontrado.", 10000);
             return;
         }
 
         MessageCreateBuilder send = new MessageCreateBuilder();
-        send.setContent("<@" + member.getId() + ">");
+        send.setContent(member.getAsMention());
         send.setEmbeds(embed(player, guild));
 
         channel.sendMessage(send.build()).queue();
     }
     
     // This will return the exact input tag
-    private String nameTag(String[] args, boolean isName) {
+    private String resolve(String[] args, boolean isName) {
         final StringBuilder builder = new StringBuilder();
 
         for (String s : args)
@@ -93,10 +94,9 @@ public class Profiles implements CommandExecutor {
         return builder.build();
     }
 
-    private Player parse(String str) {
-        Gson gson = new Gson();
-
-        PlayerInput input = gson.fromJson(str, PlayerInput.class);
+    private Player fetchPlayer(String[] args) {
+        String resposne = requester.requestAsString("https://api.henrikdev.xyz/valorant/v1/account/" + resolve(args, true) + "/" + resolve(args, false), null);
+        PlayerInput input = gson.fromJson(resposne, PlayerInput.class);
 
         if (input == null || input.status != 200)
             return null;
@@ -106,7 +106,17 @@ public class Profiles implements CommandExecutor {
 
     private record PlayerInput(int status, Player data) {}
 
-    private record Player(String name, String tag, String puuid, String region, int account_level, Card card) {}
+    private record Player(
+            String name,
+            String tag,
+            String puuid,
+            String region,
+            int account_level,
+            Card card
+    ) {}
 
-    private record Card(String small, String wide) {}
+    private record Card(
+            String small,
+            String wide
+    ) {}
 }

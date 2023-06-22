@@ -1,22 +1,25 @@
 package bot.commands;
 
+import bot.internal.abstractions.BotCommand;
 import bot.util.Bot;
 import bot.util.content.Messages;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
+import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.jetbrains.annotations.NotNull;
 
 @CommandPermission(permissions = Permission.MESSAGE_MANAGE)
-public class Clear implements CommandExecutor {
+public class Clear extends BotCommand {
+
+    public Clear(String name) {
+        super(true, name);
+    }
 
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
 
-        MessageChannelUnion channel = message.getChannel();
-        String[] args = message.getContentRaw().split(" ");
+        TextChannel channel = message.getChannel().asTextChannel();
 
         byte amount;
 
@@ -26,9 +29,9 @@ public class Clear implements CommandExecutor {
         }
 
         try {
-            amount = Byte.parseByte(args[1]);
+            amount = Byte.parseByte(args[0]);
         } catch (NumberFormatException e) {
-            Bot.tempMessage(channel, "Valor `amount:` inválido. Por favor forneça um numero entre `1 e 100`.", 10000);
+            Bot.tempMessage(channel, "Valor `amount` inválido. Por favor forneça um numero entre `1 e 100`.", 10000);
             return;
         }
 

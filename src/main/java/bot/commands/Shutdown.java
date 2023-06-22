@@ -2,16 +2,17 @@ package bot.commands;
 
 import bot.Main;
 import bot.util.Bot;
-import bot.util.interfaces.SlashExecutor;
+import bot.internal.abstractions.SlashExecutor;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
+import org.jetbrains.annotations.NotNull;
 
 public class Shutdown implements SlashExecutor {
 
     @Override
-    public void process(SlashCommandInteractionEvent event) {
+    public void process(@NotNull SlashCommandInteraction event) {
 
         JDA api = Main.getApi();
         User user = event.getUser();

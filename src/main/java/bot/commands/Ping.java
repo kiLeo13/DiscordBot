@@ -1,8 +1,8 @@
 package bot.commands;
 
 import bot.Main;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
+import bot.internal.abstractions.BotCommand;
+import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -11,10 +11,14 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.jetbrains.annotations.NotNull;
 
 @CommandPermission(permissions = Permission.MANAGE_SERVER)
-public class Ping implements CommandExecutor {
+public class Ping extends BotCommand {
+
+    public Ping(String name) {
+        super(true, name);
+    }
 
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
 
         JDA api = Main.getApi();
         User author = message.getAuthor();

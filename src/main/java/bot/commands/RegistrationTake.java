@@ -1,14 +1,17 @@
 package bot.commands;
 
+import bot.internal.abstractions.BotCommand;
+import bot.internal.abstractions.annotations.CommandPermission;
 import bot.util.Bot;
 import bot.util.content.Channels;
 import bot.util.content.Messages;
 import bot.util.content.RegistrationRoles;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,30 +20,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 @CommandPermission(permissions = Permission.MANAGE_ROLES)
-public class RegistrationTake implements CommandExecutor {
+public class RegistrationTake extends BotCommand {
+
+    public RegistrationTake(String name) {
+        super(true, name);
+    }
 
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
 
         Member member = message.getMember();
-        String content = message.getContentRaw();
-        String[] args = content.split(" ");
         Guild guild = message.getGuild();
         TextChannel channel = message.getChannel().asTextChannel();
 
         if (channel.getId().equals(Channels.REGISTER_CHANNEL.id())) return;
 
-        if (args.length < 2) {
+        if (args.length < 1) {
             Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
             return;
         }
 
-        Bot.fetchMember(guild, args[1]).queue(m -> {
+        Bot.fetchMember(guild, args[0]).queue(m -> {
             List<Role> toGive = toGive(guild);
             List<Role> toRemove = toRemove(m);
 
-            if (m.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_NOT_REGISTERED.id()))
-                    && !m.getRoles().contains(guild.getRoleById(RegistrationRoles.ROLE_REGISTERED.id()))) {
+            if (m.getRoles().contains(guild.getRoleById(RegistrationRoles.NOT_REGISTERED.id()))
+                    && !m.getRoles().contains(guild.getRoleById(RegistrationRoles.REGISTERED.id()))) {
                 channel.sendMessage("O membro <@" + m.getId() + "> não está registrado.").queue();
                 return;
             }
@@ -62,24 +67,22 @@ public class RegistrationTake implements CommandExecutor {
 
         builder
                 .setColor(Color.RED)
-                .setThumbnail(target.getEffectiveAvatarUrl())
+                .setThumbnail(target.getUser().getAvatarUrl())
                 .setTitle("Registro de `" + target.getUser().getName() + "` removido!")
                 .setDescription("Removido por `" + staff.getUser().getName() + "`\n ")
-                .addField("> **Cargos Dados**", getFormattedRolesToEmbed(givenRoles), true)
-                .addField("> **Cargos Removidos**", getFormattedRolesToEmbed(removedRoles), true)
+                .addField("> **Cargos Dados**", formatRoles(givenRoles), true)
+                .addField("> **Cargos Removidos**", formatRoles(removedRoles), true)
                 .setFooter("Oficina Myuu", "https://cdn.discordapp.com/attachments/631974560605929493/1086540588788228117/a_d51df27b11a16bbfaf5ce83acfeebfd8.png");
 
         if (channel != null) channel.sendMessageEmbeds(builder.build()).queue();
-        else System.out.println("Não foi possível salvar o registro pois nenhum chat foi encontrado.");
     }
 
-    private String getFormattedRolesToEmbed(List<Role> roles) {
+    private String formatRoles(List<Role> roles) {
         StringBuilder builder = new StringBuilder();
 
         for (Role r : roles) {
-            builder.append("<@&")
-                    .append(r.getIdLong())
-                    .append(">\n");
+            builder.append(r.getAsMention())
+                    .append("\n");
         }
 
         return builder.toString().stripTrailing();

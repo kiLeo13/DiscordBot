@@ -1,23 +1,20 @@
 package bot;
 
 import bot.commands.Shutdown;
-import bot.commands.colorroles.CheckColorsSchedule;
-import bot.commands.colorroles.ColorRole;
 import bot.commands.*;
+import bot.commands.colorroles.*;
+import bot.commands.tickets.*;
 import bot.commands.valorant.*;
-import bot.data.BotData;
-import bot.data.BotFiles;
-import bot.generic_listeners.*;
-import bot.tickets.*;
+import bot.internal.managers.commands.*;
+import bot.internal.data.*;
+import bot.misc.features.*;
+import bot.misc.schedules.*;
 import bot.util.Bot;
-import bot.util.schedules.*;
-import bot.util.server.SimpleHttpServer;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -45,10 +42,15 @@ public final class Main {
 
         try {
             api = JDABuilder.createDefault(BotData.TOKEN,
-                            GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT,
-                            GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MEMBERS,
-                            GatewayIntent.GUILD_EMOJIS_AND_STICKERS, GatewayIntent.SCHEDULED_EVENTS,
-                            GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
+                            GatewayIntent.GUILD_MESSAGES,
+                            GatewayIntent.MESSAGE_CONTENT,
+                            GatewayIntent.GUILD_VOICE_STATES,
+                            GatewayIntent.GUILD_MEMBERS,
+                            GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
+                            GatewayIntent.SCHEDULED_EVENTS,
+                            GatewayIntent.GUILD_PRESENCES,
+                            GatewayIntent.GUILD_MESSAGE_REACTIONS
+                    )
                     .setEventManager(new AnnotatedEventManager())
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableCache(CacheFlag.VOICE_STATE, CacheFlag.ONLINE_STATUS)
@@ -62,13 +64,6 @@ public final class Main {
             e.printStackTrace();
             System.out.println("Failed to login, exiting...");
             return;
-        }
-        
-        // Run http server
-        try {
-            SimpleHttpServer.runServer();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         // Registers
@@ -85,7 +80,6 @@ public final class Main {
 
                 // Text
                 new AgeFilter(),
-                new BlockLorittaExploit(),
                 new Links(),
                 new OnBotPing(),
                 new WordFilter(),
@@ -100,35 +94,31 @@ public final class Main {
     }
 
     private static void registerCommands() {
-        final CommandHandler commands = CommandHandler.getManager().register("<prefix>retrieve", new Retriever());
+        final CommandHandler manager = CommandHandler.getManager();
 
-        commands.register("<pfix>ping", new Ping())
-                .register("<pfix>among", new RoleAmongUs())
-                .register("<pfix>say", new Say())
-                .register("<pfix>uptime", new Uptime())
-                .register("<pfix>clear", new Clear())
-                .register("<pfix>userinfo", new Userinfo())
-                .register("<pfix>avatar", new Avatar())
-                .register("<pfix>help", new Help())
-                .register("<pfix>banner", new Banner())
-                .register("<pfix>serverinfo", new ServerInfo())
-                .register("<pfix>linff", new Linff())
-                .register("<pfix>ip", new IPLookup())
-                .register("<pfix>avatar-bot", new AvatarBot())
-                .register("<pfix>roleinfo", new RoleInfo())
-                .register("<pfix>p-help", new PrivilegedHelp())
-                .register(new Tumaes(), "<pfix>tumaes", "<pfix>anão", "<pfix>toquinho", "<pfix>sacy")
-                .register(new Permissions(), "<pfix>permissions", "<pfix>permission")
-
-                .register(new Characters(), "<pfix>valorant-agent", "<pfix>v-agent")
-                .register(new Profiles(), "<pfix>valorant-player", "<pfix>v-player")
-
-                .register(new Disconnect(), "<pfix>dd", "<pfix>disconnect")
-
-                .register("<pfix>sql", new ConnectDataBase())
-
-                .register("<regs>roles", new RegistrationRoles())
-                .register("<regs>take", new RegistrationTake());
+        manager.registerCommands(
+                new Ping("<pf>ping"),
+                new RoleAmongUs("<pf>among"),
+                new Say("<pf>say"),
+                new Uptime("<pf>uptime"),
+                new Clear("<pf>clear"),
+                new Userinfo("<pf>userinfo"),
+                new Avatar("<pf>avatar"),
+                new Help("<pf>help"),
+                new Banner("<pf>banner"),
+                new ServerInfo("<pf>serverinfo"),
+                new IPLookup("<pf>ip"),
+                new RoleInfo("<pf>roleinfo"),
+                new EditMessage("<pf>edit"),
+                new Tumaes("<pf>tumaes", "<pf>anão", "<pf>toquinho", "<pf>sacy"),
+                new Permissions("<pf>permissions", "<pf>permission"),
+                new Characters("<pf>v-agent"),
+                new Profiles("<pf>v-player"),
+                new FindMembersWithColor("<pf>colors"),
+                new Disconnect("<pf>dd", "<pf>disconnect"),
+                new ConnectDataBase("<pf>sql"),
+                new RegistrationTake("<pf>reg-take")
+        );
 
         Bot.log("<GREEN>Successfully registered <YELLOW>" + CommandHandler.getCommands().size() + "<GREEN> commands!", false);
         registerApplicationCommands();
@@ -137,53 +127,6 @@ public final class Main {
     private static void registerApplicationCommands() {
         SlashHandler slash = SlashHandler.getManager();
         List<CommandData> commands = new ArrayList<>();
-
-        /* []====================[] Disconnect []====================[] */
-        commands.add(Commands.slash("disconnect", "Desconecta o usuário do canal de voz atual."));
-
-        /* []====================[] Disconnect All []====================[] */
-        OptionData disonnectAllChannels = new OptionData(OptionType.CHANNEL, "channel", "Decide de qual canal os membros devem ser desconectados.", true)
-                .setChannelTypes(ChannelType.VOICE);
-        OptionData disconnectAllChannelsOptions = new OptionData(OptionType.STRING, "filter", "Filtra os membros a NÃO serem desconectados.", false)
-                .addChoice("Staff ✩", "staff")
-                .addChoice("Eventos 🎈", "eventos")
-                .addChoice("Rádio 📻", "radio")
-                .addChoice("Rádio & Eventos 🎤", "both");
-
-        commands.add(Commands.slash("disconnectall", "Desconecta todos os membros de um canal de voz (opção de filtragem)")
-                .addOptions(disonnectAllChannels, disconnectAllChannelsOptions)
-                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES)));
-
-        /* []====================[] Registration []====================[] */
-        OptionData registrationGender = new OptionData(OptionType.STRING, "gender", "O gênero do membro a ser registrado.", true)
-                .addChoice("Feminino", "female")
-                .addChoice("Masculino", "male")
-                .addChoice("Não binário", "nonBinary");
-
-        OptionData registrationAge = new OptionData(OptionType.INTEGER, "age", "A idade do membro a ser registrado.", true);
-
-        OptionData registrationTarget = new OptionData(OptionType.USER, "target", "O membro a ser registrado.", true);
-
-        OptionData registrationPlataform = new OptionData(OptionType.STRING, "plataform", "A plataforma que o membro a ser registrado usa o Discord.", true)
-                .addChoice("Computador 💻", "pc")
-                .addChoice("Mobile 📱", "mobile");
-
-        commands.add(Commands.slash("register", "Registra um novo membro.")
-                .addOptions(registrationGender, registrationAge, registrationPlataform, registrationTarget)
-                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_ROLES)));
-
-        /* []====================[] Move All []====================[] */
-        OptionData initialChannel = new OptionData(OptionType.CHANNEL, "init-channel", "Canal onde os membros atualmente estão.", true)
-               .setChannelTypes(ChannelType.VOICE);
-
-        OptionData finalChannel = new OptionData(OptionType.CHANNEL, "final-channel", "Canal para onde os membros irão ser movidos.", true)
-                .setChannelTypes(ChannelType.VOICE);
-
-        OptionData shouldOverride = new OptionData(OptionType.BOOLEAN, "should-ignore", "Define se o bot deve ignorar as limitações de chat, como por exemplo, limite de membros.", false);
-
-        commands.add(Commands.slash("moveall", "Move todos os membros de um canal de voz para outro.")
-                .addOptions(initialChannel, finalChannel, shouldOverride)
-                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
         /* []====================[] Color Role []====================[] */
         OptionData optionColorTarget = new OptionData(OptionType.USER, "member", "Qual membro deve receber o cargo de cor informado.", true);
@@ -202,25 +145,6 @@ public final class Main {
         commands.add(Commands.slash("shutdown", "Desliga o bot em caso de emergência.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
-        /* []====================[] Bot Status []====================[] */
-        OptionData activityOption = new OptionData(OptionType.STRING, "link", "O link da live.");
-        OptionData activityName = new OptionData(OptionType.STRING, "name", "Define o nome da live para aparecer no perfil.");
-        
-        commands.add(Commands.slash("stream", "Define os status do bot.")
-                .addOptions(activityOption, activityName)
-                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
-
-        /* []====================[] Transfer Member Data []====================[] */
-        OptionData transferFirstMember = new OptionData(OptionType.USER, "from", "De qual membro devemos pegar os cargos.", true);
-        OptionData transferSecondMember = new OptionData(OptionType.USER, "to", "Para qual membro devemos adicionar os cargos.", true);
-        OptionData transferIgnore = new OptionData(OptionType.STRING, "action", "Se devemos ignorar se o membro 'from' tem mais permissões que o outro que receberá os cargos.", false)
-                .addChoice("Ignore", "ignore")
-                .addChoice("Revert", "revert");
-
-        commands.add(Commands.slash("transfer", "Transfere os cargos de um membro para outro (o membro anterior não perderá os cargos).")
-                .addOptions(transferFirstMember, transferSecondMember, transferIgnore)
-                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
-
         /* -------------------- TICKET SYSTEM -------------------- */
         OptionData closeTicketIsRefused = new OptionData(OptionType.BOOLEAN, "refused", "Determina se o ticket foi fechado porque foi recusado a ser respondido.", false);
         commands.add(Commands.slash("ticket", "Abre um novo ticket para entrar em contato com nossa equipe."));
@@ -237,13 +161,8 @@ public final class Main {
 
         // Internally register all the slash commands
         slash
-                .register("disconnect", new Disconnect())
-                .register("disconnectall", new DisconnectAll())
-                .register("register", Registration.getInstance())
-                .register("moveall", new VoiceMoveAll())
                 .register("color", new ColorRole())
                 .register("shutdown", new Shutdown())
-                .register("stream", new BotStatus())
                 .register("close", new CloseTicket())
                 .register("ticket", new OpenTicket());
     }
@@ -257,8 +176,7 @@ public final class Main {
 
         scheduler
                 .addRunnable(3600 * 1000, new PayServer())
-                .addRunnable(60000, new CheckColorsSchedule())
-                .addRunnable(3600 * 1000, new BigoVoiceChannel());
+                .addRunnable(60000, new CheckColorsSchedule());
 
         // Starts the schedule
         scheduler.release();

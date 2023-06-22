@@ -1,11 +1,11 @@
 package bot.commands;
 
+import bot.internal.abstractions.BotCommand;
 import bot.util.Bot;
 import bot.util.content.Channels;
 import bot.util.content.Messages;
 import bot.util.content.Roles;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
+import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -17,22 +17,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 @CommandPermission()
-public class RoleAmongUs implements CommandExecutor {
+public class RoleAmongUs extends BotCommand {
+
+    public RoleAmongUs(String name) {
+        super(false, name);
+    }
 
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
 
         TextChannel channel = message.getChannel().asTextChannel();
         Member member = message.getMember();
         String content = message.getContentRaw();
-        String[] args = content.split(" ");
         Guild guild = message.getGuild();
         Role roleAmongUs = guild.getRoleById(Roles.ROLE_AMONG_US.id());
 
         if (!isMemberAllowed(member)) return;
         if (!Channels.STAFF_AJUDANTES_CHANNEL.id().equals(channel.getId())) return;
 
-        if (args.length < 2) {
+        if (args.length < 1) {
             Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 5000);
             return;
         }
@@ -42,7 +45,7 @@ public class RoleAmongUs implements CommandExecutor {
             return;
         }
 
-        Bot.fetchMember(guild, args[1]).queue(m -> {
+        Bot.fetchMember(guild, args[0]).queue(m -> {
             if (m.getRoles().contains(roleAmongUs)) {
                 channel.sendMessage("O membro <@" + m.getId() + "> já tem o cargo `" + roleAmongUs.getName() + "`.").queue();
                 return;

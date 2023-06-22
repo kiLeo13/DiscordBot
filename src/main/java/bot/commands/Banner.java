@@ -1,9 +1,9 @@
 package bot.commands;
 
+import bot.internal.abstractions.BotCommand;
 import bot.util.Bot;
 import bot.util.content.Messages;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
+import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -13,21 +13,23 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 
 @CommandPermission()
-public class Banner implements CommandExecutor {
+public class Banner extends BotCommand {
+
+    public Banner(String name) {
+        super(true, name);
+    }
 
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
 
         Member member = message.getMember();
-        String content = message.getContentRaw();
-        String[] args = content.split(" ");
         Guild guild = message.getGuild();
         TextChannel channel = message.getChannel().asTextChannel();
         MessageCreateBuilder send = new MessageCreateBuilder();
 
-        send.setContent("<@" + member.getId() + ">");
+        send.setContent(member.getAsMention());
 
-        Bot.fetchUser(args.length < 2 ? member.getId() : args[1]).queue(m -> {
+        Bot.fetchUser(args.length < 1 ? member.getId() : args[0]).queue(m -> {
             m.retrieveProfile().queue(p -> {
                 String banner = p.getBannerUrl() == null
                         ? null

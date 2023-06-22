@@ -1,9 +1,9 @@
 package bot.commands;
 
+import bot.internal.abstractions.BotCommand;
 import bot.util.Bot;
 import bot.util.content.Messages;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
+import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
@@ -15,23 +15,26 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @CommandPermission()
-public class RoleInfo implements CommandExecutor {
+public class RoleInfo extends BotCommand {
+    private EmbedBuilder embedBuilder;
+
+    public RoleInfo(String name) {
+        super(true, name);
+    }
 
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
         
-        String content = message.getContentRaw();
         Member member = message.getMember();
-        String[] args = content.split(" ");
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
 
-        if (args.length < 2) {
+        if (args.length < 1) {
             Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
             return;
         }
 
-        Role role = Bot.getRole(guild, args[1]);
+        Role role = Bot.getRole(guild, args[0]);
 
         if (role == null) {
             Bot.tempMessage(channel, "O cargo fornecido não existe.", 10000);
@@ -39,48 +42,30 @@ public class RoleInfo implements CommandExecutor {
         }
 
         MessageCreateBuilder builder = new MessageCreateBuilder();
-        MessageEmbed embed = embed(role);
+        embed(role);
 
-        builder.setEmbeds(embed);
-        builder.setContent("<@" + member.getIdLong() + ">");
+        builder.setEmbeds(embedBuilder.build());
+        builder.setContent(member.getAsMention());
 
-        Message sent = channel.sendMessage(builder.build()).complete();
+        channel.sendMessage(builder.build()).queue(m -> guild.findMembersWithRoles(role).onSuccess(ms -> {
+            int size = ms.size();
+            int sizeOnline = ms.stream().filter(mem -> !mem.getOnlineStatus().equals(OnlineStatus.OFFLINE)).toList().size();
 
-        guild.findMembersWithRoles(role).onSuccess(m -> {
-            int size = m.size();
-            int sizeOnline = m.stream().filter(mem -> !mem.getOnlineStatus().equals(OnlineStatus.OFFLINE)).toList().size();
-
-            final EmbedBuilder newEmbed = new EmbedBuilder();
-
-            newEmbed
-                    .setTitle(embed.getTitle())
-                    .setDescription(embed.getDescription())
-                    .setColor(embed.getColor())
-                    .setFooter(embed.getFooter() == null
-                            ? ""
-                            : embed.getFooter().getText(), embed.getFooter().getIconUrl());
-
-            if (embed.getThumbnail() != null)
-                newEmbed.setThumbnail(embed.getThumbnail().getUrl());
-
-            for (int i = 0; i < embed.getFields().size(); i++) {
-                if (i == embed.getFields().size() - 2) {
-                    newEmbed.addField("👥 Membros", String.format("Total: `%s`\nOnline: `%s`",
+            embedBuilder.getFields().set(embedBuilder.length() - 2, new MessageEmbed.Field(
+                    "👥 Membros",
+                    String.format("Total: `%s`\nOnline: `%s`",
                             size < 10 ? "0" + size : size,
                             sizeOnline < 10 ? "0" + sizeOnline : sizeOnline
-                    ), true);
-                    continue;
-                }
+                    ),
+                    true
+            ));
 
-                newEmbed.addField(embed.getFields().get(i));
-            }
-
-            sent.editMessageEmbeds(newEmbed.build()).queue();
-        });
+            m.editMessageEmbeds(embedBuilder.build()).queue();
+        }));
     }
 
-    private MessageEmbed embed(Role role) {
-        final EmbedBuilder builder = new EmbedBuilder();
+    private void embed(Role role) {
+        embedBuilder = new EmbedBuilder();
         Guild guild = role.getGuild();
         long creation = role.getTimeCreated().toEpochSecond();
 
@@ -89,7 +74,7 @@ public class RoleInfo implements CommandExecutor {
         int colorGreen = role.getColor() == null ? 0 : role.getColor().getGreen();
         int colorBlue = role.getColor() == null ? 0 : role.getColor().getBlue();
 
-        builder
+        embedBuilder
                 .setTitle(role.getName())
                 .setDescription("Informações do cargo <@&" + role.getIdLong() + ">.")
                 .setColor(role.getColor())
@@ -109,10 +94,9 @@ public class RoleInfo implements CommandExecutor {
                 .setFooter(guild.getName(), guild.getIconUrl());
 
         RoleIcon icon = role.getIcon();
-        if (icon != null)
-            builder.setThumbnail(icon.getIconUrl());
 
-        return builder.build();
+        if (icon != null)
+            embedBuilder.setThumbnail(icon.getIconUrl());
     }
 
     private String permissions(Role role) {

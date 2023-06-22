@@ -1,8 +1,8 @@
 package bot.commands;
 
+import bot.internal.abstractions.BotCommand;
 import bot.util.Bot;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
+import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -15,28 +15,31 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 
 @CommandPermission()
-public class Avatar implements CommandExecutor {
+public class Avatar extends BotCommand {
+
+    public Avatar(String name) {
+        super(true, name);
+    }
 
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
 
         TextChannel channel = message.getChannel().asTextChannel();
         Member member = message.getMember();
         Guild guild = message.getGuild();
         String content = message.getContentRaw();
-        String[] args = content.split(" ");
         MessageCreateBuilder send = new MessageCreateBuilder();
         boolean fromGuild = content.toLowerCase().endsWith("--server");
 
-        send.setContent("<@" + member.getId() + ">");
+        send.setContent(member.getAsMention());
 
-        if (args.length < 2) {
+        if (args.length < 1) {
             String avatarUrl = avatarUrl(member, fromGuild);
 
             send.setEmbeds(embed(avatarUrl, member));
             channel.sendMessage(send.build()).queue();
         } else {
-            Bot.fetchMember(guild, fromGuild ? member.getId() : args[1]).queue(m -> {
+            Bot.fetchMember(guild, fromGuild ? member.getId() : args[0]).queue(m -> {
                 String avatarUrl = avatarUrl(m, fromGuild);
 
                 if (avatarUrl == null) {

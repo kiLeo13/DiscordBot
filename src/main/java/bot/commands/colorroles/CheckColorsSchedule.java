@@ -1,6 +1,6 @@
 package bot.commands.colorroles;
 
-import bot.util.interfaces.BotScheduler;
+import bot.internal.abstractions.BotScheduler;
 
 public class CheckColorsSchedule implements BotScheduler {
 
@@ -8,6 +8,10 @@ public class CheckColorsSchedule implements BotScheduler {
     public void perform() {
         
         
+
+    }
+
+    private void remove(String member) {
 
     }
 }

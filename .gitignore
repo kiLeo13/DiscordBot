@@ -25,7 +25,7 @@ hs_err_pid*
 replay_pid*
 
 # bot.Main Config (token and stuff)
-src/main/java/bot/data/
+src/main/java/bot/internal/data/
 
 # Idea files
 .idea/

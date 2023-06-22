@@ -1,11 +1,11 @@
 package bot.commands;
 
+import bot.internal.abstractions.BotCommand;
 import bot.util.*;
 import bot.util.content.Messages;
 import bot.util.content.Roles;
-import bot.util.content.StaffEmoji;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
+import bot.util.content.MemberEmoji;
+import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -16,25 +16,27 @@ import java.awt.*;
 import java.util.List;
 
 @CommandPermission()
-public class Userinfo implements CommandExecutor {
+public class Userinfo extends BotCommand {
+
+    public Userinfo(String name) {
+        super(true, name);
+    }
 
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
 
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
-        String content = message.getContentRaw();
-        String[] args = content.split(" ");
         MessageCreateBuilder send = new MessageCreateBuilder();
 
-        send.setContent("<@" + member.getId() + ">");
+        send.setContent(member.getAsMention());
 
         if (args.length < 2) {
             send.setEmbeds(embed(member));
             channel.sendMessage(send.build()).queue();
         } else {
-            Bot.fetchMember(guild, args[1]).queue(m -> {
+            Bot.fetchMember(guild, args[0]).queue(m -> {
                 send.setEmbeds(embed(m));
                 channel.sendMessage(send.build()).queue();
             }, e -> channel.sendMessage(Messages.ERROR_MEMBER_NOT_FOUND.message()).queue());
@@ -90,10 +92,10 @@ public class Userinfo implements CommandExecutor {
 
             default -> {
                 if (target.getRoles().contains(salada)) {
-                    StaffEmoji[] emojis = StaffEmoji.values();
+                    MemberEmoji[] emojis = MemberEmoji.values();
 
-                    for (StaffEmoji e : emojis) {
-                        if (e.id() == target.getIdLong()) {
+                    for (MemberEmoji e : emojis) {
+                        if (e.id().equals(target.getId())) {
                             title = e.emoji() + " " + target.getUser().getName();
                             break;
                         }

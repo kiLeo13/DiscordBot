@@ -1,8 +1,8 @@
 package bot.commands;
 
+import bot.internal.abstractions.BotCommand;
 import bot.util.Bot;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
+import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -16,17 +16,20 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @CommandPermission(permissions = Permission.MANAGE_SERVER)
-public class Say implements CommandExecutor {
+public class Say extends BotCommand {
+
+    public Say(String name) {
+        super(true, name);
+    }
 
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
 
         MessageChannelUnion channel = message.getChannel();
         String content = message.getContentRaw();
         List<Message.Attachment> attachments = message.getAttachments();
         List<FileUpload> fileUploads = new ArrayList<>();
         MessageCreateBuilder builder = new MessageCreateBuilder();
-        String[] args = content.split(" ");
 
         Message replyiedMessage = message.getReferencedMessage();
 

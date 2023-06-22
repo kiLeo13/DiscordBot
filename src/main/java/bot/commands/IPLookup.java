@@ -4,11 +4,11 @@ import java.awt.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import bot.internal.abstractions.BotCommand;
 import com.google.gson.Gson;
 
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
-import bot.util.managers.requests.RequestManager;
+import bot.internal.abstractions.annotations.CommandPermission;
+import bot.internal.managers.requests.RequestManager;
 import bot.util.Bot;
 import bot.util.content.Messages;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -21,37 +21,39 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.jetbrains.annotations.NotNull;
 
 @CommandPermission()
-public class IPLookup implements CommandExecutor {
+public class IPLookup extends BotCommand {
     private static final RequestManager requester = RequestManager.create();
 
+    public IPLookup(String name) {
+        super(true, name);
+    }
+
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
         
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
-        String content = message.getContentRaw();
-        String[] args = content.split(" ");
         String regex = "\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b";
         Pattern pattern = Pattern.compile(regex);
 
-        if (args.length < 2) {
+        if (args.length < 1) {
             Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
             return;
         }
 
-        Matcher matcher = pattern.matcher(args[1]);
+        Matcher matcher = pattern.matcher(args[0]);
 
         if (!matcher.matches()) {
-            Bot.tempMessage(channel, "O IP `" + args[1] + "` é inválido.", 10000);
+            Bot.tempMessage(channel, "O IP `" + args[0] + "` é inválido.", 10000);
             return;
         }
 
-        String returned = requester.requestAsString("http://ip-api.com/json/" + args[1], null);
+        String returned = requester.requestAsString("http://ip-api.com/json/" + args[0], null);
         IP ip = deserialize(returned);
 
         if (ip == null) {
             Bot.tempMessage(channel,
-                "Não foi possível encontrar a região do ip `" + args[1] + "`.",
+                "Não foi possível encontrar a região do ip `" + args[0] + "`.",
                 10000);
             return;
         }

@@ -1,8 +1,8 @@
 package bot.commands;
 
 import bot.Main;
-import bot.util.interfaces.CommandExecutor;
-import bot.util.interfaces.annotations.CommandPermission;
+import bot.internal.abstractions.BotCommand;
+import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -15,11 +15,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
 @CommandPermission(permissions = Permission.MANAGE_SERVER)
-public class Uptime implements CommandExecutor {
+public class Uptime extends BotCommand {
     private static final byte timeZone = -3;
 
+    public Uptime(String name) {
+        super(true, name);
+    }
+
     @Override
-    public void run(@NotNull Message message) {
+    public void run(@NotNull Message message, String[] args) {
 
         User author = message.getAuthor();
         MessageChannelUnion channel = message.getChannel();
