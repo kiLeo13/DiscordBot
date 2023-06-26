@@ -1,10 +1,9 @@
 package bot.commands;
 
 import bot.internal.abstractions.BotCommand;
-import bot.internal.abstractions.annotations.CommandPermission;
 import bot.util.Bot;
 import bot.util.content.Channels;
-import bot.util.content.Messages;
+import bot.util.content.Responses;
 import bot.util.content.RegistrationRoles;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -13,32 +12,25 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@CommandPermission(permissions = Permission.MANAGE_ROLES)
 public class RegistrationTake extends BotCommand {
 
     public RegistrationTake(String name) {
-        super(true, name);
+        super(true, 1, Permission.MANAGE_ROLES, "{cmd} <member>", name);
     }
 
     @Override
-    public void run(@NotNull Message message, String[] args) {
+    public void run(Message message, String[] args) {
 
         Member member = message.getMember();
         Guild guild = message.getGuild();
         TextChannel channel = message.getChannel().asTextChannel();
 
         if (channel.getId().equals(Channels.REGISTER_CHANNEL.id())) return;
-
-        if (args.length < 1) {
-            Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
-            return;
-        }
 
         Bot.fetchMember(guild, args[0]).queue(m -> {
             List<Role> toGive = toGive(guild);
@@ -58,7 +50,7 @@ public class RegistrationTake extends BotCommand {
                 e.printStackTrace();
             });
 
-        }, e -> Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000));
+        }, e -> Bot.tempEmbed(channel, Responses.ERROR_MEMBER_NOT_FOUND, 10000));
     }
 
     private void logRegister(Member target, List<Role> givenRoles, List<Role> removedRoles, Member staff) {

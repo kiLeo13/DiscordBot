@@ -1,42 +1,32 @@
 package bot.commands.valorant;
 
-import java.awt.Color;
-import java.util.List;
-
 import bot.internal.abstractions.BotCommand;
-import com.google.gson.Gson;
-
-import bot.util.Bot;
-import bot.util.content.Messages;
-import bot.internal.abstractions.annotations.CommandPermission;
 import bot.internal.managers.requests.RequestManager;
+import bot.util.Bot;
+import com.google.gson.Gson;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.jetbrains.annotations.NotNull;
 
-@CommandPermission()
+import java.awt.*;
+import java.util.List;
+
 public class Characters extends BotCommand {
     private static final RequestManager requester = RequestManager.create();
 
     public Characters(String name) {
-        super(true, name);
+        super(true, 1, null, "{cmd} <agent-name>", name);
     }
 
     @Override
-    public void run(@NotNull Message message, String[] args) {
+    public void run(Message message, String[] args) {
         
         Member member = message.getMember();
-        MessageChannelUnion channel = message.getChannel();
+        TextChannel channel = message.getChannel().asTextChannel();
         String content = message.getContentRaw();
-
-        if (args.length < 1) {
-            channel.sendMessage(Messages.ERROR_TOO_FEW_ARGUMENTS.message()).queue();
-            return;
-        }
 
         List<Agent> agents = fetchAgents();
 

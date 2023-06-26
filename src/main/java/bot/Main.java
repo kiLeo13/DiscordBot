@@ -2,7 +2,6 @@ package bot;
 
 import bot.commands.Shutdown;
 import bot.commands.*;
-import bot.commands.colorroles.*;
 import bot.commands.tickets.*;
 import bot.commands.valorant.*;
 import bot.internal.managers.commands.*;
@@ -97,30 +96,27 @@ public final class Main {
         final CommandHandler manager = CommandHandler.getManager();
 
         manager.registerCommands(
-                new Ping("<pf>ping"),
-                new RoleAmongUs("<pf>among"),
-                new Say("<pf>say"),
-                new Uptime("<pf>uptime"),
-                new Clear("<pf>clear"),
-                new Userinfo("<pf>userinfo"),
-                new Avatar("<pf>avatar"),
-                new Help("<pf>help"),
-                new Banner("<pf>banner"),
-                new ServerInfo("<pf>serverinfo"),
-                new IPLookup("<pf>ip"),
-                new RoleInfo("<pf>roleinfo"),
-                new EditMessage("<pf>edit"),
-                new Tumaes("<pf>tumaes", "<pf>anão", "<pf>toquinho", "<pf>sacy"),
-                new Permissions("<pf>permissions", "<pf>permission"),
-                new Characters("<pf>v-agent"),
-                new Profiles("<pf>v-player"),
-                new FindMembersWithColor("<pf>colors"),
-                new Disconnect("<pf>dd", "<pf>disconnect"),
-                new ConnectDataBase("<pf>sql"),
-                new RegistrationTake("<pf>reg-take")
+                new Ping("{pf}ping"),
+                new RoleAmongUs("{pf}among"),
+                new Say("{pf}say"),
+                new Uptime("{pf}uptime"),
+                new Clear("{pf}clear"),
+                new Userinfo("{pf}userinfo"),
+                new Avatar("{pf}avatar"),
+                new Help("{pf}help"),
+                new Banner("{pf}banner"),
+                new ServerInfo("{pf}serverinfo"),
+                new IPLookup("{pf}ip"),
+                new RoleInfo("{pf}roleinfo"),
+                new Tumaes("{pf}tumaes", "{pf}anão", "{pf}toquinho", "{pf}sacy"),
+                new Permissions("{pf}permissions", "{pf}permission"),
+                new Characters("{pf}v-agent"),
+                new Profiles("{pf}v-player"),
+                new Disconnect("{pf}dd", "{pf}disconnect"),
+                new RegistrationTake("{pf}reg-take")
         );
 
-        Bot.log("<GREEN>Successfully registered <YELLOW>" + CommandHandler.getCommands().size() + "<GREEN> commands!", false);
+        Bot.log("{GREEN}Successfully registered {YELLOW}" + CommandHandler.getCommands().size() + "{GREEN} commands!");
         registerApplicationCommands();
     }
 
@@ -154,14 +150,13 @@ public final class Main {
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER)));
 
         // Registering it
-        api.updateCommands().addCommands(commands).queue(m -> Bot.log("<GREEN>Successfully registered <YELLOW>" + commands.size() + "<GREEN> slash commands!", false),e -> {
+        api.updateCommands().addCommands(commands).queue(m -> Bot.log("{GREEN}Successfully registered {YELLOW}" + commands.size() + "{GREEN} slash commands!"),e -> {
             e.printStackTrace();
-            Bot.log("<RED>Could not register commands.", true);
+            Bot.log("{RED}Could not register commands.");
         });
 
         // Internally register all the slash commands
         slash
-                .register("color", new ColorRole())
                 .register("shutdown", new Shutdown())
                 .register("close", new CloseTicket())
                 .register("ticket", new OpenTicket());
@@ -175,8 +170,7 @@ public final class Main {
         final ScheduleManager scheduler = ScheduleManager.getManager();
 
         scheduler
-                .addRunnable(3600 * 1000, new PayServer())
-                .addRunnable(60000, new CheckColorsSchedule());
+                .addRunnable(3600 * 1000, new PayServer());
 
         // Starts the schedule
         scheduler.release();

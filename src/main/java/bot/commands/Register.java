@@ -1,10 +1,8 @@
 package bot.commands;
 
-import bot.internal.abstractions.BotCommand;
-import bot.internal.abstractions.annotations.CommandPermission;
 import bot.util.Bot;
 import bot.util.content.Channels;
-import bot.util.content.Messages;
+import bot.util.content.Responses;
 import bot.util.content.RegistrationRoles;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -12,13 +10,11 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@CommandPermission()
 public class Register { // Register is a special command, we don't use the abstract class here
     private static Register instance;
     private static Role requiredRole;
@@ -58,7 +54,7 @@ public class Register { // Register is a special command, we don't use the abstr
         Pattern pattern = Pattern.compile("^[fmn][0-9][pm]$");
 
         if (!checkRoles(guild)) {
-            Bot.log("Not all roles were found to complete the registration process or one of them is higher than me! Aborting...", true);
+            Bot.log("{YELLOW}Not all roles were found to complete the registration process or one of them is higher than me! Aborting...");
             return;
         }
 
@@ -69,7 +65,7 @@ public class Register { // Register is a special command, we don't use the abstr
         if (!member.hasPermission(Permission.MANAGE_ROLES) && !member.getRoles().contains(requiredRole)) return;
 
         if (args.length < 1) {
-            Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
+            Bot.tempEmbed(channel, Responses.ERROR_TOO_FEW_ARGUMENTS, 10000);
             return;
         }
 
@@ -109,7 +105,7 @@ public class Register { // Register is a special command, we don't use the abstr
                                 Bot.tempMessage(channel, "Algo deu errado. Verifique o console para mais informações sobre o erro.", 10000);
                                 e.printStackTrace();
                             });
-        }, e -> Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000));
+        }, e -> Bot.tempEmbed(channel, Responses.ERROR_MEMBER_NOT_FOUND, 10000));
     }
 
     private List<Role> resolveRoles(String arg) {

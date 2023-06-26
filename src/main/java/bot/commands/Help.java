@@ -1,21 +1,17 @@
 package bot.commands;
 
 import bot.internal.abstractions.BotCommand;
-import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.dv8tion.jda.internal.entities.GuildImpl;
-import net.dv8tion.jda.internal.requests.restaction.MessageCreateActionImpl;
 
-@CommandPermission()
 public class Help extends BotCommand {
 
     public Help(String name) {
-        super(false, name);
+        super("{cmd} [command] [--hidden | --access]", name);
     }
 
     @Override

@@ -8,28 +8,25 @@ import java.util.HashMap;
 import java.util.List;
 
 import bot.internal.abstractions.BotCommand;
-import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.Yaml;
 
 import bot.util.content.Channels;
-import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
-@CommandPermission()
 public class Tumaes extends BotCommand {
     private static final File file = new File("resources", "tumaes.yml");
     private static final Yaml yaml = new Yaml();
 
     public Tumaes(String... names) {
-        super(false, names);
+        super(false, null, names);
     }
 
     @Override
-    public void run(@NotNull Message message, String[] name) {
+    public void run(Message message, String[] name) {
         
         TextChannel channel = message.getChannel().asTextChannel();
         Guild guild = message.getGuild();

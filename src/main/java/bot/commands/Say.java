@@ -2,28 +2,25 @@ package bot.commands;
 
 import bot.internal.abstractions.BotCommand;
 import bot.util.Bot;
-import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-@CommandPermission(permissions = Permission.MANAGE_SERVER)
 public class Say extends BotCommand {
 
     public Say(String name) {
-        super(true, name);
+        super(true, 0, Permission.MANAGE_SERVER, "{cmd} [content]", name);
     }
 
     @Override
-    public void run(@NotNull Message message, String[] args) {
+    public void run(Message message, String[] args) {
 
         MessageChannelUnion channel = message.getChannel();
         String content = message.getContentRaw();

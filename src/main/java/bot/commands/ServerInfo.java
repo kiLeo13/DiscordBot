@@ -1,7 +1,6 @@
 package bot.commands;
 
 import bot.internal.abstractions.BotCommand;
-import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -9,22 +8,20 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
-@CommandPermission()
 public class ServerInfo extends BotCommand {
 
     public ServerInfo(String name) {
-        super(true, name);
+        super(true, null, name);
     }
 
     @Override
-    public void run(@NotNull Message message, String[] args) {
+    public void run(Message message, String[] args) {
 
         MessageChannelUnion channel = message.getChannel();
         User author = message.getAuthor();

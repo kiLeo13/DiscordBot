@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -30,7 +29,7 @@ public class CloseTicket implements SlashExecutor {
     private static final TicketStorage manager = TicketStorage.create();
 
     @Override
-    public void process(@NotNull SlashCommandInteraction event) {
+    public void execute(SlashCommandInteraction event) {
 
         OptionMapping refused = event.getOption("refused");
         boolean isRefused = refused != null && refused.getAsBoolean();
@@ -81,7 +80,7 @@ public class CloseTicket implements SlashExecutor {
         LocalDateTime ticketCreation = LocalDateTime.ofEpochSecond(ticket.creation(), 0, ZoneOffset.UTC);
 
         if (ticketLog == null) {
-            Bot.log("Could not find log for closed tickets.", true);
+            Bot.log("{RED}Could not find log for closed tickets.");
             return;
         }
 

@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -13,7 +12,7 @@ public class MessageInputTicket extends ListenerAdapter {
     private static final TicketStorage manager = TicketStorage.create();
 
     @SubscribeEvent
-    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+    public void onMessageReceived(MessageReceivedEvent event) {
 
         Message message = event.getMessage();
         MessageChannel channel = message.getChannel();

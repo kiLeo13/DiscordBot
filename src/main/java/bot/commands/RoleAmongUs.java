@@ -3,45 +3,36 @@ package bot.commands;
 import bot.internal.abstractions.BotCommand;
 import bot.util.Bot;
 import bot.util.content.Channels;
-import bot.util.content.Messages;
+import bot.util.content.Responses;
 import bot.util.content.Roles;
-import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@CommandPermission()
 public class RoleAmongUs extends BotCommand {
 
     public RoleAmongUs(String name) {
-        super(false, name);
+        super(false, "{cmd} <member>", name);
     }
 
     @Override
-    public void run(@NotNull Message message, String[] args) {
+    public void run(Message message, String[] args) {
 
         TextChannel channel = message.getChannel().asTextChannel();
         Member member = message.getMember();
-        String content = message.getContentRaw();
         Guild guild = message.getGuild();
         Role roleAmongUs = guild.getRoleById(Roles.ROLE_AMONG_US.id());
 
         if (!isMemberAllowed(member)) return;
         if (!Channels.STAFF_AJUDANTES_CHANNEL.id().equals(channel.getId())) return;
 
-        if (args.length < 1) {
-            Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 5000);
-            return;
-        }
-
         if (roleAmongUs == null) {
-            Bot.tempMessage(channel, Messages.ERROR_REQUIRED_ROLES_NOT_FOUND.message(), 10000);
+            Bot.tempEmbed(channel, Responses.ERROR_REQUIRED_ROLES_NOT_FOUND, 10000);
             return;
         }
 
@@ -58,7 +49,7 @@ public class RoleAmongUs extends BotCommand {
 
             guild.addRoleToMember(m, roleAmongUs).queue();
             channel.sendMessage(String.format("<@%s> o cargo `%s` foi adicionado com sucesso à <@%s>!", member.getId(), roleAmongUs.getName(), m.getId())).queue();
-        }, e -> Bot.tempMessage(channel, Messages.ERROR_MEMBER_NOT_FOUND.message(), 10000));
+        }, e -> Bot.tempEmbed(channel, Responses.ERROR_MEMBER_NOT_FOUND, 10000));
     }
 
     private boolean isMemberAllowed(Member member) {

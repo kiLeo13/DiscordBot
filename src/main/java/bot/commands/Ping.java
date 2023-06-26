@@ -2,36 +2,50 @@ package bot.commands;
 
 import bot.Main;
 import bot.internal.abstractions.BotCommand;
-import bot.internal.abstractions.annotations.CommandPermission;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import org.jetbrains.annotations.NotNull;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
-@CommandPermission(permissions = Permission.MANAGE_SERVER)
 public class Ping extends BotCommand {
 
     public Ping(String name) {
-        super(true, name);
+        super(null, name);
     }
 
     @Override
-    public void run(@NotNull Message message, String[] args) {
+    public void run(Message message, String[] args) {
+
+        TextChannel channel = message.getChannel().asTextChannel();
+        User author = message.getAuthor();
+
+        MessageCreateBuilder builder = new MessageCreateBuilder();
+
+        builder.setContent(author.getAsMention());
+        builder.setEmbeds(embed(message));
+
+        channel.sendMessage(builder.build()).queue();
+    }
+
+    private MessageEmbed embed(Message call) {
+        final EmbedBuilder builder = new EmbedBuilder();
 
         JDA api = Main.getApi();
-        User author = message.getAuthor();
-        MessageChannelUnion channel = message.getChannel();
-
         long apiPing = api.getRestPing().complete();
         long gatewayPing = api.getGatewayPing();
+        User user = call.getAuthor();
+        Guild guild = call.getGuild();
 
-        channel.sendMessage(String.format("""
-                <@%s> **Oie!** <:Hiro:855653864693694494>
-                
-                🕒** | Gateway Ping**: `%dms`
-                📡** | API Ping**: `%dms`
-                """, author.getId(), gatewayPing, apiPing)).queue();
+        builder
+                .setAuthor("📡 Overall Ping", null, user.getAvatarUrl())
+                .addField("🌐 Gateway Ping", "`" + gatewayPing + "`", true)
+                .addField("🌐 API Ping", "`" + apiPing + "`", true)
+                .setFooter(guild.getName(), guild.getIconUrl());
+
+        return builder.build();
     }
 }

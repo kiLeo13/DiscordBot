@@ -2,28 +2,25 @@ package bot.commands;
 
 import bot.internal.abstractions.BotCommand;
 import bot.util.*;
-import bot.util.content.Messages;
+import bot.util.content.Responses;
 import bot.util.content.Roles;
 import bot.util.content.MemberEmoji;
-import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.List;
 
-@CommandPermission()
 public class Userinfo extends BotCommand {
 
     public Userinfo(String name) {
-        super(true, name);
+        super("{cmd} [member]", name);
     }
 
     @Override
-    public void run(@NotNull Message message, String[] args) {
+    public void run(Message message, String[] args) {
 
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
@@ -39,7 +36,7 @@ public class Userinfo extends BotCommand {
             Bot.fetchMember(guild, args[0]).queue(m -> {
                 send.setEmbeds(embed(m));
                 channel.sendMessage(send.build()).queue();
-            }, e -> channel.sendMessage(Messages.ERROR_MEMBER_NOT_FOUND.message()).queue());
+            }, e -> channel.sendMessageEmbeds(Responses.ERROR_MEMBER_NOT_FOUND).queue());
         }
     }
 

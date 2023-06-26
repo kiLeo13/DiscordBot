@@ -168,7 +168,7 @@ public class TicketStorage {
         final File dir = BotFiles.DIR_TICKETS;
 
         if (dir.mkdirs())
-            Bot.log("<YELLOW>'tickets' directory was not found. Creating a new one.", false);
+            Bot.log("{YELLOW}'tickets' directory was not found. Creating a new one.");
 
         if (!dir.isDirectory())
             throw new UnsupportedOperationException("The provided file object is not a directory");
@@ -244,7 +244,7 @@ public class TicketStorage {
         final File dir = BotFiles.DIR_TICKETS;
 
         if (dir.mkdirs())
-            Bot.log("<YELLOW>'tickets' directory was not found. Creating a new one.", false);
+            Bot.log("{YELLOW}'tickets' directory was not found. Creating a new one.");
 
         if (!dir.isDirectory())
             throw new UnsupportedOperationException("The provided file object is not a directory");

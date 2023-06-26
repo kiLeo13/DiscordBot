@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class TicketInfoCreation extends ListenerAdapter {
     private static final TicketStorage manager = TicketStorage.create();
 
     @SubscribeEvent
-    public void onModalInteraction(@NotNull ModalInteractionEvent event) {
+    public void onModalInteraction(ModalInteractionEvent event) {
 
         if (!event.getInteraction().getModalId().equals("create-ticket")) return;
 
@@ -32,7 +31,7 @@ public class TicketInfoCreation extends ListenerAdapter {
 
         if (supportCategory == null) {
             event.reply("Não foi possível abrir um ticket. Nossa requipe já está trabalhando para resolver o problema").setEphemeral(true).queue();
-            Bot.log("Categoria de 'Support' não foi encontrada. ID: " + Categories.SUPPORT.id(), true);
+            Bot.log("{YELLOW}Categoria de 'Support' não foi encontrada. ID: " + Categories.SUPPORT.id());
             TextChannel ajudantes = guild.getTextChannelById(Channels.STAFF_AJUDANTES_CHANNEL.id());
 
             if (ajudantes != null)

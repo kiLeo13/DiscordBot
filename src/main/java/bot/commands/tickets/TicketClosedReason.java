@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -22,7 +21,7 @@ public class TicketClosedReason extends ListenerAdapter {
     protected static final HashMap<MessageChannel, String> channelDeletionReason = new HashMap<>();
 
     @SubscribeEvent
-    public void onModalInteraction(@NotNull ModalInteractionEvent event) {
+    public void onModalInteraction(ModalInteractionEvent event) {
 
         if (!event.getInteraction().getModalId().equals("ticket-closed-reason")) return;
 

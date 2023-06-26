@@ -2,7 +2,6 @@ package bot.commands;
 
 import bot.internal.abstractions.BotCommand;
 import bot.util.Bot;
-import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -10,19 +9,17 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
-@CommandPermission()
 public class Avatar extends BotCommand {
 
     public Avatar(String name) {
-        super(true, name);
+        super("{cmd} [user] [--server]", name);
     }
 
     @Override
-    public void run(@NotNull Message message, String[] args) {
+    public void run(Message message, String[] args) {
 
         TextChannel channel = message.getChannel().asTextChannel();
         Member member = message.getMember();

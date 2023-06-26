@@ -39,7 +39,7 @@ public class SlashHandler extends ListenerAdapter {
         SlashExecutor command = commands.get(cmd);
         if (command == null) return;
 
-        command.process(event);
+        command.execute(event);
     }
 
     public SlashHandler register(String name, SlashExecutor command) {

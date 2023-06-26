@@ -18,31 +18,28 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Bot {
-    private static final Timer timer = new Timer(false);
-
     private Bot() {}
 
-    /**
-     * 
-     * @param channel The channel to be sent the message
-     * @param message The message to be sent in the channel
-     * @param time The time (in milliseconds) the bot will wait before deleting the message
-     * 
-    **/
     public static void tempMessage(MessageChannel channel, String message, int time) {
         if (channel == null) return;
         channel.sendMessage(message)
                 .delay(time, TimeUnit.MILLISECONDS)
                 .flatMap(Message::delete)
                 .queue(null, new ErrorHandler()
-                        .ignore(ErrorResponse.UNKNOWN_MESSAGE));
+                        .ignore(ErrorResponse.UNKNOWN_MESSAGE)
+                );
     }
 
-    /**
-     * @param message The message to be replied to
-     * @param content The message to be sent in the channel
-     * @param time The time (in milliseconds) the bot will wait before deleting the message
-     **/
+    public static void tempEmbed(MessageChannel channel, MessageEmbed embed, int time) {
+        if (channel == null) return;
+        channel.sendMessageEmbeds(embed)
+                .delay(time, TimeUnit.MILLISECONDS)
+                .flatMap(Message::delete)
+                .queue(null, new ErrorHandler()
+                        .ignore(ErrorResponse.UNKNOWN_MESSAGE)
+                );
+    }
+
     public static void tempReply(Message message, String content, int time) {
         message.reply(content)
                 .delay(time, TimeUnit.MILLISECONDS)
@@ -51,40 +48,10 @@ public class Bot {
                         .ignore(ErrorResponse.UNKNOWN_MESSAGE));
     }
 
-    /**
-     * Useful for deleting a message you are not sure if still exists without throwing an exception.
-     *
-     * @param message The message to be deleted.
-     **/
     public static void delete(Message message) {
         message.delete()
                 .queue(null, new ErrorHandler()
                         .ignore(ErrorResponse.UNKNOWN_MESSAGE));
-    }
-
-    public static void setTimeout(Runnable runnable, long delay) {
-        TimerTask task = new TimerTask() {
-
-            @Override
-            public void run() {
-                runnable.run();
-            }
-        };
-
-        timer.schedule(task, delay);
-    }
-
-    public static TimerTask setInterval(Runnable runnable, long delay) {
-        TimerTask task = new TimerTask() {
-            
-            @Override
-            public void run() {
-                runnable.run();
-            }
-        };
-        
-        timer.scheduleAtFixedRate(task, 0, delay);
-        return task;
     }
 
     public static Role getRole(Guild guild, String id) {
@@ -117,7 +84,7 @@ public class Bot {
         return jda.retrieveUserById(arg);
     }
 
-    public static CacheRestAction<Member> fetchMember(@NotNull Guild guild, @NotNull String arg) {
+    public static CacheRestAction<Member> fetchMember(Guild guild, String arg) {
         arg = arg.replaceAll("[^0-9]+", "");
 
         if (arg.isBlank()) arg = "-1";
@@ -125,21 +92,21 @@ public class Bot {
         return guild.retrieveMemberById(arg);
     }
 
-    public static void log(String str, boolean error) {
+    public static void log(String str) {
         final HashMap<String, String> placeholders = new HashMap<>();
 
-        placeholders.put("<RESET>", "\033[0m");
-        placeholders.put("<BLACK>", "\033[0;30m");
-        placeholders.put("<RED>", "\033[0;31m");
-        placeholders.put("<GREEN>", "\033[0;32m");
-        placeholders.put("<YELLOW>", "\033[0;33m");
-        placeholders.put("<BLUE>", "\033[0;34m");
-        placeholders.put("<PURPLE>", "\033[0;35m");
-        placeholders.put("<CYAN>", "\033[0;36m");
-        placeholders.put("<WHITE>", "\033[0;37m");
+        placeholders.put("{RESET}", "\033[0m");
+        placeholders.put("{BLACK}", "\033[0;30m");
+        placeholders.put("{RED}", "\033[0;31m");
+        placeholders.put("{GREEN}", "\033[0;32m");
+        placeholders.put("{YELLOW}", "\033[0;33m");
+        placeholders.put("{BLUE}", "\033[0;34m");
+        placeholders.put("{PURPLE}", "\033[0;35m");
+        placeholders.put("{CYAN}", "\033[0;36m");
+        placeholders.put("{WHITE}", "\033[0;37m");
 
         for (String k : placeholders.keySet())
-            str = str.replaceAll(k, placeholders.get(k));
+            str = str.replace(k, placeholders.get(k));
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -147,10 +114,7 @@ public class Bot {
         String minute = now.getMinute() < 10 ? "0" + now.getMinute() : String.valueOf(now.getMinute());
         String second = now.getSecond() < 10 ? "0" + now.getSecond() : String.valueOf(now.getSecond());
 
-        if (error)
-            System.err.printf("[%s.%s.%s]: %s%s\n", hour, minute, second, str, "\033[0m");
-        else
-            System.out.printf("[%s.%s.%s]: %s%s\n", hour, minute, second, str, "\033[0m");
+        System.out.printf("[%s.%s.%s]: %s%s\n", hour, minute, second, str, "\033[0m");
     }
 
     public static String read(File file) {

@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
-import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -20,7 +19,7 @@ public class OpenTicket implements SlashExecutor {
     protected static final HashMap<String, Long> cooldown = new HashMap<>();
 
     @Override
-    public void process(@NotNull SlashCommandInteraction event) {
+    public void execute(SlashCommandInteraction event) {
 
         Member member = event.getMember();
         Guild guild = event.getGuild();

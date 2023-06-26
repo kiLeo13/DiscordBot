@@ -2,37 +2,28 @@ package bot.commands;
 
 import bot.internal.abstractions.BotCommand;
 import bot.util.Bot;
-import bot.util.content.Messages;
-import bot.internal.abstractions.annotations.CommandPermission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-@CommandPermission()
 public class RoleInfo extends BotCommand {
     private EmbedBuilder embedBuilder;
 
     public RoleInfo(String name) {
-        super(true, name);
+        super(true, 1, null, "{cmd} <role>", name);
     }
 
     @Override
-    public void run(@NotNull Message message, String[] args) {
+    public void run(Message message, String[] args) {
         
         Member member = message.getMember();
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
-
-        if (args.length < 1) {
-            Bot.tempMessage(channel, Messages.ERROR_TOO_FEW_ARGUMENTS.message(), 10000);
-            return;
-        }
 
         Role role = Bot.getRole(guild, args[0]);
 

@@ -4,8 +4,8 @@ import bot.commands.Register;
 import bot.internal.data.BotData;
 import bot.util.Bot;
 import bot.internal.abstractions.BotCommand;
-import bot.internal.abstractions.annotations.CommandPermission;
 import bot.internal.abstractions.annotations.MessageDeletion;
+import bot.util.content.Responses;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 
 public class CommandHandler extends ListenerAdapter {
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(5);
-    private static final Map<List<String>, BotCommand> commands = new HashMap<>();
+    private static final List<BotCommand> commands = new ArrayList<>();
     private static CommandHandler INSTANCE;
 
     private CommandHandler() {}
@@ -48,9 +48,9 @@ public class CommandHandler extends ListenerAdapter {
 
         Member member = message.getMember();
         String input = message.getContentRaw().toLowerCase();
-        String cmd = input.split(" ")[0];
-        String[] args = input.split(" ");
-        String[] cmdArgs = args.length < 2
+        String[] rawArgs = input.split(" ");
+        String cmd = rawArgs[0];
+        String[] cmdArgs = rawArgs.length < 2
                 ? new String[]{}
                 : input.substring(cmd.length() + 1).split(" ");
 
@@ -67,6 +67,13 @@ public class CommandHandler extends ListenerAdapter {
         if (hasPermission(member, command)) {
             MessageDeletion annotation = command.getClass().getAnnotation(MessageDeletion.class);
 
+            // Block it if the executed command has fewer arguments provided than the required amount
+            if (cmdArgs.length < command.getMinLength()) {
+                Bot.tempEmbed(message.getChannel(), Responses.ERROR_TOO_FEW_ARGUMENTS, 10000);
+                Bot.delete(message);
+                return;
+            }
+
             if (annotation == null || annotation.value())
                 Bot.delete(message);
 
@@ -75,51 +82,35 @@ public class CommandHandler extends ListenerAdapter {
     }
 
     private boolean hasPermission(Member member, BotCommand command) {
-        final List<Permission> permissions = List.of(command.getClass().getAnnotation(CommandPermission.class).permissions());
+        final Permission permission = command.getRequiredPermission();
 
-        if (permissions.isEmpty()) return true;
-
-        for (Permission p : permissions)
-            if (member.hasPermission(p))
-                return true;
-
-        return false;
+        return permission == null || member.hasPermission(permission);
     }
 
     private BotCommand findCommand(String cmd) {
-        for (List<String> cmds : commands.keySet()) {
-            BotCommand command = commands.get(cmds);
+        for (BotCommand command : commands) {
+            List<String> names = command.getNames();
 
-            if (cmds.contains(cmd))
+            if (names.contains(cmd))
                 return command;
         }
 
         return null;
     }
 
-    /**
-     * Registers the commands the bot will listen to.
-     *
-     * @param input The commands to be registered.
-     */
     public void registerCommands(BotCommand... input) {
         for (BotCommand command : input) {
-            List<String> names = command.getNames()
-                    .stream()
-                    .map(s -> s
-                            .replace("<pf>", BotData.PREFIX)
-                            .toLowerCase()
-                    ).toList();
+            final List<String> names = command.getNames().stream().map(String::toLowerCase).toList();
 
             for (String n : names)
-                if (n == null || n.toLowerCase().split(" ").length != 1)
+                if (n == null || n.split(" ").length != 1)
                     throw new IllegalArgumentException("Command names cannot contain spaces");
 
-            commands.put(names, command);
+            commands.add(command);
         }
     }
 
-    public static Map<List<String>, BotCommand> getCommands() {
-        return Collections.unmodifiableMap(commands);
+    public static List<BotCommand> getCommands() {
+        return commands;
     }
 }

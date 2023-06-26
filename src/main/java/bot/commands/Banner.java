@@ -2,25 +2,22 @@ package bot.commands;
 
 import bot.internal.abstractions.BotCommand;
 import bot.util.Bot;
-import bot.util.content.Messages;
-import bot.internal.abstractions.annotations.CommandPermission;
+import bot.util.content.Responses;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
-@CommandPermission()
 public class Banner extends BotCommand {
 
     public Banner(String name) {
-        super(true, name);
+        super("{cmd} [user]", name);
     }
 
     @Override
-    public void run(@NotNull Message message, String[] args) {
+    public void run(Message message, String[] args) {
 
         Member member = message.getMember();
         Guild guild = message.getGuild();
@@ -42,7 +39,7 @@ public class Banner extends BotCommand {
 
                 send.setEmbeds(embed(banner, guild, m));
                 channel.sendMessage(send.build()).queue();
-            }, e -> Bot.tempMessage(channel, Messages.ERROR_USER_NOT_FOUND.message(), 10000));
+            }, e -> Bot.tempEmbed(channel, Responses.ERROR_USER_NOT_FOUND, 10000));
         });
     }
 
