@@ -4,7 +4,7 @@ import bot.internal.abstractions.BotCommand;
 import bot.util.Bot;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
@@ -22,7 +22,7 @@ public class Say extends BotCommand {
     @Override
     public void run(Message message, String[] args) {
 
-        MessageChannelUnion channel = message.getChannel();
+        TextChannel channel = message.getChannel().asTextChannel();
         String content = message.getContentRaw();
         List<Message.Attachment> attachments = message.getAttachments();
         List<FileUpload> fileUploads = new ArrayList<>();
@@ -47,7 +47,7 @@ public class Say extends BotCommand {
         }
 
         builder.addFiles(fileUploads);
-        if (args.length >= 2) builder.setContent(content.substring(args[0].length() + 1));
+        if (args.length != 0) builder.setContent(content.substring(4));
 
         // If the message to be sent is empty, tell them about it
         if (builder.isEmpty()) {

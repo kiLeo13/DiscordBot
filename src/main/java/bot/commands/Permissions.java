@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 public class Permissions extends BotCommand {
 
     public Permissions(String... names) {
-        super(null, names);
+        super("{cmd} [member]", names);
     }
 
     @Override

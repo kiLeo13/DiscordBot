@@ -7,7 +7,12 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 public class Clear extends BotCommand {
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
     private boolean isCleaning = false;
 
     public Clear(String name) {
@@ -34,7 +39,7 @@ public class Clear extends BotCommand {
             return;
         }
 
-        clear(channel, amount);
+        clear(channel, amount, amount);
     }
 
     private int toInt(String arg) {
@@ -45,24 +50,19 @@ public class Clear extends BotCommand {
         }
     }
 
-    private void clear(TextChannel channel, int input) {
+    private void clear(TextChannel channel, int input, final int raw) {
         isCleaning = true;
         int amount = Math.min(100, input);
 
         // If it's 0 so the clear process has successfully ended
         if (amount <= 0) {
-            Bot.tempEmbed(
-                    channel,
-                    Responses.success("🧹 Pronto", "`" + input + "` mensagens foram limpadas.", channel.getGuild().getIconUrl()),
-                    10000
-            );
-            isCleaning = false;
+            success(channel, raw);
             return;
         }
 
-        channel.getHistory().retrievePast(amount).queue(ms -> {
+        channel.getHistory().retrievePast(amount).queue(messages -> {
 
-            if (ms == null || ms.isEmpty()) {
+            if (messages == null || messages.isEmpty()) {
                 Bot.tempEmbed(
                         channel,
                         Responses.error("❌ Nada encontrado", "Nenhuma mensagem foi encontrada.", null),
@@ -71,16 +71,32 @@ public class Clear extends BotCommand {
                 return;
             }
 
-            // I fucking hope it does not hit the rate limit lol
-            channel.deleteMessagesByIds(ms.stream().map(Message::getId).toList())
-                    .queue(v -> clear(channel, amount - ms.size()));
-        }, e -> {
-            e.printStackTrace();
-            Bot.tempEmbed(
-                    channel,
-                    Responses.error("❌ Ocorreu um erro", "Causa: `" + e.getMessage() + "`.", null),
-                    10000
-            );
+            if (messages.size() == 1) {
+                Bot.delete(messages.get(0));
+                success(channel, 1);
+                return;
+            }
+
+            // I fucking hope it does not hit the rate limit
+            channel.deleteMessagesByIds(messages.stream().map(Message::getId).toList()).queue(v -> {
+
+                System.out.println("Call cleared " + messages.size() + " messages.");
+
+                // We have to wait at least a second before calling it again
+                scheduler.schedule(() -> clear(channel, amount - messages.size(), raw), 1500, TimeUnit.MILLISECONDS);
+            });
         });
+    }
+
+    private void success(TextChannel channel, int amount) {
+        Bot.tempMessage(
+                channel,
+                String.format("Pronto, `%s` %s!",
+                        amount < 10 ? "0" + amount : amount,
+                        amount == 1 ? "mensagem foi limpada" : "mensagens foram limpadas"
+                ),
+                5000
+        );
+        isCleaning = false;
     }
 }

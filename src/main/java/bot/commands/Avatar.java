@@ -2,11 +2,9 @@ package bot.commands;
 
 import bot.internal.abstractions.BotCommand;
 import bot.util.Bot;
+import bot.util.content.Responses;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
@@ -29,31 +27,104 @@ public class Avatar extends BotCommand {
         boolean fromGuild = content.toLowerCase().endsWith("--server");
 
         send.setContent(member.getAsMention());
+        AvatarState state = resolveAvatar(args, fromGuild);
+        String url;
+        MessageEmbed embed;
 
-        if (args.length < 1) {
-            String avatarUrl = avatarUrl(member, fromGuild);
+        switch (state) {
+            case SELF_AVATAR -> {
+                url = member.getUser().getAvatarUrl();
 
-            send.setEmbeds(embed(avatarUrl, member));
-            channel.sendMessage(send.build()).queue();
-        } else {
-            Bot.fetchMember(guild, fromGuild ? member.getId() : args[0]).queue(m -> {
-                String avatarUrl = avatarUrl(m, fromGuild);
-
-                if (avatarUrl == null) {
-                    Bot.tempMessage(channel, "O usuário não possui um avatar específico para este servidor.", 5000);
+                if (url == null) {
+                    Bot.tempEmbed(channel, Responses.ERROR_INFORMATION_NOT_FOUND, 10000);
                     return;
                 }
 
-                send.setEmbeds(embed(avatarUrl, m));
-                channel.sendMessage(send.build()).queue();
-            }, e -> Bot.tempMessage(channel, "Membro não encontrado! Talvez você esteja procurando um usuário que não está neste servidor, garanto que este recurso está sendo desenvolvido.", 15000));
+                embed = embed(url, guild, member.getUser());
+            }
+
+            case SELF_AVATAR_GUILD -> {
+                url = member.getAvatarUrl();
+
+                if (url == null) {
+                    Bot.tempEmbed(
+                            channel,
+                            Responses.warn("❌ O membro não possui um avatar específico para o servidor.", null, null),
+                            10000
+                    );
+                    return;
+                }
+
+                embed = embed(url, guild, member.getUser());
+            }
+
+            case MEMBER_AVATAR_GUILD -> {
+                Bot.fetchMember(guild, args[0]).queue(m -> {
+                    String avatar = getAvatar(m);
+
+                    if (avatar == null) {
+                        Bot.tempEmbed(
+                                channel,
+                                Responses.warn("❌ O membro não possui um avatar específico para o servidor.", null, null),
+                                10000
+                        );
+                        return;
+                    }
+
+                    MessageEmbed msgEmbed = embed(avatar, guild, m.getUser());
+                    send.setEmbeds(msgEmbed);
+                    channel.sendMessage(send.build()).queue();
+                }, e -> Bot.tempEmbed(channel, Responses.ERROR_MEMBER_NOT_FOUND, 5000));
+                return;
+            }
+
+            case USER_AVATAR -> {
+                Bot.fetchUser(args[0]).queue(u -> {
+                    String avatar = getAvatar(u);
+
+                    if (avatar == null) {
+                        Bot.tempEmbed(channel, Responses.ERROR_INFORMATION_NOT_FOUND, 10000);
+                        return;
+                    }
+
+                    MessageEmbed msgEmbed = embed(avatar, guild, u);
+                    send.setEmbeds(msgEmbed);
+                    channel.sendMessage(send.build()).queue();
+                }, e -> Bot.tempEmbed(channel, Responses.ERROR_USER_NOT_FOUND, 5000));
+                return;
+            }
+
+            // This should be impossible but
+            // Better safe than sorry?
+            default -> {
+                Bot.tempMessage(channel, "Nenhum padrão encontrado para procura.", 10000);
+                return;
+            }
         }
+
+        send.setEmbeds(embed);
+        channel.sendMessage(send.build()).queue();
     }
 
-    private MessageEmbed embed(String url, Member target) {
+    private String getAvatar(User user) {
+        String url = user.getAvatarUrl();
+
+        return url == null
+                ? null
+                : url + "?size=2048";
+    }
+
+    private String getAvatar(Member member) {
+        String url = member.getAvatarUrl();
+
+        return url == null
+                ? null
+                : url + "?size=2048";
+    }
+
+    private MessageEmbed embed(String url, Guild guild, User target) {
         final EmbedBuilder builder = new EmbedBuilder();
-        Guild guild = target.getGuild();
-        String name = target.getUser().getName();
+        String name = target.getName();
 
         // Embed related
         String title = "🖼 " + name;
@@ -89,10 +160,25 @@ public class Avatar extends BotCommand {
                 .build();
     }
 
-    private String avatarUrl(Member target, boolean fromGuild) {
-        String avatar = fromGuild ? target.getAvatarUrl() : target.getUser().getAvatarUrl();
+    private AvatarState resolveAvatar(String[] args, boolean isGuild) {
 
-        // Return null if not found, resize the image otherwise
-        return avatar == null ? null : avatar + "?size=2048";
+        if (args.length == 0)
+            return AvatarState.SELF_AVATAR;
+
+        if (args.length == 1)
+            return isGuild
+                    ? AvatarState.SELF_AVATAR_GUILD
+                    : AvatarState.USER_AVATAR;
+
+        return isGuild
+                ? AvatarState.MEMBER_AVATAR_GUILD
+                : AvatarState.USER_AVATAR;
+    }
+
+    private enum AvatarState {
+        SELF_AVATAR,
+        SELF_AVATAR_GUILD,
+        USER_AVATAR,
+        MEMBER_AVATAR_GUILD
     }
 }

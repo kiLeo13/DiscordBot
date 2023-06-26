@@ -11,7 +11,6 @@ import bot.misc.schedules.*;
 import bot.util.Bot;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
@@ -53,11 +52,11 @@ public final class Main {
                     .setEventManager(new AnnotatedEventManager())
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableCache(CacheFlag.VOICE_STATE, CacheFlag.ONLINE_STATUS)
+                    .setActivity(Activity.playing("Oficina"))
                     .build()
                     .awaitReady();
 
             init = System.currentTimeMillis();
-            api.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Oficina"), false);
             runRunnables();
         } catch (InterruptedException e) {
             e.printStackTrace();

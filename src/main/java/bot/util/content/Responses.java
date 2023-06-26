@@ -7,6 +7,7 @@ import java.awt.*;
 
 public final class Responses {
 
+    public static MessageEmbed ERROR_INFORMATION_NOT_FOUND = create("❌ A informação pedida não foi encontrada.", null);
     public static MessageEmbed ERROR_VOICE_CHANNEL_NOT_FOUND = create("❌ Canal de voz não encontrado", null);
     public static MessageEmbed ERROR_INVALID_ARGUMENTS = create("❌ Argumentos fornecidos são inválidos", null);
     public static MessageEmbed ERROR_TOO_FEW_ARGUMENTS = create("❌ Argumentos insuficientes", null);
