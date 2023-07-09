@@ -10,11 +10,6 @@ import java.io.InputStream;
 import java.util.Map;
 
 public class RequestManager {
-    private RequestManager() {}
-
-    public static RequestManager create() {
-        return new RequestManager();
-    }
 
     /**
      * @param url The API endpoint.
@@ -40,11 +35,11 @@ public class RequestManager {
      * @param headers The headers (optional).
      * @return The {@link String} representation of the response body or an empty String if something goes wrong.
      */
-    public String requestAsString(String url, @Nullable Map<String, String> headers) {
+    public String requestString(String url, @Nullable Map<String, String> headers) {
         try {
             final ResponseBody body = request(url, headers, Method.GET, null);
             String response = body.string();
-            
+
             body.close();
             return response;
         } catch (IOException | NullPointerException e) {
@@ -57,7 +52,7 @@ public class RequestManager {
      * Returns a {@link ResponseBody} representation of the request.
      * <p>
      * <b>You MUST close every {@link ResponseBody} after using it.</b>
-     * 
+     *
      * @param url The endpoint.
      * @param headers The headers (optional).
      * @param method The method to make the request.

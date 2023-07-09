@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public class EconomyManager {
-    private static final RequestManager manager = RequestManager.create();
+    private static final RequestManager manager = new RequestManager();
     private static final Gson gson = new Gson();
     private final String token;
 
@@ -37,7 +37,7 @@ public class EconomyManager {
 
     /**
      * Sets the balance of a member to a new value.
-     * 
+     *
      * @param member The member to have their balance set to a new value.
      * @param bank The new bank amount to be set.
      * @param cash The new cash amount to be set.
@@ -73,7 +73,7 @@ public class EconomyManager {
      * Resets the balance of the provided member.
      * <p>
      * <b>This action can definitely not be undone.</b>
-     * 
+     *
      * @param member The member to have their balance reset.
      * @param reason The reason for the reset.
      * @return A {@link Balance} instance containing the new balance of the member or null if something goes wrong.
@@ -116,7 +116,7 @@ public class EconomyManager {
      * This method retrieves 100 members per page as default.
      * <p>
      * <b>This method returns the first (0) page of the leaderboard</b>
-     * 
+     *
      * @param guild The guild you want to get the leaderboard.
      * @return A {@link Leaderboard} instance containing all the leaderboard information or null if something goes wrong.
      * @see EconomyManager#getLeaderboard(Guild, int, int, int)
@@ -129,7 +129,7 @@ public class EconomyManager {
 
     /**
      * Retrieves the {@link Leaderboard} of a certain guild.
-     * 
+     *
      * @param guild The guild you want to get the leaderboard.
      * @param page The page of the leaderboard.
      * @param limit How many users can fit in a single page.
@@ -144,10 +144,10 @@ public class EconomyManager {
     }
 
     private String fetchBalance(Member member) {
-        String json = manager.requestAsString("https://unbelievaboat.com/api/v1/guilds/" + member.getGuild().getId() + "/users/" + member.getIdLong(),
+        String json = manager.requestString("https://unbelievaboat.com/api/v1/guilds/" + member.getGuild().getId() + "/users/" + member.getIdLong(),
                 Map.of(
-                "Authorization", this.token,
-                "accept", "application/json"
+                        "Authorization", this.token,
+                        "accept", "application/json"
                 )
         );
 
@@ -158,7 +158,7 @@ public class EconomyManager {
         if (limit < 0 || offset < 0)
             throw new IllegalArgumentException("Value 'limit' and 'offset' cannot be less than 0");
 
-        return manager.requestAsString("https://unbelievaboat.com/api/v1/guilds/" + guild.getId() + "/users/?sort=total&limit=" + limit + "&page=" + page,
+        return manager.requestString("https://unbelievaboat.com/api/v1/guilds/" + guild.getId() + "/users/?sort=total&limit=" + limit + "&page=" + page,
                 Map.of(
                         "Authorization", this.token,
                         "accept", "application/json"

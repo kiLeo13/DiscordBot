@@ -4,6 +4,7 @@ import bot.util.Bot;
 import bot.util.content.Channels;
 import bot.util.content.Responses;
 import bot.util.content.RegistrationRoles;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -11,6 +12,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -49,6 +51,7 @@ public class Register { // Register is a special command, we don't use the abstr
 
         TextChannel channel = message.getChannel().asTextChannel();
         String content = message.getContentRaw().substring(2);
+        String regex = "^[fmn][0-9]+[pm]$";
         Member member = message.getMember();
         Guild guild = message.getGuild();
 
@@ -58,7 +61,7 @@ public class Register { // Register is a special command, we don't use the abstr
         }
 
         // Members with Manage Roles are allowed to run this command anywhere
-        if (!member.hasPermission(Permission.MANAGE_ROLES) && !channel.getId().equals(Channels.REGISTER_CHANNEL.id())) return;
+        if (!member.hasPermission(Permission.MANAGE_ROLES) && channel.getIdLong() != Channels.REGISTER_CHANNEL.id()) return;
 
         // Members with Manage Roles are not required to have the required role
         if (!member.hasPermission(Permission.MANAGE_ROLES) && !member.getRoles().contains(requiredRole)) return;
@@ -68,7 +71,7 @@ public class Register { // Register is a special command, we don't use the abstr
             return;
         }
 
-        if (!Pattern.matches("^[fmn][0-9]+[pm]$", args[0])) {
+        if (!Pattern.matches(regex, args[0])) {
             Bot.tempMessage(channel, "O padrão de registro usado é inválido.", 10000);
             return;
         }
@@ -104,12 +107,13 @@ public class Register { // Register is a special command, we don't use the abstr
             if (target.getRoles().contains(verified))
                 rolesRemove.add(verified);
 
-            guild.modifyMemberRoles(target, rolesAdd, rolesRemove)
-                    .queue(s -> Bot.tempMessage(channel, "Membro " + target.getAsMention() + " foi registrado(a) com sucesso!", 10000),
-                            e -> {
-                                Bot.tempMessage(channel, "Algo deu errado. Verifique o console para mais informações sobre o erro.", 10000);
-                                e.printStackTrace();
-                            });
+            guild.modifyMemberRoles(target, rolesAdd, rolesRemove).queue(s -> {
+                Bot.tempMessage(channel, "Membro " + target.getAsMention() + " foi registrado(a) com sucesso!", 10000);
+                log(target, member, rolesAdd, rolesRemove);
+            }, e -> {
+                Bot.tempMessage(channel, "Algo deu errado. Verifique o console para mais informações sobre o erro.", 10000);
+                e.printStackTrace();
+            });
         }, e -> Bot.tempEmbed(channel, Responses.ERROR_MEMBER_NOT_FOUND, 10000));
     }
 
@@ -201,5 +205,40 @@ public class Register { // Register is a special command, we don't use the abstr
         }
 
         return true;
+    }
+
+    private void log(Member member, Member moderator, List<Role> added, List<Role> taken) {
+        final EmbedBuilder builder = new EmbedBuilder();
+        Guild guild = member.getGuild();
+        TextChannel log = guild.getTextChannelById(Channels.REGISTER_LOG_CHANNEL.id());
+
+        if (log == null) {
+            Bot.log("{RED}Register log channel not found! Ignoring it.");
+            return;
+        }
+
+        builder
+                .setTitle(String.format("`%s` foi registrado!", member.getUser().getEffectiveName()))
+                .setDescription(String.format("Registrado por `%s`.", moderator.getUser().getEffectiveName()))
+                .addField("Adicionados", format(added), true)
+                .addField("Removidos", format(taken), true)
+                .setColor(Color.GREEN)
+                .setFooter(guild.getName(), guild.getIconUrl());
+
+        log.sendMessageEmbeds(builder.build()).queue();
+
+        String out = String.format("%s registrou o membro %s!", moderator.getUser().getEffectiveName(), member.getUser().getEffectiveName());
+        Bot.log(out);
+    }
+
+    private String format(List<Role> roles) {
+        final StringBuilder builder = new StringBuilder();
+
+        for (Role r : roles)
+            builder
+                    .append(r.getAsMention())
+                    .append("\n");
+
+        return builder.toString().stripTrailing();
     }
 }

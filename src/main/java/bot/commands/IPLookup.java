@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 public class IPLookup extends BotCommand {
-    private static final RequestManager requester = RequestManager.create();
+    private static final RequestManager requester = new RequestManager();
 
     public IPLookup(String name) {
         super(true, 1, null, "{cmd} <ip>", name);
@@ -80,7 +80,7 @@ public class IPLookup extends BotCommand {
     }
 
     private IP getIpData(String ip) {
-        String response = requester.requestAsString("http://ip-api.com/json/" + ip, null);
+        String response = requester.requestString("http://ip-api.com/json/" + ip, null);
         Gson gson = new Gson();
         IP value = gson.fromJson(response, IP.class);
 

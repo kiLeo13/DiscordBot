@@ -70,7 +70,7 @@ public class LogTimeout extends ListenerAdapter {
         String targetMention = String.format("<@%d>", targetId);
         String title = String.format("%s %s!", target == null ? "Um membro" : target.getEffectiveName(), isPunishment ? "recebeu timeout" : "teve o timeout removido");
         String period = String.format("<t:%d>\n(<t:%d:R>)", current, current);
-        String previousPeriod = String.format("<t:%d>\n(<t:%d:R>)", old, old);
+        String previousPeriod = String.format("<t:%d>\n(`%s`)", old, getDifference(old));
 
         builder
                 .setAuthor(title, null, target == null ? null : target.getAvatarUrl())
@@ -86,8 +86,7 @@ public class LogTimeout extends ListenerAdapter {
         } else {
             builder
                     .addField("👥 Membro", targetMention, true)
-                    .addField("📅 Seria Removido", previousPeriod, true)
-                    .addField("🕒 Restante", "`" + getDifference(old) + "`", true);
+                    .addField("📅 Seria Removido", previousPeriod, true);
         }
 
         return builder.build();

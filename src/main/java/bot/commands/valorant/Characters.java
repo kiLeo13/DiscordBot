@@ -15,7 +15,7 @@ import java.awt.*;
 import java.util.List;
 
 public class Characters extends BotCommand {
-    private static final RequestManager requester = RequestManager.create();
+    private static final RequestManager requester = new RequestManager();
 
     public Characters(String name) {
         super(true, 1, null, "{cmd} <agent-name>", name);
@@ -92,7 +92,7 @@ public class Characters extends BotCommand {
     }
 
     private List<Agent> fetchAgents() {
-        String response = requester.requestAsString("https://valorant-api.com/v1/agents/", null);
+        String response = requester.requestString("https://valorant-api.com/v1/agents/", null);
         Gson gson = new Gson();
         return gson.fromJson(response, Agents.class).data;
     }

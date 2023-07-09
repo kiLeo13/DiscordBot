@@ -18,7 +18,7 @@ import java.awt.*;
 
 public class Profiles extends BotCommand {
     private static final Gson gson = new Gson();
-    private static final RequestManager requester = RequestManager.create();
+    private static final RequestManager requester = new RequestManager();
     private long lastUsed;
 
     public Profiles(String name) {
@@ -62,11 +62,17 @@ public class Profiles extends BotCommand {
     }
     
     private String name(String[] args) {
-        return resolve(args)[0];
+        String[] value = resolve(args);
+        return value.length == 2
+                ? value[0]
+                : null;
     }
 
     private String tag(String[] args) {
-        return resolve(args)[1];
+        String[] value = resolve(args);
+        return value.length == 2
+                ? resolve(args)[1]
+                : null;
     }
 
     private String[] resolve(String[] args) {
@@ -103,7 +109,7 @@ public class Profiles extends BotCommand {
     }
 
     private Player fetchPlayer(String name, String tag) {
-        String resposne = requester.requestAsString("https://api.henrikdev.xyz/valorant/v1/account/" + name + "/" + tag, null);
+        String resposne = requester.requestString("https://api.henrikdev.xyz/valorant/v1/account/" + name + "/" + tag, null);
         ReceivedData input = gson.fromJson(resposne, ReceivedData.class);
 
         if (input == null || input.status != 200)
