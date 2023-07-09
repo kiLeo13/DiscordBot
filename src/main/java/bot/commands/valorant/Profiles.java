@@ -34,11 +34,7 @@ public class Profiles extends BotCommand {
         long now = System.currentTimeMillis();
 
         if (now - lastUsed < 2000) {
-            Bot.tempEmbed(
-                    channel,
-                    Responses.warn(null, "Por favor, aguarde `02s` entre usos para este comando.", null),
-                    10000
-            );
+            Bot.tempMessage(channel, "Por favor, aguarde `02s` entre usos para este comando.", 10000);
             return;
         }
 
@@ -52,7 +48,7 @@ public class Profiles extends BotCommand {
         if (player == null) {
             Bot.tempEmbed(
                     channel,
-                    Responses.warn(null, "Usuário `" + name + "#" + tag + "` não encontrado.", null),
+                    Responses.error(null, "Usuário `" + name + "#" + tag + "` não encontrado.", null),
                     10000
             );
             return;

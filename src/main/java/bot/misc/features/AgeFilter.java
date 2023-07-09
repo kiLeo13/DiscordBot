@@ -20,9 +20,8 @@ public class AgeFilter extends ListenerAdapter {
         
         Message message = event.getMessage();
         Member member = message.getMember();
-        String[] args = message.getContentRaw().replaceAll("[^0-9 ]+", "").split(" ");
+        String contentNumbers = message.getContentRaw().replaceAll("[^0-9 ]+", "");
         MessageChannelUnion channel = message.getChannel();
-        boolean hasNumber = false;
         User author = message.getAuthor();
 
         if (!Channels.AGE_FILTER_CHANNELS.ids().contains(channel.getId())) return;
@@ -30,23 +29,9 @@ public class AgeFilter extends ListenerAdapter {
 
         Role requiredRole = message.getGuild().getRoleById(RegistrationRoles.REQUIRED.id());
 
-        if (member.hasPermission(Permission.MANAGE_SERVER) || member.getRoles().contains(requiredRole)) return;
+        if (member.hasPermission(Permission.MANAGE_SERVER) || (requiredRole != null && member.getRoles().contains(requiredRole))) return;
 
-        for (String i : args) {
-            try {
-                int number = Integer.parseInt(i);
-
-                // Are you really 30 years old OR EVEN -1 YEAR OLD? :oooo
-                if (number > 30 || number < 0) {
-                    Bot.delete(message);
-                    return;
-                }
-
-                hasNumber = true;
-            } catch (NumberFormatException ignore) {}
-        }
-
-        // Hmmm you're one of those people who never age, right?
-        if (!hasNumber) Bot.delete(message);
+        if (contentNumbers.isBlank())
+            Bot.delete(message);
     }
 }

@@ -27,6 +27,9 @@ public class Avatar extends BotCommand {
         boolean fromGuild = content.toLowerCase().endsWith("--server");
 
         send.setContent(member.getAsMention());
+
+        // Checks what kind of avatar the member is tryna check
+        // as members can set a specific avatar for each guild
         AvatarState state = resolveAvatar(args, fromGuild);
         String url;
         MessageEmbed embed;
@@ -49,7 +52,7 @@ public class Avatar extends BotCommand {
                 if (url == null) {
                     Bot.tempEmbed(
                             channel,
-                            Responses.warn("❌ O membro não possui um avatar específico para o servidor.", null, null),
+                            Responses.error("❌ Você não possui um avatar específico para este servidor.", null, null),
                             10000
                     );
                     return;
@@ -65,7 +68,7 @@ public class Avatar extends BotCommand {
                     if (avatar == null) {
                         Bot.tempEmbed(
                                 channel,
-                                Responses.warn("❌ O membro não possui um avatar específico para o servidor.", null, null),
+                                Responses.error("❌ O membro não possui um avatar específico para este servidor.", null, null),
                                 10000
                         );
                         return;

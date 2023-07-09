@@ -45,6 +45,7 @@ public final class Main {
                             GatewayIntent.GUILD_VOICE_STATES,
                             GatewayIntent.GUILD_MEMBERS,
                             GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
+                            GatewayIntent.GUILD_MODERATION,
                             GatewayIntent.SCHEDULED_EVENTS,
                             GatewayIntent.GUILD_PRESENCES,
                             GatewayIntent.GUILD_MESSAGE_REACTIONS
@@ -87,7 +88,10 @@ public final class Main {
 
                 // Modals
                 new TicketInfoCreation(),
-                new TicketClosedReason()
+                new TicketClosedReason(),
+
+                // Member timed out
+                new LogTimeout()
         );
     }
 

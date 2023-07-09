@@ -47,7 +47,7 @@ public class IPLookup extends BotCommand {
         if (ip == null) {
             Bot.tempEmbed(
                     channel,
-                    Responses.warn("❌ Não foi possível encontrar a região do ip `" + args[0] + "`.", null, null),
+                    Responses.error("❌ IP não encontrado", "Não foi possível encontrar a região do ip `" + args[0] + "`.", null),
                     10000
             );
             return;

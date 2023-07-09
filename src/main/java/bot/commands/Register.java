@@ -51,10 +51,9 @@ public class Register { // Register is a special command, we don't use the abstr
         String content = message.getContentRaw().substring(2);
         Member member = message.getMember();
         Guild guild = message.getGuild();
-        Pattern pattern = Pattern.compile("^[fmn][0-9][pm]$");
 
         if (!checkRoles(guild)) {
-            Bot.log("{YELLOW}Not all roles were found to complete the registration process or one of them is higher than me! Aborting...");
+            Bot.log("{YELLOW}Roles not found to complete the registration process or one of them is higher than me! Aborting...");
             return;
         }
 
@@ -64,19 +63,25 @@ public class Register { // Register is a special command, we don't use the abstr
         // Members with Manage Roles are not required to have the required role
         if (!member.hasPermission(Permission.MANAGE_ROLES) && !member.getRoles().contains(requiredRole)) return;
 
-        if (args.length < 1) {
+        if (args.length < 2) {
             Bot.tempEmbed(channel, Responses.ERROR_TOO_FEW_ARGUMENTS, 10000);
             return;
         }
 
-        if (pattern.matcher(content.split(" ")[0]).matches()) {
+        if (!Pattern.matches("^[fmn][0-9]+[pm]$", args[0])) {
             Bot.tempMessage(channel, "O padrão de registro usado é inválido.", 10000);
             return;
         }
 
-        Bot.fetchMember(guild, args[0]).queue(target -> {
-            final List<Role> rolesAdd = resolveRoles(content);
+        Bot.fetchMember(guild, args[1]).queue(target -> {
+            final List<Role> rolesAdd = resolveRoles(args[0]);
             final List<Role> rolesRemove = new ArrayList<>(2);
+
+            // This is a generic error that will probably never be reached
+            if (rolesAdd == null) {
+                Bot.tempMessage(channel, "Não foi possível completar a operação.", 10000);
+                return;
+            }
 
             if (target.getRoles().contains(registered)) {
                 Bot.tempMessage(channel, "O membro `" + target.getUser().getName() + "` já está registrado.", 10000);
@@ -108,18 +113,23 @@ public class Register { // Register is a special command, we don't use the abstr
         }, e -> Bot.tempEmbed(channel, Responses.ERROR_MEMBER_NOT_FOUND, 10000));
     }
 
-    private List<Role> resolveRoles(String arg) {
-        final List<Role> roles = new ArrayList<>(4);
+    private List<Role> resolveRoles(String input) {
+        final List<Role> roles = new ArrayList<>();
 
-        roles.add(resolveGender(arg));
-        roles.addAll(resolveAge(arg));
-        roles.add(resolvePlataform(arg));
+        roles.add(resolveGender(input));
+        roles.addAll(resolveAge(input));
+        roles.add(resolvePlataform(input));
+
+        if (roles.size() < 3)
+            return null;
+
+        roles.add(registered);
 
         return roles;
     }
 
-    private Role resolveGender(String arg) {
-        char value = arg.charAt(0);
+    private Role resolveGender(String input) {
+        char value = input.charAt(0);
 
         switch (value) {
             case 'f' -> { return female; }
@@ -130,12 +140,12 @@ public class Register { // Register is a special command, we don't use the abstr
         return null;
     }
 
-    private List<Role> resolveAge(String arg) {
-        String value = arg.substring(1, arg.length() - 2);
+    private List<Role> resolveAge(String input) {
+        String value = input.substring(1, input.length() - 1);
         final List<Role> roles = new ArrayList<>(2);
 
         try {
-            byte age = Byte.parseByte(value);
+            short age = Short.parseShort(value);
 
             if (age < 13) roles.add(under13);
             if (age < 18) roles.add(underage);
@@ -143,12 +153,12 @@ public class Register { // Register is a special command, we don't use the abstr
 
             return roles;
         } catch (NumberFormatException e) {
-            return null;
+            return List.of();
         }
     }
 
-    private Role resolvePlataform(String arg) {
-        char value = arg.charAt(arg.length() - 1);
+    private Role resolvePlataform(String input) {
+        char value = input.charAt(input.length() - 1);
 
         switch (value) {
             case 'm' -> { return mobile; }

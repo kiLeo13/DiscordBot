@@ -55,8 +55,8 @@ public class CommandHandler extends ListenerAdapter {
                 : input.substring(cmd.length() + 1).split(" ");
 
         // Registration command is a specific case
-        if (cmd.startsWith("r!")) {
-            Register.getInstance().run(message, cmdArgs);
+        if (cmd.startsWith("r!") || !cmd.startsWith("r!take")) {
+            Register.getInstance().run(message, input.substring(2).split(" "));
             Bot.delete(message);
             return;
         }
@@ -102,15 +102,35 @@ public class CommandHandler extends ListenerAdapter {
         for (BotCommand command : input) {
             final List<String> names = command.getNames().stream().map(String::toLowerCase).toList();
 
-            for (String n : names)
+            for (String n : names) {
+
                 if (n == null || n.split(" ").length != 1)
                     throw new IllegalArgumentException("Command names cannot contain spaces");
+            }
 
             commands.add(command);
         }
     }
 
+    /**
+     * Returns the command with the provided name.
+     *
+     * @param name The name of the command. <b>You MUST provide the prefix</b>.
+     * @return A possible-null {@link BotCommand} instance with the command.
+     */
+    public static BotCommand getCommand(String name) {
+
+        for (BotCommand cmd : commands) {
+            List<String> cmdName = cmd.getNames();
+
+            if (cmdName.contains(name))
+                return cmd;
+        }
+
+        return null;
+    }
+
     public static List<BotCommand> getCommands() {
-        return commands;
+        return Collections.unmodifiableList(commands);
     }
 }

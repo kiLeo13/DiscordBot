@@ -7,13 +7,8 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 public class Clear extends BotCommand {
-    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
-    private boolean isCleaning = false;
+    private static long lastUse;
 
     public Clear(String name) {
         super(true, 1, Permission.MESSAGE_MANAGE, "{cmd} <amount>", name);
@@ -23,23 +18,38 @@ public class Clear extends BotCommand {
     public void run(Message message, String[] args) {
 
         TextChannel channel = message.getChannel().asTextChannel();
+        long now = System.currentTimeMillis();
         int amount = toInt(args[0]);
 
-        if (amount <= 0 || amount > 1000) {
+        // Just to be sure we will never hit the rate-limit
+        if ((now - lastUse) < 1000) {
+            Bot.tempMessage(channel, "Aguarde pelo menos `1s` entre usos para este comando.", 5000);
+            return;
+        }
+
+        if (amount <= 0 || amount > 100) {
             Bot.tempEmbed(channel, Responses.ERROR_INVALID_ARGUMENTS, 10000);
             return;
         }
 
-        if (isCleaning) {
-            Bot.tempEmbed(
-                    channel,
-                    Responses.warn("⏱ Aguarde", "O bot está limpando mensagens.", null),
-                    10000
-            );
-            return;
-        }
+        channel.getHistory().retrievePast(amount).queue(ms -> {
 
-        clear(channel, amount, amount);
+            if (ms == null || ms.isEmpty()) {
+                Bot.tempMessage(channel, "Nenhuma mensagem foi encontrada.",5000);
+                return;
+            }
+
+            if (ms.size() == 1) {
+                Bot.delete(ms.get(0));
+                success(channel, 1);
+                return;
+            }
+
+            channel.deleteMessagesByIds(ms.stream().map(Message::getId).toList()).queue(v -> {
+                success(channel, ms.size());
+                lastUse = System.currentTimeMillis();
+            });
+        });
     }
 
     private int toInt(String arg) {
@@ -50,53 +60,12 @@ public class Clear extends BotCommand {
         }
     }
 
-    private void clear(TextChannel channel, int input, final int raw) {
-        isCleaning = true;
-        int amount = Math.min(100, input);
-
-        // If it's 0 so the clear process has successfully ended
-        if (amount <= 0) {
-            success(channel, raw);
-            return;
-        }
-
-        channel.getHistory().retrievePast(amount).queue(messages -> {
-
-            if (messages == null || messages.isEmpty()) {
-                Bot.tempEmbed(
-                        channel,
-                        Responses.error("❌ Nada encontrado", "Nenhuma mensagem foi encontrada.", null),
-                        10000
-                );
-                return;
-            }
-
-            if (messages.size() == 1) {
-                Bot.delete(messages.get(0));
-                success(channel, 1);
-                return;
-            }
-
-            // I fucking hope it does not hit the rate limit
-            channel.deleteMessagesByIds(messages.stream().map(Message::getId).toList()).queue(v -> {
-
-                System.out.println("Call cleared " + messages.size() + " messages.");
-
-                // We have to wait at least a second before calling it again
-                scheduler.schedule(() -> clear(channel, amount - messages.size(), raw), 1500, TimeUnit.MILLISECONDS);
-            });
-        });
-    }
-
     private void success(TextChannel channel, int amount) {
-        Bot.tempMessage(
-                channel,
-                String.format("Pronto, `%s` %s!",
-                        amount < 10 ? "0" + amount : amount,
-                        amount == 1 ? "mensagem foi limpada" : "mensagens foram limpadas"
+        Bot.tempMessage(channel, String.format("Pronto! `%s` %s!",
+                amount < 10 ? "0" + amount : amount,
+                amount == 1 ? "mensagem foi apagada" : "mensagens foram apagadas"
                 ),
                 5000
         );
-        isCleaning = false;
     }
 }

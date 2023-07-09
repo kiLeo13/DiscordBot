@@ -1,6 +1,6 @@
 package bot.misc.schedules;
 
-import bot.internal.abstractions.BotScheduler;
+import bot.internal.abstractions.annotations.BotScheduler;
 
 import java.util.HashMap;
 import java.util.Map;
