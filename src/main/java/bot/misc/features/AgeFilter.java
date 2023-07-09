@@ -24,7 +24,7 @@ public class AgeFilter extends ListenerAdapter {
         MessageChannelUnion channel = message.getChannel();
         User author = message.getAuthor();
 
-        if (!Channels.AGE_FILTER_CHANNELS.ids().contains(channel.getId())) return;
+        if (Channels.AGE_FILTER_CHANNEL.id() != channel.getIdLong()) return;
         if (member == null || author.isBot()) return;
 
         Role requiredRole = message.getGuild().getRoleById(RegistrationRoles.REQUIRED.id());

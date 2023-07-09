@@ -29,7 +29,7 @@ public class RoleAmongUs extends BotCommand {
         Role roleAmongUs = guild.getRoleById(Roles.ROLE_AMONG_US.id());
 
         if (!isMemberAllowed(member)) return;
-        if (!Channels.STAFF_AJUDANTES_CHANNEL.id().equals(channel.getId())) return;
+        if (Channels.STAFF_AJUDANTES_CHANNEL.id() != channel.getIdLong()) return;
 
         if (roleAmongUs == null) {
             Bot.tempEmbed(channel, Responses.ERROR_REQUIRED_ROLES_NOT_FOUND, 10000);
@@ -53,6 +53,8 @@ public class RoleAmongUs extends BotCommand {
     }
 
     private boolean isMemberAllowed(Member member) {
+        if (member == null) return false;
+
         List<Role> possibleRoles = new ArrayList<>();
         Guild guild = member.getGuild();
 
