@@ -34,6 +34,7 @@ src/main/java/bot/internal/data/
 # Useless directories
 target/
 resources/
+src/main/java/bot/util/content/
 
 # Some util stuff, like channels & roles
 src/main/java/bot/util/Channels.java
