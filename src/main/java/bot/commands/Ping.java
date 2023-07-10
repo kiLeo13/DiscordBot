@@ -4,7 +4,6 @@ import bot.Main;
 import bot.internal.abstractions.BotCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -22,29 +21,25 @@ public class Ping extends BotCommand {
 
         TextChannel channel = message.getChannel().asTextChannel();
         User author = message.getAuthor();
-
+        JDA api = Main.getApi();
         MessageCreateBuilder builder = new MessageCreateBuilder();
+        long gatewayPing = api.getGatewayPing();
 
         builder.setContent(author.getAsMention());
-        builder.setEmbeds(embed(message));
 
-        channel.sendMessage(builder.build()).queue();
+        api.getRestPing().queue(ping -> {
+            builder.setEmbeds(embed(ping, gatewayPing));
+            channel.sendMessage(builder.build()).queue();
+        });
     }
 
-    private MessageEmbed embed(Message call) {
+    private MessageEmbed embed(long restPing, long gatewayPing) {
         final EmbedBuilder builder = new EmbedBuilder();
 
-        JDA api = Main.getApi();
-        long apiPing = api.getRestPing().complete();
-        long gatewayPing = api.getGatewayPing();
-        User user = call.getAuthor();
-        Guild guild = call.getGuild();
-
         builder
-                .setAuthor("📡 Overall Ping", null, user.getAvatarUrl())
-                .addField("🌐 Gateway Ping", "`" + gatewayPing + "`", true)
-                .addField("🌐 API Ping", "`" + apiPing + "`", true)
-                .setFooter(guild.getName(), guild.getIconUrl());
+                .setTitle("📡 Overall Ping")
+                .addField("🌐 Gateway Ping", "`" + gatewayPing + "ms`", true)
+                .addField("🌐 API Ping", "`" + restPing + "ms`", true);
 
         return builder.build();
     }

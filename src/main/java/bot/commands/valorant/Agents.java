@@ -14,10 +14,11 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import java.awt.*;
 import java.util.List;
 
-public class Characters extends BotCommand {
+public class Agents extends BotCommand {
+    private static final Gson gson = new Gson();
     private static final RequestManager requester = new RequestManager();
 
-    public Characters(String name) {
+    public Agents(String name) {
         super(true, 1, null, "{cmd} <agent-name>", name);
     }
 
@@ -27,18 +28,16 @@ public class Characters extends BotCommand {
         Member member = message.getMember();
         TextChannel channel = message.getChannel().asTextChannel();
         String content = message.getContentRaw();
-
+        MessageCreateBuilder send = new MessageCreateBuilder();
         List<Agent> agents = fetchAgents();
 
         Agent agent = resolveAgent(args[0], agents);
 
         // Does the agent exist?
         if (agent == null) {
-            Bot.tempMessage(channel, "Agent não encontrado na API.", 10000);
+            Bot.tempMessage(channel, "Agente não encontrado na API.", 10000);
             return;
         }
-
-        MessageCreateBuilder send = new MessageCreateBuilder();
 
         send.setEmbeds(embed(agent, content.toLowerCase().endsWith("--full")));
         send.setContent(member.getAsMention());
@@ -50,21 +49,17 @@ public class Characters extends BotCommand {
         EmbedBuilder builder = new EmbedBuilder();
 
         Color color = hexToRgb(agent.backgroundGradientColors[0]);
+        String agentUrl = String.format("https://playvalorant.com/en-us/agents/%s/", agent.displayName.replace("/", "-").toLowerCase());
         String name = agent.displayName;
         String description = agent.description;
         String image = agent.displayIcon;
         List<Ability> abilities = agent.abilities;
 
         builder
-                .setTitle(name)
+                .setAuthor(name + " (" + agent.role.displayName + ")", agentUrl)
                 .setDescription(description)
                 .setThumbnail(image)
-                .addField("✨ Habilidades", String.format("""
-                        `%s`
-                        `%s`
-                        `%s`
-                        `%s`
-                        """,
+                .addField("✨ Habilidades", String.format("`%s`\n`%s`\n`%s`\n`%s`",
                         abilities.get(0).displayName,
                         abilities.get(1).displayName,
                         abilities.get(2).displayName,
@@ -93,8 +88,11 @@ public class Characters extends BotCommand {
 
     private List<Agent> fetchAgents() {
         String response = requester.requestString("https://valorant-api.com/v1/agents/", null);
-        Gson gson = new Gson();
-        return gson.fromJson(response, Agents.class).data;
+        AgentsInput agentsInput = gson.fromJson(response, AgentsInput.class);
+
+        return agentsInput == null
+                ? List.of()
+                : agentsInput.data;
     }
 
     private Color hexToRgb(String hex) {
@@ -110,17 +108,20 @@ public class Characters extends BotCommand {
         return null;
     }
 
-    private record Agents(List<Agent> data) {}
+    private record AgentsInput(List<Agent> data) {}
 
     private record Agent(
             String displayName,
             String displayIcon,
             String description,
             String bustPortrait,
+            AgentRole role,
             String[] backgroundGradientColors,
             boolean isPlayableCharacter,
             List<Ability> abilities
     ) {}
+
+    private record AgentRole(String displayName) {}
 
     private record Ability(String displayName, String description) {}
 }

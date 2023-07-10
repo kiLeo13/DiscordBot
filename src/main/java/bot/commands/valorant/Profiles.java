@@ -40,6 +40,12 @@ public class Profiles extends BotCommand {
 
         String name = name(args);
         String tag = tag(args);
+
+        if (name == null || tag == null) {
+            Bot.tempEmbed(channel, Responses.ERROR_INVALID_ARGUMENTS, 10000);
+            return;
+        }
+
         Player player = fetchPlayer(name, tag);
 
         // Updating cooldown
@@ -71,7 +77,7 @@ public class Profiles extends BotCommand {
     private String tag(String[] args) {
         String[] value = resolve(args);
         return value.length == 2
-                ? resolve(args)[1]
+                ? value[1]
                 : null;
     }
 

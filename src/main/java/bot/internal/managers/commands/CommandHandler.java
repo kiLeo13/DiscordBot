@@ -55,7 +55,7 @@ public class CommandHandler extends ListenerAdapter {
                 : input.substring(cmd.length() + 1).split(" ");
 
         // Registration command is a specific case
-        if (cmd.startsWith("r!") || !cmd.startsWith("r!take")) {
+        if (cmd.startsWith("r!") && !cmd.startsWith("r!take")) {
             Register.getInstance().run(message, input.substring(2).split(" "));
             Bot.delete(message);
             return;

@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -82,6 +83,27 @@ public class Bot {
         if (arg.isBlank()) arg = "-1";
 
         return jda.retrieveUserById(arg);
+    }
+
+    public static String parsePeriod(long period) {
+        final StringBuilder builder = new StringBuilder();
+        Duration duration = Duration.ofSeconds(period);
+
+        if (duration.toSeconds() == 0) return "0s";
+
+        // It's safe to cast here as timeouts cannot exceed 2,419,200 seconds (28 days)
+        int day = (int) duration.toDaysPart();
+        int hrs = duration.toHoursPart();
+        int min = duration.toMinutesPart();
+        int sec = duration.toSecondsPart();
+
+        if (day != 0) builder.append(String.format("%sd, ", day < 10 ? "0" + day : day));
+        if (hrs != 0) builder.append(String.format("%sh, ", hrs < 10 ? "0" + hrs : hrs));
+        if (min != 0) builder.append(String.format("%sm, ", min < 10 ? "0" + min : min));
+        if (sec != 0) builder.append(String.format("%ss, ", sec < 10 ? "0" + sec : sec));
+
+        String result = builder.toString().stripTrailing();
+        return result.substring(0, result.length() - 1);
     }
 
     public static CacheRestAction<Member> fetchMember(Guild guild, String arg) {

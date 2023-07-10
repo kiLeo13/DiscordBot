@@ -91,7 +91,10 @@ public final class Main {
                 new TicketClosedReason(),
 
                 // Member timed out
-                new LogTimeout()
+                new LogTimeout(),
+
+                // Nobody still uses those nasty commands
+                new BlockDumbCommands()
         );
     }
 
@@ -113,7 +116,7 @@ public final class Main {
                 new RoleInfo("{pf}roleinfo"),
                 new Tumaes("{pf}tumaes", "{pf}anão", "{pf}toquinho", "{pf}sacy"),
                 new Permissions("{pf}permissions", "{pf}permission"),
-                new Characters("{pf}v-agent"),
+                new Agents("{pf}v-agent"),
                 new Profiles("{pf}v-player"),
                 new Disconnect("{pf}dd", "{pf}disconnect"),
                 new RegistrationTake("{pf}reg-take")

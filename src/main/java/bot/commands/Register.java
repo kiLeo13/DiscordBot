@@ -108,7 +108,7 @@ public class Register { // Register is a special command, we don't use the abstr
                 rolesRemove.add(verified);
 
             guild.modifyMemberRoles(target, rolesAdd, rolesRemove).queue(s -> {
-                Bot.tempMessage(channel, "Membro " + target.getAsMention() + " foi registrado(a) com sucesso!", 10000);
+                Bot.tempMessage(channel, "Membro " + target.getAsMention() + " foi registrado com sucesso!", 10000);
                 log(target, member, rolesAdd, rolesRemove);
             }, e -> {
                 Bot.tempMessage(channel, "Algo deu errado. Verifique o console para mais informações sobre o erro.", 10000);

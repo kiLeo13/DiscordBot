@@ -26,21 +26,19 @@ public class Banner extends BotCommand {
 
         send.setContent(member.getAsMention());
 
-        Bot.fetchUser(args.length < 1 ? member.getId() : args[0]).queue(m -> {
-            m.retrieveProfile().queue(p -> {
-                String banner = p.getBannerUrl() == null
-                        ? null
-                        : p.getBannerUrl() + "?size=2048";
+        Bot.fetchUser(args.length < 1 ? member.getId() : args[0]).queue(m -> m.retrieveProfile().queue(p -> {
+            String banner = p.getBannerUrl() == null
+                    ? null
+                    : p.getBannerUrl() + "?size=2048";
 
-                if (banner == null) {
-                    Bot.tempMessage(channel, "Nenhum banner foi encontrado para este usuário.", 10000);
-                    return;
-                }
+            if (banner == null) {
+                Bot.tempMessage(channel, "Nenhum banner foi encontrado para este usuário.", 10000);
+                return;
+            }
 
-                send.setEmbeds(embed(banner, guild, m));
-                channel.sendMessage(send.build()).queue();
-            }, e -> Bot.tempEmbed(channel, Responses.ERROR_USER_NOT_FOUND, 10000));
-        });
+            send.setEmbeds(embed(banner, guild, m));
+            channel.sendMessage(send.build()).queue();
+        }, e -> Bot.tempEmbed(channel, Responses.ERROR_USER_NOT_FOUND, 10000)));
     }
 
     private MessageEmbed embed(String url, Guild guild, User target) {
