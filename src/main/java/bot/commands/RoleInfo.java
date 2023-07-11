@@ -6,13 +6,12 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 import java.util.List;
 
 public class RoleInfo extends BotCommand {
-    private EmbedBuilder embedBuilder;
 
     public RoleInfo(String name) {
         super(true, 1, null, "{cmd} <role>", name);
@@ -22,41 +21,41 @@ public class RoleInfo extends BotCommand {
     public void run(Message message, String[] args) {
         
         Member member = message.getMember();
-        MessageChannelUnion channel = message.getChannel();
+        TextChannel channel = message.getChannel().asTextChannel();
         Guild guild = message.getGuild();
-
         Role role = Bot.getRole(guild, args[0]);
+        MessageCreateBuilder send = new MessageCreateBuilder();
 
         if (role == null) {
             Bot.tempMessage(channel, "O cargo fornecido não existe.", 10000);
             return;
         }
 
-        MessageCreateBuilder builder = new MessageCreateBuilder();
-        embed(role);
+        MessageEmbed embed = embed(role);
+        send.setEmbeds(embed);
+        send.setContent(member.getAsMention());
 
-        builder.setEmbeds(embedBuilder.build());
-        builder.setContent(member.getAsMention());
-
-        channel.sendMessage(builder.build()).queue(m -> guild.findMembersWithRoles(role).onSuccess(ms -> {
-            int size = ms.size();
+        channel.sendMessage(send.build()).queue(m -> guild.findMembersWithRoles(role).onSuccess(ms -> {
+            final EmbedBuilder builder = new EmbedBuilder(embed);
+            final List<MessageEmbed.Field> fields = builder.getFields();
+            int sizeTotal = ms.size();
             int sizeOnline = ms.stream().filter(mem -> !mem.getOnlineStatus().equals(OnlineStatus.OFFLINE)).toList().size();
 
-            embedBuilder.getFields().set(embedBuilder.length() - 2, new MessageEmbed.Field(
+            fields.set(fields.size() - 2, new MessageEmbed.Field(
                     "👥 Membros",
                     String.format("Total: `%s`\nOnline: `%s`",
-                            size < 10 ? "0" + size : size,
+                            sizeTotal < 10 ? "0" + sizeTotal : sizeTotal,
                             sizeOnline < 10 ? "0" + sizeOnline : sizeOnline
                     ),
                     true
             ));
 
-            m.editMessageEmbeds(embedBuilder.build()).queue();
+            m.editMessageEmbeds(builder.build()).queue();
         }));
     }
 
-    private void embed(Role role) {
-        embedBuilder = new EmbedBuilder();
+    private MessageEmbed embed(Role role) {
+        final EmbedBuilder embedBuilder = new EmbedBuilder();
         Guild guild = role.getGuild();
         long creation = role.getTimeCreated().toEpochSecond();
 
@@ -88,6 +87,7 @@ public class RoleInfo extends BotCommand {
 
         if (icon != null)
             embedBuilder.setThumbnail(icon.getIconUrl());
+        return embedBuilder.build();
     }
 
     private String permissions(Role role) {
