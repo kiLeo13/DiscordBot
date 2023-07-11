@@ -27,12 +27,12 @@ public class Clear extends BotCommand {
             return;
         }
 
-        if (amount <= 0 || amount > 100) {
+        if (amount <= 0 || amount > 99) {
             Bot.tempEmbed(channel, Responses.ERROR_INVALID_ARGUMENTS, 10000);
             return;
         }
 
-        channel.getHistory().retrievePast(amount).queue(ms -> {
+        channel.getHistory().retrievePast(amount + 1).queue(ms -> {
 
             if (ms == null || ms.isEmpty()) {
                 Bot.tempMessage(channel, "Nenhuma mensagem foi encontrada.",5000);

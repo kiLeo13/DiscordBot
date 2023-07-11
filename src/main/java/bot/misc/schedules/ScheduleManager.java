@@ -10,14 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 public class ScheduleManager {
     private static final Map<Long, BotScheduler> runnables = new HashMap<>();
-    private static ScheduleManager instance;
-
-    private ScheduleManager() {}
-
-    public static ScheduleManager getManager() {
-        if (instance == null) instance = new ScheduleManager();
-        return instance;
-    }
 
     /**
      * Keep in mind that in order to start the schedule you must call {@link #release()} ONCE.

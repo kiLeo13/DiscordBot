@@ -8,6 +8,7 @@ import bot.util.content.MemberEmoji;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 import java.awt.*;
@@ -29,14 +30,18 @@ public class Userinfo extends BotCommand {
 
         send.setContent(member.getAsMention());
 
-        if (args.length < 2) {
+        if (args.length < 1) {
             send.setEmbeds(embed(member));
             channel.sendMessage(send.build()).queue();
         } else {
-            Bot.fetchMember(guild, args[0]).queue(m -> {
-                send.setEmbeds(embed(m));
+            // I will fix this complete() later, too lazy now
+            try {
+                Member target = Bot.fetchMember(guild, args[0]).complete();
+                send.setEmbeds(embed(target));
                 channel.sendMessage(send.build()).queue();
-            }, e -> channel.sendMessageEmbeds(Responses.ERROR_MEMBER_NOT_FOUND).queue());
+            } catch (ErrorResponseException e) {
+                channel.sendMessageEmbeds(Responses.ERROR_MEMBER_NOT_FOUND).queue();
+            }
         }
     }
 

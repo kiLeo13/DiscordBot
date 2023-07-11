@@ -81,7 +81,6 @@ public final class Main {
                 new AgeFilter(),
                 new Links(),
                 new OnBotPing(),
-                new WordFilter(),
                 CommandHandler.getManager(),
                 SlashHandler.getManager(),
                 new MessageInputTicket(),
@@ -173,7 +172,7 @@ public final class Main {
     }
 
     private static void runRunnables() {
-        final ScheduleManager scheduler = ScheduleManager.getManager();
+        final ScheduleManager scheduler = new ScheduleManager();
 
         scheduler
                 .addRunnable(3600 * 1000, new PayServer());

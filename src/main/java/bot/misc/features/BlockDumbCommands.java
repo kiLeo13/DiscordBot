@@ -1,9 +1,11 @@
 package bot.misc.features;
 
+import bot.internal.data.BotData;
 import bot.util.Bot;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
@@ -18,13 +20,17 @@ public class BlockDumbCommands extends ListenerAdapter {
 
         Message message = event.getMessage();
         User author = message.getAuthor();
+        MessageChannelUnion channel = message.getChannel();
         List<MessageEmbed> embeds = message.getEmbeds();
 
         if (author.getIdLong() != 297153970613387264L || embeds.isEmpty()) return;
 
-        for (MessageEmbed embed : embeds)
-            if (shouldDelete(embed))
+        for (MessageEmbed embed : embeds) {
+            if (shouldDelete(embed)) {
                 Bot.delete(message);
+                channel.sendMessage("Este comando é recomendável que use o bot da Oficina.\nEx: Use `" + BotData.PREFIX + "userinfo` ou `" + BotData.PREFIX + "avatar` ao invés disso.").queue();
+            }
+        }
     }
 
     private boolean shouldDelete(MessageEmbed embed) {

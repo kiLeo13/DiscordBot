@@ -46,7 +46,7 @@ public class Agents extends BotCommand {
     }
 
     private MessageEmbed embed(Agent agent, boolean hasDescription) {
-        EmbedBuilder builder = new EmbedBuilder();
+        final EmbedBuilder builder = new EmbedBuilder();
 
         Color color = hexToRgb(agent.backgroundGradientColors[0]);
         String agentUrl = String.format("https://playvalorant.com/en-us/agents/%s/", agent.displayName.replace("/", "-").toLowerCase());

@@ -110,6 +110,7 @@ public class Register { // Register is a special command, we don't use the abstr
             guild.modifyMemberRoles(target, rolesAdd, rolesRemove).queue(s -> {
                 Bot.tempMessage(channel, "Membro " + target.getAsMention() + " foi registrado com sucesso!", 10000);
                 log(target, member, rolesAdd, rolesRemove);
+                deleteLastMessageByUser(target, channel);
             }, e -> {
                 Bot.tempMessage(channel, "Algo deu errado. Verifique o console para mais informações sobre o erro.", 10000);
                 e.printStackTrace();
@@ -240,5 +241,16 @@ public class Register { // Register is a special command, we don't use the abstr
                     .append("\n");
 
         return builder.toString().stripTrailing();
+    }
+
+    private void deleteLastMessageByUser(Member target, TextChannel channel) {
+        channel.getHistory().retrievePast(20).queue(history -> {
+            for (Message m : history) {
+                if (m.getAuthor().getIdLong() != target.getIdLong()) continue;
+
+                m.delete().queue();
+                break;
+            }
+        });
     }
 }
