@@ -108,7 +108,7 @@ public class Register { // Register is a special command, we don't use the abstr
                 rolesRemove.add(verified);
 
             guild.modifyMemberRoles(target, rolesAdd, rolesRemove).queue(s -> {
-                Bot.tempMessage(channel, "Membro " + target.getAsMention() + " foi registrado com sucesso!", 10000);
+                Bot.tempMessage(channel, member.getAsMention() + " Membro " + target.getAsMention() + " foi registrado com sucesso!", 10000);
                 log(target, member, rolesAdd, rolesRemove);
                 deleteLastMessageByUser(target, channel);
             }, e -> {
@@ -220,11 +220,12 @@ public class Register { // Register is a special command, we don't use the abstr
 
         builder
                 .setTitle(String.format("`%s` foi registrado!", member.getUser().getEffectiveName()))
+                .setThumbnail(member.getUser().getAvatarUrl())
                 .setDescription(String.format("Registrado por `%s`.", moderator.getUser().getEffectiveName()))
                 .addField("Adicionados", format(added), true)
                 .addField("Removidos", format(taken), true)
                 .setColor(Color.GREEN)
-                .setFooter(guild.getName(), guild.getIconUrl());
+                .setFooter(guild.getName() + "・ID: " + member.getId(), guild.getIconUrl());
 
         log.sendMessageEmbeds(builder.build()).queue();
 

@@ -1,7 +1,7 @@
 package bot.misc.schedules;
 
 import bot.Main;
-import bot.internal.abstractions.annotations.BotScheduler;
+import bot.internal.abstractions.BotScheduler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;

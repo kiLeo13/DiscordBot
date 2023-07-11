@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
-public class SimpleHttpServer {
+public final class SimpleHttpServer {
 
     public static void runServer() throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);

@@ -16,7 +16,7 @@ public class RequestManager {
      * @param headers The headers (optional).
      * @return An {@link InputStream} representation of the response body or null if something goes wrong.
      */
-    public InputStream requestAsStream(String url, @Nullable Map<String, String> headers) {
+    public InputStream requestStream(String url, @Nullable Map<String, String> headers) {
         try {
             final ResponseBody body = request(url, headers, Method.GET, null);
             byte[] bytes = body.bytes();

@@ -1,4 +1,4 @@
-package bot.internal.abstractions.annotations;
+package bot.internal.abstractions;
 
 public interface BotScheduler {
     void perform();

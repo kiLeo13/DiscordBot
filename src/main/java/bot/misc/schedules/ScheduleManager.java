@@ -1,6 +1,6 @@
 package bot.misc.schedules;
 
-import bot.internal.abstractions.annotations.BotScheduler;
+import bot.internal.abstractions.BotScheduler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ public class ScheduleManager {
      * 
      * @param interval The interval between two task executions (in milliseconds).
      * @param scheduler What code should be run.
-     * @return The same {@link ScheduleManager} instance for function call chaining logic.
+     * @return The same {@link ScheduleManager} instance for chaining convenience.
      */
     public ScheduleManager addRunnable(long interval, BotScheduler scheduler) {
         if (scheduler == null)
